@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   // Optional: hardcoded fallback API URL if Firestore is unreachable.
-  apiUrlFallback: '',
+  apiUrlFallback: 'https://gramophonic-robbie-sustainingly.ngrok-free.dev',
   // Firebase web config (safe to ship in client). Paste from Firebase Console → Project settings → General.
   firebase: {
     apiKey: '',
