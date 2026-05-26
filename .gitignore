@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.angular/
+out-tsc/
+*.log
+.env
+.env.local
+.firebase/
+.DS_Store

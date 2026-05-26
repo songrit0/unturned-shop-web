@@ -1,0 +1,16 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class',
+  content: [
+    './src/**/*.{html,ts}',
+    './node_modules/flowbite/**/*.js',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+      },
+    },
+  },
+  plugins: [require('flowbite/plugin')],
+};

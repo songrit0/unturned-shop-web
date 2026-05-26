@@ -1,0 +1,65 @@
+{
+  "app": {
+    "title": "SellVault Shop"
+  },
+  "nav": {
+    "shop": "Shop",
+    "bills": "Bills",
+    "coins": "Coin",
+    "login": "Sign in",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "SellVault Shop",
+    "subtitle": "Sign in to buy/sell items and manage coins",
+    "button": "Sign in with Discord",
+    "hint": "Use the same Discord account as the bot"
+  },
+  "callback": {
+    "loading": "Signing in..."
+  },
+  "home": {
+    "hello": "Hi {{name}} 👋",
+    "linked": "Steam: {{id}}",
+    "notLinked": "Steam not linked",
+    "tiles": {
+      "shop": "Browse items",
+      "bills": "Cash bills",
+      "coins": "Balance + history"
+    }
+  },
+  "welcome": {
+    "title": "Welcome Pack",
+    "desc": "Generate code → in-game → type {{cmd}} → link + receive Welcome Pack",
+    "generate": "Generate Welcome Code",
+    "generating": "Generating...",
+    "yourCode": "Your code (one-time use):",
+    "copy": "Copy",
+    "copied": "Copied",
+    "useInGame": "In Unturned, type:",
+    "alreadyLinked": "Account already linked (steam {{id}})",
+    "error": "Something went wrong, try again"
+  },
+  "shop": {
+    "title": "Shop",
+    "billsTitle": "Bills Shop",
+    "search": "Search...",
+    "empty": "No items",
+    "stock": "stock: {{n}}",
+    "addToCart": "Add",
+    "cartSoon": "Basket coming in Phase 4"
+  },
+  "coins": {
+    "title": "Coins",
+    "balance": "Balance",
+    "needLink": "Steam not linked — in-game, type /link <code> first",
+    "marketHistory": "Market history",
+    "rewardLog": "Reward Log",
+    "empty": "No items"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading..."
+  }
+}

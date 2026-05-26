@@ -1,0 +1,65 @@
+{
+  "app": {
+    "title": "SellVault Shop"
+  },
+  "nav": {
+    "shop": "ร้านค้า",
+    "bills": "ธนบัตร",
+    "coins": "Coin",
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออก"
+  },
+  "login": {
+    "title": "SellVault Shop",
+    "subtitle": "เข้าสู่ระบบเพื่อซื้อ-ขายของ จัดการ coin",
+    "button": "เข้าสู่ระบบด้วย Discord",
+    "hint": "ใช้ Discord เดียวกับที่ใช้กับบอท"
+  },
+  "callback": {
+    "loading": "กำลังเข้าสู่ระบบ..."
+  },
+  "home": {
+    "hello": "สวัสดี {{name}} 👋",
+    "linked": "บัญชี Steam: {{id}}",
+    "notLinked": "ยังไม่ผูกบัญชี Steam",
+    "tiles": {
+      "shop": "ของในร้าน",
+      "bills": "ธนบัตรในเกม",
+      "coins": "ยอด + ประวัติ"
+    }
+  },
+  "welcome": {
+    "title": "Welcome Pack",
+    "desc": "สร้าง code → เข้าเกม → พิมพ์ {{cmd}} → ผูกบัญชี + รับ Welcome Pack",
+    "generate": "สร้าง Welcome Code",
+    "generating": "กำลังสร้าง...",
+    "yourCode": "Code ของคุณ (ใช้ได้ครั้งเดียว):",
+    "copy": "คัดลอก",
+    "copied": "คัดลอกแล้ว",
+    "useInGame": "เข้าเกม Unturned → พิมพ์:",
+    "alreadyLinked": "บัญชีนี้ผูกแล้ว (steam {{id}})",
+    "error": "เกิดข้อผิดพลาด ลองใหม่"
+  },
+  "shop": {
+    "title": "ร้านค้า",
+    "billsTitle": "ธนบัตร",
+    "search": "ค้นหา...",
+    "empty": "ไม่พบรายการ",
+    "stock": "stock: {{n}}",
+    "addToCart": "ใส่ตะกร้า",
+    "cartSoon": "ฟีเจอร์ตะกร้าจะมาใน Phase 4"
+  },
+  "coins": {
+    "title": "Coin",
+    "balance": "ยอดคงเหลือ",
+    "needLink": "ยังไม่ผูก Steam — เข้าเกมแล้วพิมพ์ /link <code> ก่อน",
+    "marketHistory": "ประวัติตลาด",
+    "rewardLog": "Reward Log",
+    "empty": "ยังไม่มีรายการ"
+  },
+  "common": {
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "loading": "กำลังโหลด..."
+  }
+}
