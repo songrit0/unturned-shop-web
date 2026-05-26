@@ -9,13 +9,13 @@ import { MarketItem, MarketKind, MarketService } from '../../services/market.ser
         <span class="mi lg" [class.text-brand-500]="kind === 'normal'" [class.text-emerald-500]="kind === 'bills'">
           {{ kind === 'bills' ? 'payments' : 'shopping_bag' }}
         </span>
-        {{ kind === 'bills' ? 'Bills Shop' : 'Shop' }}
+        {{ (kind === 'bills' ? 'shop.billsTitle' : 'shop.title') | translate }}
       </h1>
 
       <div class="flex flex-wrap gap-3 items-center mb-4">
         <div class="relative max-w-sm flex-1 min-w-[200px]">
           <span class="mi absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input type="search" [(ngModel)]="q" placeholder="ค้นหา..."
+          <input type="search" [(ngModel)]="q" [placeholder]="'shop.search' | translate"
                  (ngModelChange)="apply()"
                  class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
         </div>
@@ -24,26 +24,26 @@ import { MarketItem, MarketKind, MarketService } from '../../services/market.ser
           <button (click)="filter='all'; apply()" class="text-sm px-3 py-1.5 rounded-lg"
                   [class.bg-brand-500]="filter==='all'" [class.text-white]="filter==='all'"
                   [class.bg-slate-100]="filter!=='all'" [class.dark:bg-slate-700]="filter!=='all'">
-            ทั้งหมด ({{ items.length }})
+            {{ 'shop.all' | translate }} ({{ items.length }})
           </button>
           <button (click)="filter='sale'; apply()" class="text-sm px-3 py-1.5 rounded-lg flex items-center gap-1"
                   [class.bg-emerald-500]="filter==='sale'" [class.text-white]="filter==='sale'"
                   [class.bg-emerald-50]="filter!=='sale'" [class.text-emerald-700]="filter!=='sale'"
                   [class.dark:bg-emerald-900]="filter!=='sale'" [class.dark:text-emerald-300]="filter!=='sale'">
-            <span class="mi">trending_down</span> ลดราคา ({{ countSale }})
+            <span class="mi">trending_down</span> {{ 'shop.sale' | translate }} ({{ countSale }})
           </button>
           <button (click)="filter='hot'; apply()" class="text-sm px-3 py-1.5 rounded-lg flex items-center gap-1"
                   [class.bg-amber-500]="filter==='hot'" [class.text-white]="filter==='hot'"
                   [class.bg-amber-50]="filter!=='hot'" [class.text-amber-700]="filter!=='hot'"
                   [class.dark:bg-amber-900]="filter!=='hot'" [class.dark:text-amber-300]="filter!=='hot'">
-            <span class="mi">whatshot</span> เหลือน้อย ({{ countHot }})
+            <span class="mi">whatshot</span> {{ 'shop.hot' | translate }} ({{ countHot }})
           </button>
           <select [(ngModel)]="sort" (ngModelChange)="apply()"
                   class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
-            <option value="price-asc">ราคา ↑</option>
-            <option value="price-desc">ราคา ↓</option>
-            <option value="discount-desc">ลดราคามากสุด</option>
-            <option value="name">ชื่อ A→Z</option>
+            <option value="price-asc">{{ 'shop.sortPriceAsc' | translate }}</option>
+            <option value="price-desc">{{ 'shop.sortPriceDesc' | translate }}</option>
+            <option value="discount-desc">{{ 'shop.sortDiscount' | translate }}</option>
+            <option value="name">{{ 'shop.sortName' | translate }}</option>
           </select>
         </div>
       </div>
@@ -51,7 +51,7 @@ import { MarketItem, MarketKind, MarketService } from '../../services/market.ser
       <ng-container *ngIf="!loading; else loadingTpl">
         <p *ngIf="filtered.length === 0" class="text-slate-500 text-center py-12">
           <span class="mi xl block mb-2">inventory_2</span>
-          ไม่พบรายการ
+          {{ 'shop.empty' | translate }}
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <app-item-card *ngFor="let it of filtered; trackBy: trackById" [item]="it"></app-item-card>

@@ -12,7 +12,7 @@ import { BasketService } from '../../services/basket.service';
     <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 p-3">
         <a routerLink="/" class="font-bold text-lg whitespace-nowrap flex items-center gap-2">
-          <img src="assets/logo.png" alt="logo" class="w-9 h-9 rounded-lg">
+          <img src="assets/220750.png" alt="logo" class="w-9 h-9 rounded-lg">
           <span class="hidden sm:inline">{{ 'app.title' | translate }}</span>
         </a>
 
@@ -30,7 +30,7 @@ import { BasketService } from '../../services/basket.service';
           <a routerLink="/codes" routerLinkActive="text-brand-600"
              class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
             <span class="mi">history</span>
-            <span class="hidden sm:inline">โค้ด</span>
+            <span class="hidden sm:inline">{{ 'nav.codes' | translate }}</span>
           </a>
           <a routerLink="/coins" routerLinkActive="text-brand-600"
              class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
@@ -40,13 +40,13 @@ import { BasketService } from '../../services/basket.service';
           <ng-container *ngIf="(auth.me$ | async)?.is_admin">
             <a routerLink="/admin/market" routerLinkActive="text-rose-600"
                class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               title="จัดการร้านค้า">
+               [title]="'nav.adminMarket' | translate">
               <span class="mi">build</span>
               <span class="hidden lg:inline">Market</span>
             </a>
             <a routerLink="/admin/coins" routerLinkActive="text-rose-600"
                class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               title="จัดการ Coin">
+               [title]="'nav.adminCoins' | translate">
               <span class="mi">account_balance_wallet</span>
               <span class="hidden lg:inline">Coins</span>
             </a>
@@ -63,7 +63,7 @@ import { BasketService } from '../../services/basket.service';
             </span>
           </button>
 
-          <a routerLink="/help" title="วิธีใช้"
+          <a routerLink="/help" [title]="'nav.help' | translate"
              class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
             <span class="mi">help</span>
           </a>

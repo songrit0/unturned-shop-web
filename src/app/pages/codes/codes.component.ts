@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { CodesService, MyCode } from '../../services/codes.service';
 
 @Component({
@@ -6,14 +7,14 @@ import { CodesService, MyCode } from '../../services/codes.service';
   template: `
     <div class="max-w-4xl mx-auto p-4 space-y-4">
       <h1 class="text-2xl font-bold flex items-center gap-2">
-        <span class="mi lg text-brand-500">history</span> ประวัติโค้ด
+        <span class="mi lg text-brand-500">history</span> {{ 'codes.title' | translate }}
       </h1>
-      <p class="text-sm text-slate-500">โค้ดทั้งหมดที่คุณสั่งซื้อ — กด คัดลอก ไปใช้ในเกมได้</p>
+      <p class="text-sm text-slate-500">{{ 'codes.desc' | translate }}</p>
 
       <ng-container *ngIf="!loading; else loadingTpl">
         <div *ngIf="codes.length === 0" class="text-center py-12 text-slate-400">
           <span class="mi xl block mb-2">receipt_long</span>
-          ยังไม่เคยซื้อโค้ด
+          {{ 'codes.empty' | translate }}
         </div>
 
         <div *ngFor="let c of codes" class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
@@ -40,7 +41,7 @@ import { CodesService, MyCode } from '../../services/codes.service';
               <button (click)="copy(c.code)" [disabled]="c.status !== 'available'"
                       class="text-sm px-3 py-1 rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 disabled:opacity-40 flex items-center gap-1">
                 <span class="mi">{{ copiedCode === c.code ? 'check' : 'content_copy' }}</span>
-                {{ copiedCode === c.code ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+                {{ (copiedCode === c.code ? 'welcome.copied' : 'welcome.copy') | translate }}
               </button>
             </div>
           </div>
@@ -55,7 +56,7 @@ import { CodesService, MyCode } from '../../services/codes.service';
           </div>
 
           <p *ngIf="c.status === 'available'" class="text-xs text-slate-500 mt-3">
-            เข้าเกมแล้วพิมพ์: <code class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded font-mono">/code {{ c.code }}</code>
+            {{ 'codes.useInGame' | translate }} <code class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded font-mono">/code {{ c.code }}</code>
           </p>
         </div>
       </ng-container>
@@ -73,7 +74,7 @@ export class CodesComponent implements OnInit {
   codes: MyCode[] = [];
   copiedCode: string | null = null;
 
-  constructor(private svc: CodesService) {}
+  constructor(private svc: CodesService, private t: TranslateService) {}
 
   ngOnInit() {
     this.svc.listMine(100).subscribe({
@@ -90,11 +91,6 @@ export class CodesComponent implements OnInit {
   }
 
   statusText(s: MyCode['status']): string {
-    switch (s) {
-      case 'available': return 'พร้อมใช้';
-      case 'used': return 'ใช้แล้ว';
-      case 'expired': return 'หมดอายุ';
-      case 'disabled': return 'ปิด';
-    }
+    return this.t.instant('codes.status.' + s);
   }
 }

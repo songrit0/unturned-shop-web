@@ -23,7 +23,7 @@ import { VersionService } from '../../services/version.service';
           </span>
         </div>
         <a routerLink="/help" class="hover:text-brand-600 flex items-center gap-1">
-          <span class="mi">help</span> วิธีใช้
+          <span class="mi">help</span> {{ 'nav.help' | translate }}
         </a>
       </div>
     </footer>

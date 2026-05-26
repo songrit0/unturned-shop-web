@@ -10,7 +10,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       <div class="flex items-center gap-1">
         <select [ngModel]="limit" (ngModelChange)="onLimit($event)"
                 class="text-xs px-2 py-1 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
-          <option *ngFor="let n of limits" [ngValue]="n">{{ n }}/หน้า</option>
+          <option *ngFor="let n of limits" [ngValue]="n">{{ 'pager.perPage' | translate:{ n: n } }}</option>
         </select>
         <button (click)="go(1)" [disabled]="page <= 1"
                 class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40">

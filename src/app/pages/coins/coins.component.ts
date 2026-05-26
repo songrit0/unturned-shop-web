@@ -10,14 +10,14 @@ import { ActivityLog, CoinsMe, CoinsService, MarketLog, Paginated } from '../../
       </h1>
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-5">
-        <p class="text-slate-500 text-sm">ยอดคงเหลือ</p>
+        <p class="text-slate-500 text-sm">{{ 'coins.balance' | translate }}</p>
         <p class="text-4xl font-bold text-amber-500 flex items-baseline gap-2">
           {{ me ? (me.balance | number) : '...' }}
           <span class="text-lg text-slate-400 font-normal">Coin</span>
         </p>
         <p *ngIf="me && !me.linked" class="text-xs text-amber-600 mt-2 flex items-center gap-1">
           <span class="mi">warning</span>
-          ยังไม่ผูก Steam — เข้าเกมแล้วพิมพ์ /link &lt;code&gt; ก่อน
+          {{ 'coins.needLink' | translate }}
         </p>
       </div>
 
@@ -25,9 +25,9 @@ import { ActivityLog, CoinsMe, CoinsService, MarketLog, Paginated } from '../../
         <!-- market history -->
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-5">
           <h2 class="font-semibold mb-3 flex items-center gap-2">
-            <span class="mi">receipt_long</span> ประวัติตลาด
+            <span class="mi">receipt_long</span> {{ 'coins.marketHistory' | translate }}
           </h2>
-          <p *ngIf="marketPage && marketPage.items.length === 0" class="text-slate-400 text-sm py-4">ยังไม่มีรายการ</p>
+          <p *ngIf="marketPage && marketPage.items.length === 0" class="text-slate-400 text-sm py-4">{{ 'coins.empty' | translate }}</p>
           <ul class="space-y-2 text-sm" *ngIf="marketPage">
             <li *ngFor="let m of marketPage.items" class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-1">
               <span>
@@ -58,7 +58,7 @@ import { ActivityLog, CoinsMe, CoinsService, MarketLog, Paginated } from '../../
           <h2 class="font-semibold mb-3 flex items-center gap-2">
             <span class="mi">military_tech</span> Reward Log
           </h2>
-          <p *ngIf="activityPage && activityPage.items.length === 0" class="text-slate-400 text-sm py-4">ยังไม่มีรายการ</p>
+          <p *ngIf="activityPage && activityPage.items.length === 0" class="text-slate-400 text-sm py-4">{{ 'coins.empty' | translate }}</p>
           <ul class="space-y-2 text-sm" *ngIf="activityPage">
             <li *ngFor="let a of activityPage.items" class="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-1">
               <span class="font-mono text-xs">{{ a.kind }}</span>

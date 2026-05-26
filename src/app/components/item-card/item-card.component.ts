@@ -20,7 +20,7 @@ import { BasketService } from '../../services/basket.service';
       <span *ngIf="item.amount > 0 && item.amount <= 5"
             class="absolute top-2 right-2 z-10 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
         <span class="mi text-sm">whatshot</span>
-        เหลือน้อย
+        {{ 'shop.lowStock' | translate }}
       </span>
 
       <div class="aspect-square bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
@@ -45,12 +45,12 @@ import { BasketService } from '../../services/basket.service';
               </p>
               <span *ngIf="discountPct() !== 0" class="text-xs text-slate-400 line-through">{{ item.base_price | number }}</span>
             </div>
-            <p class="text-xs text-slate-500">stock: {{ item.amount | number }}</p>
+            <p class="text-xs text-slate-500">{{ 'shop.stock' | translate:{ n: item.amount } }}</p>
           </div>
           <button (click)="add()" [disabled]="loading || added"
                   class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm rounded-lg disabled:opacity-60 flex items-center gap-1 whitespace-nowrap">
             <span class="mi">{{ added ? 'check' : 'add_shopping_cart' }}</span>
-            {{ added ? 'แล้ว' : 'ใส่' }}
+            {{ (added ? 'shop.added' : 'shop.addToCart') | translate }}
           </button>
         </div>
       </div>

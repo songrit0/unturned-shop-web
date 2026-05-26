@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
     <div class="min-h-screen flex items-center justify-center">
       <div class="text-center">
         <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p>กำลังเข้าสู่ระบบ...</p>
+        <p>{{ 'callback.loading' | translate }}</p>
       </div>
     </div>
   `,

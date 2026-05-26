@@ -6,8 +6,13 @@
     "shop": "Shop",
     "bills": "Bills",
     "coins": "Coin",
+    "codes": "Codes",
     "login": "Sign in",
-    "logout": "Logout"
+    "logout": "Logout",
+    "help": "Help",
+    "adminMarket": "Manage Market",
+    "adminCoins": "Manage Coin",
+    "basket": "Basket"
   },
   "login": {
     "title": "SellVault Shop",
@@ -19,18 +24,21 @@
     "loading": "Signing in..."
   },
   "home": {
-    "hello": "Hi {{name}} 👋",
+    "hello": "Hi {{name}}",
     "linked": "Steam: {{id}}",
     "notLinked": "Steam not linked",
-    "tiles": {
-      "shop": "Browse items",
-      "bills": "Cash bills",
-      "coins": "Balance + history"
-    }
+    "shopDesc": "Browse items",
+    "billsDesc": "Cash bills",
+    "coinsDesc": "Balance + history",
+    "codesDesc": "History + reuse",
+    "adminMarketDesc": "Admin · Market",
+    "adminCoinsDesc": "Admin · Coins",
+    "helpLink": "How it works + economy"
   },
   "welcome": {
     "title": "Welcome Pack",
-    "desc": "Generate code → in-game → type {{cmd}} → link + receive Welcome Pack",
+    "descPrefix": "Generate code → in-game → type",
+    "descSuffix": "→ link + receive Welcome Pack",
     "generate": "Generate Welcome Code",
     "generating": "Generating...",
     "yourCode": "Your code (one-time use):",
@@ -47,7 +55,37 @@
     "empty": "No items",
     "stock": "stock: {{n}}",
     "addToCart": "Add",
-    "cartSoon": "Basket coming in Phase 4"
+    "added": "Added",
+    "lowStock": "Low stock",
+    "all": "All",
+    "sale": "Sale",
+    "hot": "Low stock",
+    "sortPriceAsc": "Price ↑",
+    "sortPriceDesc": "Price ↓",
+    "sortDiscount": "Biggest discount",
+    "sortName": "Name A→Z"
+  },
+  "basket": {
+    "title": "Basket",
+    "empty": "Basket is empty",
+    "perItem": "each",
+    "balance": "Balance",
+    "total": "Total",
+    "checkout": "Confirm order",
+    "checkoutLoading": "Paying...",
+    "successTitle": "Order successful!",
+    "successHint": "Use this code in-game (one-time use)",
+    "useInGame": "In-game, type:",
+    "ok": "OK",
+    "errors": {
+      "notLinked": "Steam not linked — create a Welcome Code first",
+      "empty": "Basket is empty",
+      "noItem": "Some items were removed from the market",
+      "outOfStock": "{{name}} out of stock",
+      "insufficient": "Not enough Coin (have {{balance}}, need {{total}})",
+      "generic": "Something went wrong",
+      "itemFallback": "Some item"
+    }
   },
   "coins": {
     "title": "Coins",
@@ -57,9 +95,162 @@
     "rewardLog": "Reward Log",
     "empty": "No items"
   },
+  "codes": {
+    "title": "Code history",
+    "desc": "All codes you've purchased — copy to use in-game",
+    "empty": "No codes purchased yet",
+    "useInGame": "In-game, type:",
+    "status": {
+      "available": "Available",
+      "used": "Used",
+      "expired": "Expired",
+      "disabled": "Disabled"
+    }
+  },
+  "help": {
+    "title": "How it works",
+    "subtitle": "This site works with the Discord bot + the Unturned in-game plugin",
+    "firstUse": "First-time setup",
+    "step1Title": "Sign in with Discord",
+    "step1Desc": "Click \"Sign in with Discord\" on the login page",
+    "step2Title": "Link Steam (get Welcome Pack)",
+    "step2Desc": "Home → Welcome Pack box → generate code → in-game → type /link <code> → link + receive welcome items + 100 Coin",
+    "step3Title": "Buy / sell / view balance",
+    "step3Desc": "Use the top menu",
+    "howToBuy": "How to buy",
+    "buy1": "Open Shop or Bills",
+    "buy2": "Click \"Add\" on each item",
+    "buy3": "Click the cart icon top-right → review basket → adjust qty → confirm order",
+    "buy4": "Coin is deducted → you get a redeem code",
+    "buy5": "In-game → type /code <code> → receive items",
+    "buyForget": "Forgot your code? See Code history",
+    "howToSell": "How to sell",
+    "sell1Title": "Method 1: /sell in a Safe Zone (recommended)",
+    "sell1Desc": "Enter a Safe Zone → type /sell → box opens → drop items → close box → get Coin",
+    "sell2Title": "Method 2: Admin-placed Sell Box",
+    "sell2Desc": "Walk to the box → open → drop items → close → get Coin",
+    "sellNote": "Only items in the Shop can be sold — anything else is returned",
+    "economy": "Economy",
+    "earnTitle": "How to earn Coin",
+    "earn1": "🎁 Welcome Pack (one-time)",
+    "earn2": "⏱ Online in-game +10 per 5 min (must not be AFK + alive)",
+    "earn3": "🧟 Kill zombie +1, Mega +5",
+    "earn4": "🦌 Kill animal +2",
+    "earn5": "⚔️ Kill player (PvP) +5 (120s cooldown per victim)",
+    "earn6": "🔨 Build barricade/structure +2",
+    "earn7": "🌳 Harvest resource +1",
+    "earn8": "💰 Sell on the market (60% of price)",
+    "earn9": "💵 Sell Bills (100% full price, no fee)",
+    "loseTitle": "How you lose Coin",
+    "lose1": "🛒 Buy from the shop (full price)",
+    "lose2": "📉 40% commission on sale (sell price = price × 0.6)",
+    "lose3": "🏛 Wealth Tax 2% daily at 03:00 (only if > 10,000)",
+    "exampleTitle": "📐 Example:",
+    "exampleDesc": "Sentinel at 50 → buy 1 = −50 coin, sell 1 = +30 coin (50 × 60%)",
+    "billsTitle": "Bills",
+    "billsDesc": "Bills are like a Cash item — sold at full price, no commission",
+    "billsList": "$5 Bill, $10, $50, $100, $500",
+    "billsNote": "Used to transfer money between players — drop in-game → whoever picks up can sell at full price",
+    "commandsTitle": "In-game commands",
+    "cmdLinkDesc": "Link Discord + receive Welcome Pack",
+    "cmdCodeDesc": "Redeem a code from the website",
+    "cmdSellDesc": "Open sell box (Safe Zone only)",
+    "cmdCoinsDesc": "Check Coin balance",
+    "cmdItemIdDesc": "Show item id of held item",
+    "cmdDecayDesc": "Check base protection (ToolCupboard)",
+    "faqTitle": "FAQ",
+    "faq1Q": "Forgot a purchased code, what now?",
+    "faq1A": "Open Code history — all codes you've purchased are listed with status (Available / Used / Expired)",
+    "faq2Q": "Why do I get less Coin than the price when selling?",
+    "faq2A": "40% commission to keep the economy balanced — sell price = market × 0.6, except Bills which pay full price",
+    "faq3Q": "Do I earn Coin while AFK?",
+    "faq3A": "No — movement is checked, no movement for 10 min counts as AFK; dead in-game also doesn't count",
+    "faq4Q": "What is Wealth Tax?",
+    "faq4A": "Wealth tax — 2% off your balance daily at 03:00, only if Coin > 10,000 — keeps people from hoarding too long",
+    "faq5Q": "What if the shop runs out of stock?",
+    "faq5A": "Stock returns when players /sell items into it — pure supply-demand"
+  },
+  "adminMarket": {
+    "title": "Manage Market",
+    "add": "Add item",
+    "addTitle": "Add item",
+    "editTitle": "Edit item",
+    "search": "Search id/name...",
+    "supplyDemand": "Supply/Demand: actual price = base × (target ÷ stock)^elasticity — auto-updates every 30s",
+    "col": {
+      "image": "Image",
+      "id": "ID",
+      "name": "Name",
+      "price": "Price",
+      "priceTitle": "Actual price (auto)",
+      "base": "Base",
+      "baseTitle": "Anchor price",
+      "stock": "Stock",
+      "target": "Target",
+      "targetTitle": "Target stock",
+      "elas": "Elas.",
+      "elasTitle": "Elasticity",
+      "enabled": "On"
+    },
+    "empty": "No items",
+    "on": "On",
+    "off": "Off",
+    "form": {
+      "itemId": "Item ID",
+      "name": "Name",
+      "basePrice": "Base price (anchor)",
+      "stockNow": "Current stock",
+      "targetStock": "Target stock",
+      "targetStockHint": "(price = base at this stock)",
+      "elasticity": "Elasticity",
+      "elasticityHint": "(0=fixed • 0.5=mid • 1=full)",
+      "preview": "Example:",
+      "previewLine1": "stock = {{amount}} → price ≈ {{price}}",
+      "previewLine2": "stock = {{target}} (target) → {{base}} | low stock → expensive | high stock → cheap",
+      "imageUrl": "Image URL (optional)",
+      "enabled": "Enabled"
+    },
+    "errors": {
+      "missing": "item_id and name required",
+      "saveFail": "Save failed"
+    },
+    "deleteConfirm": "Delete this item?",
+    "delete": "Delete"
+  },
+  "adminCoins": {
+    "title": "Manage Coin",
+    "info": "+ Grant and − Take are recorded in activity_log (kind=admin_grant/admin_take)",
+    "search": "Search steam_id / discord_id...",
+    "col": {
+      "steamId": "Steam ID",
+      "discordId": "Discord ID",
+      "linkedAt": "Linked at",
+      "balance": "Balance"
+    },
+    "grant": "Grant",
+    "take": "Take",
+    "grantTitle": "Grant Coin",
+    "takeTitle": "Take Coin",
+    "currentBalance": "Current balance:",
+    "amount": "Amount",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. shop refund",
+    "saving": "Saving...",
+    "noUser": "No user found",
+    "history": "History",
+    "noHistory": "No history",
+    "errors": {
+      "needAmount": "Amount must be > 0",
+      "saveFail": "Save failed"
+    }
+  },
+  "pager": {
+    "perPage": "{{n}}/page"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "saving": "Saving..."
   }
 }
