@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
     <div class="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
       <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8">
         <div class="text-center mb-6">
-          <span class="mi xl text-brand-500">storefront</span>
+          <img src="assets/logo.png" alt="logo" class="w-20 h-20 mx-auto">
           <h1 class="text-3xl font-bold mt-2">SellVault Shop</h1>
           <p class="text-slate-500 dark:text-slate-400 mt-1">
             เข้าสู่ระบบเพื่อซื้อ-ขายของ จัดการ coin

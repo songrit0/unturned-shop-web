@@ -12,7 +12,7 @@ import { BasketService } from '../../services/basket.service';
     <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 p-3">
         <a routerLink="/" class="font-bold text-lg whitespace-nowrap flex items-center gap-2">
-          <span class="mi lg text-brand-600">storefront</span>
+          <img src="assets/logo.png" alt="logo" class="w-9 h-9 rounded-lg">
           <span class="hidden sm:inline">{{ 'app.title' | translate }}</span>
         </a>
 
