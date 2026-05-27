@@ -42,38 +42,36 @@ import { BasketService } from '../../services/basket.service';
             <span class="mi text-amber-500">flag</span>
             <span class="hidden sm:inline">{{ 'nav.quests' | translate }}</span>
           </a>
-          <ng-container *ngIf="(auth.me$ | async)?.is_admin">
-            <a routerLink="/admin/market" routerLinkActive="text-rose-600"
-               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               [title]="'nav.adminMarket' | translate">
-              <span class="mi">build</span>
-              <span class="hidden lg:inline">Market</span>
-            </a>
-            <a routerLink="/admin/coins" routerLinkActive="text-rose-600"
-               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               [title]="'nav.adminCoins' | translate">
-              <span class="mi">account_balance_wallet</span>
-              <span class="hidden lg:inline">Coins</span>
-            </a>
-            <a routerLink="/admin/quests" routerLinkActive="text-rose-600"
-               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               [title]="'nav.adminQuests' | translate">
-              <span class="mi">flag</span>
-              <span class="hidden lg:inline">Quests</span>
-            </a>
-            <a routerLink="/admin/item-types" routerLinkActive="text-rose-600"
-               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               [title]="'nav.adminItemTypes' | translate">
-              <span class="mi">category</span>
-              <span class="hidden lg:inline">Types</span>
-            </a>
-            <a routerLink="/admin/items" routerLinkActive="text-rose-600"
-               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
-               [title]="'nav.adminItems' | translate">
-              <span class="mi">inventory_2</span>
-              <span class="hidden lg:inline">Items</span>
-            </a>
-          </ng-container>
+          <details *ngIf="(auth.me$ | async)?.is_admin" #adminMenu class="relative">
+            <summary class="list-none cursor-pointer px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500">
+              <span class="mi">admin_panel_settings</span>
+              <span class="hidden lg:inline">Admin</span>
+              <span class="mi text-xs">expand_more</span>
+            </summary>
+            <div class="absolute right-0 mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-40"
+                 (click)="adminMenu.open = false">
+              <a routerLink="/admin/market" routerLinkActive="text-rose-600"
+                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
+                <span class="mi">build</span><span>Market</span>
+              </a>
+              <a routerLink="/admin/coins" routerLinkActive="text-rose-600"
+                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
+                <span class="mi">account_balance_wallet</span><span>Coins</span>
+              </a>
+              <a routerLink="/admin/quests" routerLinkActive="text-rose-600"
+                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
+                <span class="mi">flag</span><span>Quests</span>
+              </a>
+              <a routerLink="/admin/item-types" routerLinkActive="text-rose-600"
+                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
+                <span class="mi">category</span><span>Types</span>
+              </a>
+              <a routerLink="/admin/items" routerLinkActive="text-rose-600"
+                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
+                <span class="mi">inventory_2</span><span>Items</span>
+              </a>
+            </div>
+          </details>
         </nav>
 
         <div class="flex items-center gap-1">
@@ -139,4 +137,8 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() { this.auth.clear(); this.router.navigate(['/login']); }
+
+  goAdmin(path: string) {
+    if (path) this.router.navigateByUrl(path);
+  }
 }

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrlFallback: 'http://localhost:3000',
+  apiUrlFallback: 'https://gramophonic-robbie-sustainingly.ngrok-free.dev',
   firebase: {
     apiKey: '',
     authDomain: '',
@@ -11,3 +11,4 @@ export const environment = {
   },
   apiUrlDoc: 'config/apiUrl',
 };
+
