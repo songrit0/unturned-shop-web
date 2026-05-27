@@ -349,7 +349,7 @@
     },
     "col": {
       "at": "When",
-      "user": "User",
+      "user": "Discord ID",
       "kind": "Kind",
       "qty": "Qty",
       "unit": "Unit",
@@ -366,7 +366,7 @@
     "col": {
       "at": "When",
       "item": "Item",
-      "user": "User",
+      "user": "Discord ID",
       "kind": "Kind",
       "qty": "Qty",
       "unit": "Unit",

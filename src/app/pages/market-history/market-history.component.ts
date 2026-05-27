@@ -121,4 +121,9 @@ export class MarketHistoryComponent implements OnInit {
     this.page = p;
     this.load();
   }
+
+  shortId(id: string | null | undefined): string {
+    if (!id) return '';
+    return id.length > 8 ? '…' + id.slice(-6) : id;
+  }
 }

@@ -313,4 +313,9 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   trendIcon(t: 'up' | 'down' | 'stable'): string {
     return t === 'up' ? 'trending_up' : t === 'down' ? 'trending_down' : 'trending_flat';
   }
+
+  shortId(id: string | null | undefined): string {
+    if (!id) return '';
+    return id.length > 8 ? '…' + id.slice(-6) : id;
+  }
 }
