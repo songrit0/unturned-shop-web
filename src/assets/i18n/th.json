@@ -15,6 +15,7 @@
     "adminQuests": "จัดการเควส",
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
+    "marketHistory": "ประวัติตลาด",
     "quests": "เควส",
     "basket": "ตะกร้า"
   },
@@ -324,6 +325,52 @@
       "items": "ไอเทมที่ต้องขาย",
       "addItem": "เพิ่มไอเทม",
       "noItems": "ต้องเพิ่มไอเทมอย่างน้อย 1 ชิ้น"
+    }
+  },
+  "marketDetail": {
+    "back": "กลับร้านค้า",
+    "price": "ราคา",
+    "stock": "คงเหลือ",
+    "chart": "กราฟราคา",
+    "noCandles": "ยังไม่มีข้อมูลราคา",
+    "forecast": "คาดการณ์",
+    "transactions": "ธุรกรรม",
+    "total": "ทั้งหมด",
+    "noTxns": "ยังไม่มีธุรกรรม",
+    "fc": {
+      "current": "ปัจจุบัน",
+      "ma7": "MA(7d)",
+      "ma30": "MA(30d)",
+      "projected": "คาดการณ์",
+      "trend": "เทรนด์",
+      "up": "ขึ้น",
+      "down": "ลง",
+      "stable": "นิ่ง"
+    },
+    "col": {
+      "at": "เวลา",
+      "user": "ผู้ใช้",
+      "kind": "ประเภท",
+      "qty": "จำนวน",
+      "unit": "ต่อชิ้น",
+      "total": "รวม"
+    }
+  },
+  "marketHistory": {
+    "title": "ประวัติตลาด",
+    "searchItem": "ค้นหาไอเทม...",
+    "kindAll": "ทั้งหมด",
+    "kindBuy": "ซื้อ",
+    "kindSell": "ขาย",
+    "empty": "ไม่มีธุรกรรม",
+    "col": {
+      "at": "เวลา",
+      "item": "ไอเทม",
+      "user": "ผู้ใช้",
+      "kind": "ประเภท",
+      "qty": "จำนวน",
+      "unit": "ต่อชิ้น",
+      "total": "รวม"
     }
   },
   "quests": {

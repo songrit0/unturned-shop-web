@@ -15,6 +15,7 @@
     "adminQuests": "Manage Quests",
     "adminItemTypes": "Manage Item Types",
     "adminItems": "Manage Items",
+    "marketHistory": "Market History",
     "quests": "Quests",
     "basket": "Basket"
   },
@@ -324,6 +325,52 @@
       "items": "Required items",
       "addItem": "Add item",
       "noItems": "Add at least one item"
+    }
+  },
+  "marketDetail": {
+    "back": "Back to shop",
+    "price": "Price",
+    "stock": "Stock",
+    "chart": "Price chart",
+    "noCandles": "No price history yet",
+    "forecast": "Forecast",
+    "transactions": "Transactions",
+    "total": "total",
+    "noTxns": "No transactions yet",
+    "fc": {
+      "current": "Current",
+      "ma7": "MA(7d)",
+      "ma30": "MA(30d)",
+      "projected": "Projected",
+      "trend": "Trend",
+      "up": "Up",
+      "down": "Down",
+      "stable": "Stable"
+    },
+    "col": {
+      "at": "When",
+      "user": "User",
+      "kind": "Kind",
+      "qty": "Qty",
+      "unit": "Unit",
+      "total": "Total"
+    }
+  },
+  "marketHistory": {
+    "title": "Market History",
+    "searchItem": "Search item...",
+    "kindAll": "All",
+    "kindBuy": "Buy",
+    "kindSell": "Sell",
+    "empty": "No transactions",
+    "col": {
+      "at": "When",
+      "item": "Item",
+      "user": "User",
+      "kind": "Kind",
+      "qty": "Qty",
+      "unit": "Unit",
+      "total": "Total"
     }
   },
   "quests": {

@@ -23,15 +23,15 @@ import { BasketService } from '../../services/basket.service';
         {{ 'shop.lowStock' | translate }}
       </span>
 
-      <div class="aspect-square bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+      <a [routerLink]="['/market', item.item_id]" class="aspect-square bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:opacity-90">
         <img *ngIf="item.image_url; else noImg" [src]="item.image_url" [alt]="item.name"
              class="w-full h-full object-contain p-2" loading="lazy">
         <ng-template #noImg>
           <span class="mi xl text-slate-400">inventory_2</span>
         </ng-template>
-      </div>
+      </a>
       <div class="p-3 flex-1 flex flex-col">
-        <p class="font-semibold truncate" [title]="item.name">{{ item.name }}</p>
+        <a [routerLink]="['/market', item.item_id]" class="font-semibold truncate hover:underline" [title]="item.name">{{ item.name }}</a>
         <div class="flex items-center gap-1 mb-2">
           <p class="text-xs text-slate-500">#{{ item.item_id }}</p>
           <span *ngIf="item.type_name"

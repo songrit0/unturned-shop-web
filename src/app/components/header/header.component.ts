@@ -32,6 +32,11 @@ import { BasketService } from '../../services/basket.service';
             <span class="mi">history</span>
             <span class="hidden sm:inline">{{ 'nav.codes' | translate }}</span>
           </a>
+          <a routerLink="/market/history" routerLinkActive="text-brand-600"
+             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
+            <span class="mi">receipt_long</span>
+            <span class="hidden sm:inline">{{ 'nav.marketHistory' | translate }}</span>
+          </a>
           <a routerLink="/coins" routerLinkActive="text-brand-600"
              class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
             <span class="mi text-amber-500">paid</span>

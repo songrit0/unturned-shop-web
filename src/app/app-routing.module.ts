@@ -15,6 +15,8 @@ import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.componen
 import { AdminItemTypesComponent } from './pages/admin-item-types/admin-item-types.component';
 import { AdminItemsComponent } from './pages/admin-items/admin-items.component';
 import { QuestsComponent } from './pages/quests/quests.component';
+import { MarketDetailComponent } from './pages/market-detail/market-detail.component';
+import { MarketHistoryComponent } from './pages/market-history/market-history.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -32,6 +34,8 @@ const routes: Routes = [
   { path: 'admin/quests', component: AdminQuestsComponent, canActivate: [adminGuard] },
   { path: 'admin/item-types', component: AdminItemTypesComponent, canActivate: [adminGuard] },
   { path: 'admin/items', component: AdminItemsComponent, canActivate: [adminGuard] },
+  { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
+  { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];
 
