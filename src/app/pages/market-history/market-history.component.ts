@@ -47,7 +47,7 @@ import { MarketHistoryService, MarketTxn } from '../../services/market-history.s
                   <span class="font-medium text-xs">{{ t.item_name || ('#' + t.item_id) }}</span>
                 </a>
               </td>
-              <td class="p-3 text-xs">{{ t.discord_username || t.steam_id }}</td>
+              <td class="p-3 text-xs font-mono" [title]="t.discord_id || t.steam_id">{{ shortId(t.discord_id || t.steam_id) }}</td>
               <td class="p-3">
                 <span class="text-xs px-2 py-0.5 rounded"
                       [class.bg-emerald-100]="t.kind === 'sell'" [class.text-emerald-700]="t.kind === 'sell'"

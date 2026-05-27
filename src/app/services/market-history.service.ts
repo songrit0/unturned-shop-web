@@ -30,7 +30,7 @@ export interface Forecast {
 export interface MarketTxn {
   at: string;
   steam_id: string;
-  discord_username?: string | null;
+  discord_id?: string | null;
   kind: 'buy' | 'sell';
   amount: number;
   coins: number;

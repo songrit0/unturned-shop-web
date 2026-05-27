@@ -130,7 +130,7 @@ const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
             <tbody>
               <tr *ngFor="let t of txns" class="border-t border-slate-100 dark:border-slate-700">
                 <td class="p-3 text-xs text-slate-500">{{ t.at | date:'short' }}</td>
-                <td class="p-3 text-xs">{{ t.discord_username || t.steam_id }}</td>
+                <td class="p-3 text-xs font-mono" [title]="t.discord_id || t.steam_id">{{ shortId(t.discord_id || t.steam_id) }}</td>
                 <td class="p-3">
                   <span class="text-xs px-2 py-0.5 rounded"
                         [class.bg-emerald-100]="t.kind === 'sell'" [class.text-emerald-700]="t.kind === 'sell'"
