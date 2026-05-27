@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MarketItem, MarketKind, MarketService } from '../../services/market.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../services/market.service';
 
 @Component({
   selector: 'app-shop',
@@ -45,6 +46,17 @@ import { MarketItem, MarketKind, MarketService } from '../../services/market.ser
             <option value="discount-desc">{{ 'shop.sortDiscount' | translate }}</option>
             <option value="name">{{ 'shop.sortName' | translate }}</option>
           </select>
+
+          <select [(ngModel)]="typeId" (ngModelChange)="onTypeChange()"
+                  class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
+            <option [ngValue]="null">{{ 'shop.allTypes' | translate }}</option>
+            <option *ngFor="let t of types" [ngValue]="t.id">{{ t.name }}</option>
+          </select>
+
+          <button *ngIf="typeId !== null" (click)="resetType()"
+                  class="text-xs px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center gap-1">
+            <span class="mi text-sm">close</span> {{ 'shop.resetFilter' | translate }}
+          </button>
         </div>
       </div>
 
@@ -78,10 +90,31 @@ export class ShopComponent implements OnInit {
   countSale = 0;
   countHot = 0;
 
-  constructor(private market: MarketService) {}
+  types: MarketTypeOption[] = [];
+  typeId: number | null = null;
+
+  constructor(
+    private market: MarketService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
-    this.market.list(this.kind).subscribe({
+    const raw = this.route.snapshot.queryParamMap.get('type_id');
+    const parsed = raw != null ? Number(raw) : NaN;
+    this.typeId = Number.isFinite(parsed) ? parsed : null;
+
+    this.market.types().subscribe({
+      next: t => this.types = t,
+      error: () => { this.types = []; },
+    });
+
+    this.fetch();
+  }
+
+  fetch() {
+    this.loading = true;
+    this.market.list(this.kind, this.typeId).subscribe({
       next: items => {
         this.items = items;
         this.countSale = items.filter(i => this.discountPct(i) > 0).length;
@@ -91,6 +124,20 @@ export class ShopComponent implements OnInit {
       },
       error: () => { this.loading = false; },
     });
+  }
+
+  onTypeChange() {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { type_id: this.typeId ?? null },
+      queryParamsHandling: 'merge',
+    });
+    this.fetch();
+  }
+
+  resetType() {
+    this.typeId = null;
+    this.onTypeChange();
   }
 
   discountPct(it: MarketItem): number {

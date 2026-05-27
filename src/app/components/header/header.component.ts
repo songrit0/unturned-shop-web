@@ -37,6 +37,11 @@ import { BasketService } from '../../services/basket.service';
             <span class="mi text-amber-500">paid</span>
             <span class="font-mono">{{ (coins.balance$ | async) ?? '—' }}</span>
           </a>
+          <a routerLink="/quests" routerLinkActive="text-brand-600"
+             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
+            <span class="mi text-amber-500">flag</span>
+            <span class="hidden sm:inline">{{ 'nav.quests' | translate }}</span>
+          </a>
           <ng-container *ngIf="(auth.me$ | async)?.is_admin">
             <a routerLink="/admin/market" routerLinkActive="text-rose-600"
                class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
@@ -49,6 +54,24 @@ import { BasketService } from '../../services/basket.service';
                [title]="'nav.adminCoins' | translate">
               <span class="mi">account_balance_wallet</span>
               <span class="hidden lg:inline">Coins</span>
+            </a>
+            <a routerLink="/admin/quests" routerLinkActive="text-rose-600"
+               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
+               [title]="'nav.adminQuests' | translate">
+              <span class="mi">flag</span>
+              <span class="hidden lg:inline">Quests</span>
+            </a>
+            <a routerLink="/admin/item-types" routerLinkActive="text-rose-600"
+               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
+               [title]="'nav.adminItemTypes' | translate">
+              <span class="mi">category</span>
+              <span class="hidden lg:inline">Types</span>
+            </a>
+            <a routerLink="/admin/items" routerLinkActive="text-rose-600"
+               class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500"
+               [title]="'nav.adminItems' | translate">
+              <span class="mi">inventory_2</span>
+              <span class="hidden lg:inline">Items</span>
             </a>
           </ng-container>
         </nav>

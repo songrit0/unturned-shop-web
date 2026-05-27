@@ -12,6 +12,10 @@
     "help": "Help",
     "adminMarket": "Manage Market",
     "adminCoins": "Manage Coin",
+    "adminQuests": "Manage Quests",
+    "adminItemTypes": "Manage Item Types",
+    "adminItems": "Manage Items",
+    "quests": "Quests",
     "basket": "Basket"
   },
   "login": {
@@ -63,7 +67,9 @@
     "sortPriceAsc": "Price ↑",
     "sortPriceDesc": "Price ↓",
     "sortDiscount": "Biggest discount",
-    "sortName": "Name A→Z"
+    "sortName": "Name A→Z",
+    "allTypes": "All types",
+    "resetFilter": "Clear"
   },
   "basket": {
     "title": "Basket",
@@ -208,10 +214,13 @@
       "previewLine1": "stock = {{amount}} → price ≈ {{price}}",
       "previewLine2": "stock = {{target}} (target) → {{base}} | low stock → expensive | high stock → cheap",
       "imageUrl": "Image URL (optional)",
-      "enabled": "Enabled"
+      "enabled": "Enabled",
+      "type": "Item type",
+      "pickItem": "Pick an item",
+      "pickItemSearch": "Search items by name or id..."
     },
     "errors": {
-      "missing": "item_id and name required",
+      "missing": "Pick an item first",
       "saveFail": "Save failed"
     },
     "deleteConfirm": "Delete this item?",
@@ -252,5 +261,83 @@
     "cancel": "Cancel",
     "loading": "Loading...",
     "saving": "Saving..."
+  },
+  "adminItems": {
+    "title": "Master Items",
+    "add": "Add item",
+    "addTitle": "Add item",
+    "editTitle": "Edit item",
+    "search": "Search id / name...",
+    "allTypes": "All types",
+    "empty": "No items yet",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this item?",
+    "deleteWarn": "Item may be referenced by market/quests — delete may fail.",
+    "col": {
+      "image": "Image",
+      "name": "Name",
+      "type": "Type"
+    },
+    "form": {
+      "id": "Item ID",
+      "name": "Name",
+      "description": "Description",
+      "imageUrl": "Image URL",
+      "type": "Item type",
+      "preview": "Preview"
+    }
+  },
+  "adminItemTypes": {
+    "title": "Item Types",
+    "add": "Add type",
+    "addTitle": "Add item type",
+    "editTitle": "Edit item type",
+    "empty": "No item types yet",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this item type?",
+    "col": { "name": "Name", "description": "Description" },
+    "form": { "name": "Name", "description": "Description" }
+  },
+  "adminQuests": {
+    "title": "Quests",
+    "add": "Add quest",
+    "addTitle": "Add quest",
+    "editTitle": "Edit quest",
+    "empty": "No quests yet",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this quest?",
+    "col": {
+      "name": "Name",
+      "reset": "Reset",
+      "reward": "Reward",
+      "items": "Items",
+      "enabled": "On"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "reward": "Reward (Coin)",
+      "reset": "Reset type",
+      "startAt": "Start at",
+      "endAt": "End at",
+      "enabled": "Enabled",
+      "items": "Required items",
+      "addItem": "Add item",
+      "noItems": "Add at least one item"
+    }
+  },
+  "quests": {
+    "title": "Quests",
+    "active": "Active",
+    "history": "History",
+    "emptyActive": "No active quests right now",
+    "emptyHistory": "No completed quests yet",
+    "completed": "Completed",
+    "col": {
+      "name": "Name",
+      "reset": "Reset",
+      "reward": "Reward",
+      "completedAt": "Completed"
+    }
   }
 }

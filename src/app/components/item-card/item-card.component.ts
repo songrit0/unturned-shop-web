@@ -32,7 +32,13 @@ import { BasketService } from '../../services/basket.service';
       </div>
       <div class="p-3 flex-1 flex flex-col">
         <p class="font-semibold truncate" [title]="item.name">{{ item.name }}</p>
-        <p class="text-xs text-slate-500 mb-2">#{{ item.item_id }}</p>
+        <div class="flex items-center gap-1 mb-2">
+          <p class="text-xs text-slate-500">#{{ item.item_id }}</p>
+          <span *ngIf="item.type_name"
+                class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+            {{ item.type_name }}
+          </span>
+        </div>
         <div class="mt-auto flex items-end justify-between gap-2">
           <div>
             <div class="flex items-baseline gap-2">

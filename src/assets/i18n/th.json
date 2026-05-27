@@ -12,6 +12,10 @@
     "help": "วิธีใช้",
     "adminMarket": "จัดการร้านค้า",
     "adminCoins": "จัดการ Coin",
+    "adminQuests": "จัดการเควส",
+    "adminItemTypes": "จัดการประเภทไอเทม",
+    "adminItems": "จัดการ Items",
+    "quests": "เควส",
     "basket": "ตะกร้า"
   },
   "login": {
@@ -63,7 +67,9 @@
     "sortPriceAsc": "ราคา ↑",
     "sortPriceDesc": "ราคา ↓",
     "sortDiscount": "ลดราคามากสุด",
-    "sortName": "ชื่อ A→Z"
+    "sortName": "ชื่อ A→Z",
+    "allTypes": "ทั้งหมด",
+    "resetFilter": "ล้าง"
   },
   "basket": {
     "title": "ตะกร้า",
@@ -208,10 +214,13 @@
       "previewLine1": "stock = {{amount}} → ราคา ≈ {{price}}",
       "previewLine2": "stock = {{target}} (target) → {{base}} | stock น้อย → แพง | stock เยอะ → ถูก",
       "imageUrl": "Image URL (optional)",
-      "enabled": "เปิดขาย"
+      "enabled": "เปิดขาย",
+      "type": "ประเภทไอเทม",
+      "pickItem": "เลือกไอเทม",
+      "pickItemSearch": "ค้นหาด้วยชื่อหรือ id..."
     },
     "errors": {
-      "missing": "กรอก item_id และ ชื่อ",
+      "missing": "เลือกไอเทมก่อน",
       "saveFail": "บันทึกไม่สำเร็จ"
     },
     "deleteConfirm": "ลบสินค้านี้?",
@@ -252,5 +261,84 @@
     "cancel": "ยกเลิก",
     "loading": "กำลังโหลด...",
     "saving": "กำลังบันทึก..."
-  }
+  },
+  "adminItems": {
+    "title": "Master Items",
+    "add": "เพิ่มไอเทม",
+    "addTitle": "เพิ่มไอเทม",
+    "editTitle": "แก้ไขไอเทม",
+    "search": "ค้นหา id / ชื่อ...",
+    "allTypes": "ทุกประเภท",
+    "empty": "ยังไม่มีไอเทม",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบไอเทมนี้?",
+    "deleteWarn": "ไอเทมอาจถูกอ้างอิงโดย market/quests — อาจลบไม่ได้",
+    "col": {
+      "image": "รูป",
+      "name": "ชื่อ",
+      "type": "ประเภท"
+    },
+    "form": {
+      "id": "Item ID",
+      "name": "ชื่อ",
+      "description": "รายละเอียด",
+      "imageUrl": "Image URL",
+      "type": "ประเภทไอเทม",
+      "preview": "ตัวอย่าง"
+    }
+  },
+  "adminItemTypes": {
+    "title": "ประเภทไอเทม",
+    "add": "เพิ่มประเภท",
+    "addTitle": "เพิ่มประเภทไอเทม",
+    "editTitle": "แก้ไขประเภทไอเทม",
+    "empty": "ยังไม่มีประเภทไอเทม",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบประเภทไอเทมนี้?",
+    "col": { "name": "ชื่อ", "description": "รายละเอียด" },
+    "form": { "name": "ชื่อ", "description": "รายละเอียด" }
+  },
+  "adminQuests": {
+    "title": "เควส",
+    "add": "เพิ่มเควส",
+    "addTitle": "เพิ่มเควส",
+    "editTitle": "แก้ไขเควส",
+    "empty": "ยังไม่มีเควส",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบเควสนี้?",
+    "col": {
+      "name": "ชื่อ",
+      "reset": "รีเซ็ต",
+      "reward": "รางวัล",
+      "items": "ไอเทม",
+      "enabled": "เปิด"
+    },
+    "form": {
+      "name": "ชื่อ",
+      "description": "รายละเอียด",
+      "reward": "รางวัล (Coin)",
+      "reset": "ประเภทการรีเซ็ต",
+      "startAt": "เริ่ม",
+      "endAt": "สิ้นสุด",
+      "enabled": "เปิดใช้งาน",
+      "items": "ไอเทมที่ต้องขาย",
+      "addItem": "เพิ่มไอเทม",
+      "noItems": "ต้องเพิ่มไอเทมอย่างน้อย 1 ชิ้น"
+    }
+  },
+  "quests": {
+    "title": "เควส",
+    "active": "กำลังทำ",
+    "history": "ประวัติ",
+    "emptyActive": "ยังไม่มีเควสในช่วงนี้",
+    "emptyHistory": "ยังไม่มีเควสที่ทำสำเร็จ",
+    "completed": "สำเร็จแล้ว",
+    "col": {
+      "name": "ชื่อ",
+      "reset": "รีเซ็ต",
+      "reward": "รางวัล",
+      "completedAt": "เสร็จเมื่อ"
+    }
+  },
+  "adminMarketTypeLabel": "ประเภทไอเทม"
 }

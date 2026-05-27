@@ -1,6 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AdminMarketItem, AdminMarketService, UpsertPayload } from '../../services/admin-market.service';
+import { Item, ItemsService } from '../../services/items.service';
+
+interface FormState {
+  item_id: number | null;
+  base_price: number;
+  target_stock: number;
+  elasticity: number;
+  amount: number;
+  enabled: boolean;
+}
 
 @Component({
   selector: 'app-admin-market',
@@ -49,7 +59,13 @@ import { AdminMarketItem, AdminMarketService, UpsertPayload } from '../../servic
                   </div>
                 </td>
                 <td class="p-3 font-mono text-xs">{{ it.item_id }}</td>
-                <td class="p-3 font-medium">{{ it.name }}</td>
+                <td class="p-3 font-medium">
+                  {{ it.name }}
+                  <span *ngIf="it.type_name"
+                        class="ml-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                    {{ it.type_name }}
+                  </span>
+                </td>
                 <td class="p-3 text-right font-semibold"
                     [class.text-emerald-600]="it.price < it.base_price"
                     [class.text-rose-600]="it.price > it.base_price">
@@ -98,18 +114,51 @@ import { AdminMarketItem, AdminMarketService, UpsertPayload } from '../../servic
             {{ (isNew ? 'adminMarket.addTitle' : 'adminMarket.editTitle') | translate }}
           </h3>
           <div class="space-y-3 text-sm">
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.itemId' | translate }}</span>
-                <input type="number" [(ngModel)]="form.item_id" [disabled]="!isNew"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700 disabled:opacity-50">
-              </label>
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.name' | translate }}</span>
-                <input type="text" [(ngModel)]="form.name" maxlength="64"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
-              </label>
+            <!-- Item picker (new) / read-only display (edit) -->
+            <div *ngIf="isNew" class="space-y-2">
+              <span class="text-slate-500">{{ 'adminMarket.form.pickItem' | translate }}</span>
+              <div class="relative">
+                <input type="search" [(ngModel)]="pickerQ" (ngModelChange)="onPickerSearch()"
+                       [placeholder]="'adminMarket.form.pickItemSearch' | translate"
+                       class="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+                <div *ngIf="pickerResults.length > 0 && !selectedItem"
+                     class="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg">
+                  <button *ngFor="let r of pickerResults" type="button" (click)="pickItem(r)"
+                          class="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 last:border-0">
+                    <div class="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <img *ngIf="r.image_url; else noPickImg" [src]="r.image_url" class="w-full h-full object-contain">
+                      <ng-template #noPickImg><span class="mi text-slate-400 text-sm">inventory_2</span></ng-template>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium truncate">{{ r.name }}</p>
+                      <p class="text-xs text-slate-500">#{{ r.id }}<span *ngIf="r.type_name"> · {{ r.type_name }}</span></p>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
+
+            <!-- Selected item preview -->
+            <div *ngIf="selectedItem" class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
+              <div class="w-14 h-14 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden">
+                <img *ngIf="selectedItem.image_url; else noSelImg" [src]="selectedItem.image_url" class="w-full h-full object-contain p-1">
+                <ng-template #noSelImg><span class="mi text-slate-400">inventory_2</span></ng-template>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium">{{ selectedItem.name }}</p>
+                <p class="text-xs text-slate-500">
+                  #{{ selectedItem.id }}
+                  <span *ngIf="selectedItem.type_name" class="ml-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                    {{ selectedItem.type_name }}
+                  </span>
+                </p>
+              </div>
+              <button *ngIf="isNew" type="button" (click)="clearPick()"
+                      class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-500">
+                <span class="mi text-sm">close</span>
+              </button>
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
               <label class="block">
                 <span class="text-slate-500">{{ 'adminMarket.form.basePrice' | translate }}</span>
@@ -141,11 +190,6 @@ import { AdminMarketItem, AdminMarketService, UpsertPayload } from '../../servic
               <p class="text-slate-500">{{ 'adminMarket.form.previewLine2' | translate:{ target: form.target_stock, base: (form.base_price | number) } }}</p>
             </div>
 
-            <label class="block">
-              <span class="text-slate-500">{{ 'adminMarket.form.imageUrl' | translate }}</span>
-              <input type="url" [(ngModel)]="form.image_url" maxlength="512"
-                     class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
-            </label>
             <label class="flex items-center gap-2">
               <input type="checkbox" [(ngModel)]="form.enabled">
               <span>{{ 'adminMarket.form.enabled' | translate }}</span>
@@ -186,10 +230,19 @@ export class AdminMarketComponent implements OnInit {
 
   editing: AdminMarketItem | null = null;
   isNew = false;
-  form: UpsertPayload = this.emptyForm();
+  form: FormState = this.emptyForm();
   deleting: AdminMarketItem | null = null;
 
-  constructor(private svc: AdminMarketService, private t: TranslateService) {}
+  pickerQ = '';
+  pickerResults: Item[] = [];
+  selectedItem: Item | null = null;
+  private pickerTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(
+    private svc: AdminMarketService,
+    private t: TranslateService,
+    private itemsSvc: ItemsService,
+  ) {}
 
   ngOnInit() { this.reload(); }
 
@@ -207,8 +260,8 @@ export class AdminMarketComponent implements OnInit {
     return this.items.filter(i => i.name.toLowerCase().includes(s) || String(i.item_id).includes(s));
   }
 
-  emptyForm(): UpsertPayload {
-    return { item_id: 0, name: '', base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10, image_url: '', enabled: true };
+  emptyForm(): FormState {
+    return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10, enabled: true };
   }
 
   openNew() {
@@ -216,17 +269,52 @@ export class AdminMarketComponent implements OnInit {
     this.isNew = true;
     this.form = this.emptyForm();
     this.error = null;
+    this.pickerQ = '';
+    this.pickerResults = [];
+    this.selectedItem = null;
   }
 
   openEdit(it: AdminMarketItem) {
     this.editing = it;
     this.isNew = false;
     this.form = {
-      item_id: it.item_id, name: it.name,
+      item_id: it.item_id,
       base_price: it.base_price, target_stock: it.target_stock, elasticity: it.elasticity,
-      amount: it.amount, image_url: it.image_url || '', enabled: !!it.enabled,
+      amount: it.amount, enabled: !!it.enabled,
     };
+    this.selectedItem = {
+      id: it.item_id, name: it.name, description: null,
+      image_url: it.image_url, type_id: it.type_id ?? null, type_name: it.type_name ?? null,
+    };
+    this.pickerQ = '';
+    this.pickerResults = [];
     this.error = null;
+  }
+
+  onPickerSearch() {
+    if (this.pickerTimer) clearTimeout(this.pickerTimer);
+    const q = this.pickerQ.trim();
+    if (!q) { this.pickerResults = []; return; }
+    this.pickerTimer = setTimeout(() => {
+      this.itemsSvc.adminList(q).subscribe({
+        next: r => this.pickerResults = r.slice(0, 20),
+        error: () => this.pickerResults = [],
+      });
+    }, 250);
+  }
+
+  pickItem(r: Item) {
+    this.selectedItem = r;
+    this.form.item_id = r.id;
+    this.pickerResults = [];
+    this.pickerQ = '';
+  }
+
+  clearPick() {
+    this.selectedItem = null;
+    this.form.item_id = null;
+    this.pickerQ = '';
+    this.pickerResults = [];
   }
 
   /** Local preview of the supply/demand formula (matches backend PricingService.compute). */
@@ -241,21 +329,20 @@ export class AdminMarketComponent implements OnInit {
   }
 
   save() {
-    if (!this.form.item_id || !this.form.name?.trim()) {
+    if (!this.form.item_id) {
       this.error = this.t.instant('adminMarket.errors.missing');
       return;
     }
     this.saving = true;
-    this.svc.upsert({
+    const payload: UpsertPayload = {
       item_id: Number(this.form.item_id),
-      name: this.form.name.trim(),
       base_price: Number(this.form.base_price) || 0,
       target_stock: Number(this.form.target_stock) || 1,
       elasticity: Number(this.form.elasticity) || 0,
       amount: Number(this.form.amount) || 0,
-      image_url: this.form.image_url?.trim() || undefined,
       enabled: this.form.enabled !== false,
-    }).subscribe({
+    };
+    this.svc.upsert(payload).subscribe({
       next: () => { this.saving = false; this.editing = null; this.reload(); },
       error: e => { this.saving = false; this.error = e?.error?.message?.join?.(', ') || e?.error?.message || this.t.instant('adminMarket.errors.saveFail'); },
     });

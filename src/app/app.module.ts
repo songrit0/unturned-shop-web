@@ -18,6 +18,10 @@ import { CodesComponent } from './pages/codes/codes.component';
 import { HelpComponent } from './pages/help/help.component';
 import { AdminMarketComponent } from './pages/admin-market/admin-market.component';
 import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
+import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
+import { AdminItemTypesComponent } from './pages/admin-item-types/admin-item-types.component';
+import { AdminItemsComponent } from './pages/admin-items/admin-items.component';
+import { QuestsComponent } from './pages/quests/quests.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ItemCardComponent } from './components/item-card/item-card.component';
 import { BasketDrawerComponent } from './components/basket-drawer/basket-drawer.component';
@@ -48,6 +52,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     HelpComponent,
     AdminMarketComponent,
     AdminCoinsComponent,
+    AdminQuestsComponent,
+    AdminItemTypesComponent,
+    AdminItemsComponent,
+    QuestsComponent,
     HeaderComponent,
     ItemCardComponent,
     BasketDrawerComponent,

@@ -5,24 +5,24 @@ import { ApiUrlService } from './api-url.service';
 
 export interface AdminMarketItem {
   item_id: number;
-  name: string;
-  price: number;            // live computed
+  name: string;            // from JOIN
+  price: number;           // live computed
   amount: number;
   base_price: number;
   target_stock: number;
   elasticity: number;
-  image_url: string | null;
+  image_url: string | null; // from JOIN
   enabled: number;
+  type_id?: number | null;  // from JOIN
+  type_name?: string | null;// from JOIN
 }
 
 export interface UpsertPayload {
   item_id: number;
-  name: string;
   base_price: number;
   target_stock: number;
   elasticity: number;
   amount: number;
-  image_url?: string | null;
   enabled?: boolean;
 }
 
