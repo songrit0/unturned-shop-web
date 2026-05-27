@@ -32,13 +32,15 @@ import { FooterComponent } from './components/footer/footer.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
+import pkg from '../../package.json';
 
 export function initApiUrl(apiUrl: ApiUrlService) {
   return () => apiUrl.load();
 }
 
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  const v = (pkg as { version?: string }).version || '0';
+  return new TranslateHttpLoader(http, './assets/i18n/', `.json?v=${v}`);
 }
 
 @NgModule({

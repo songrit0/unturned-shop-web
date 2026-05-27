@@ -60,10 +60,18 @@ const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
               </button>
             </div>
           </div>
-          <div #chartHost class="w-full h-80"></div>
-          <p *ngIf="!chartLoading && candles.length === 0" class="text-center text-slate-400 text-sm py-4">
-            {{ 'marketDetail.noCandles' | translate }}
-          </p>
+          <div class="relative">
+            <div #chartHost class="w-full h-80 min-h-[320px]"></div>
+            <div *ngIf="!chartLoading && candles.length === 0"
+                 class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+              <span class="mi xl text-slate-300 dark:text-slate-600">candlestick_chart</span>
+              <p class="text-slate-400 text-sm mt-2">{{ 'marketDetail.noCandles' | translate }}</p>
+            </div>
+            <div *ngIf="chartLoading"
+                 class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Forecast -->
