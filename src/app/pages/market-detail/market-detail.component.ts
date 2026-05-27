@@ -205,14 +205,19 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.itemId = Number(this.route.snapshot.paramMap.get('id'));
     this.market.get(this.itemId).subscribe({
-      next: it => { this.item = it; this.tryInitChart(); },
+      next: it => {
+        this.item = it;
+        // Item drives *ngIf="item" — chart host renders on next CD.
+        setTimeout(() => this.tryInitChart(), 0);
+      },
       error: () => { this.item = null; },
     });
+    this.loadCandles();
     this.loadForecast();
     this.loadTxns();
   }
 
-  ngAfterViewInit() { this.tryInitChart(); }
+  ngAfterViewInit() { setTimeout(() => this.tryInitChart(), 0); }
 
   ngOnDestroy() {
     this.resizeObs?.disconnect();
@@ -253,11 +258,15 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.resizeObs = new ResizeObserver(() => {
-      if (this.chart && host.clientWidth > 0) this.chart.applyOptions({ width: host.clientWidth });
+      if (this.chart && host.clientWidth > 0) {
+        this.chart.applyOptions({ width: host.clientWidth });
+        if (this.candles.length > 0) this.chart.timeScale().fitContent();
+      }
     });
     this.resizeObs.observe(host);
 
-    this.loadCandles();
+    // Apply any candles that loaded before the chart was ready.
+    if (this.candles.length > 0) this.applyCandles();
   }
 
   changeInterval(iv: CandleInterval) {
@@ -270,26 +279,46 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartLoading = true;
     this.hist.candles(this.itemId, this.interval).subscribe({
       next: data => {
-        this.candles = data;
+        const arr = Array.isArray(data) ? data : [];
+        // eslint-disable-next-line no-console
+        console.log('[chart] received', arr.length, 'candles, first:', arr[0], 'chartReady:', !!this.candleSeries);
+        this.candles = arr;
         this.chartLoading = false;
         this.applyCandles();
       },
-      error: () => { this.candles = []; this.chartLoading = false; this.applyCandles(); },
+      error: err => {
+        // eslint-disable-next-line no-console
+        console.warn('[chart] candles fetch failed', err);
+        this.candles = []; this.chartLoading = false; this.applyCandles();
+      },
     });
   }
 
   private applyCandles() {
-    if (!this.candleSeries || !this.volumeSeries) return;
-    this.candleSeries.setData(this.candles.map(c => ({
+    if (!this.candleSeries || !this.volumeSeries) {
+      // eslint-disable-next-line no-console
+      console.log('[chart] applyCandles skipped — series not ready yet, candles:', this.candles.length);
+      return;
+    }
+    // Defensive: dedupe by time (lightweight-charts throws on duplicates) + sort ASC.
+    const seen = new Set<number>();
+    const sorted = [...this.candles]
+      .map(c => ({ ...c, time: Number(c.time) }))
+      .filter(c => Number.isFinite(c.time) && !seen.has(c.time) && seen.add(c.time))
+      .sort((a, b) => a.time - b.time);
+
+    this.candleSeries.setData(sorted.map(c => ({
       time: c.time as Time,
-      open: c.open, high: c.high, low: c.low, close: c.close,
+      open: Number(c.open), high: Number(c.high), low: Number(c.low), close: Number(c.close),
     })));
-    this.volumeSeries.setData(this.candles.map(c => ({
+    this.volumeSeries.setData(sorted.map(c => ({
       time: c.time as Time,
-      value: c.volume,
+      value: Number(c.volume) || 0,
       color: c.close >= c.open ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)',
     })));
     this.chart?.timeScale().fitContent();
+    // eslint-disable-next-line no-console
+    console.log('[chart] setData done with', sorted.length, 'candles');
   }
 
   private loadForecast() {
