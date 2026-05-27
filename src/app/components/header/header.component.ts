@@ -138,7 +138,4 @@ export class HeaderComponent implements OnInit {
 
   logout() { this.auth.clear(); this.router.navigate(['/login']); }
 
-  goAdmin(path: string) {
-    if (path) this.router.navigateByUrl(path);
-  }
 }
