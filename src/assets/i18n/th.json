@@ -16,13 +16,13 @@
     "adminQuests": "จัดการเควส",
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
-    "adminVaults": "[TR] Manage Vaults",
-    "adminSubmissions": "[TR] Item Submissions",
+    "adminVaults": "จัดการคลัง",
+    "adminSubmissions": "คำขอแก้ไขไอเทม",
     "marketHistory": "ประวัติตลาด",
-    "p2pMarket": "[TR] P2P Market",
-    "vaults": "[TR] My Vaults",
-    "myListings": "[TR] My Listings",
-    "mySubmissions": "[TR] My Submissions",
+    "p2pMarket": "ตลาด P2P",
+    "vaults": "คลังของฉัน",
+    "myListings": "ประกาศขายของฉัน",
+    "mySubmissions": "คำขอของฉัน",
     "quests": "เควส",
     "basket": "ตะกร้า",
     "section": {
@@ -277,27 +277,27 @@
     "cancel": "ยกเลิก",
     "loading": "กำลังโหลด...",
     "saving": "กำลังบันทึก...",
-    "discard": "[TR] Discard"
+    "discard": "ยกเลิก"
   },
   "errors": {
-    "vault_locked_in_game": "[TR] This vault is open in-game. Close it and try again.",
-    "listing_no_longer_active": "[TR] This listing is no longer available — someone may have already bought it.",
-    "cannot_buy_own_listing": "[TR] You can't buy your own listing.",
-    "insufficient_funds": "[TR] You don't have enough coins.",
-    "not_listing_owner": "[TR] Only the seller can change this listing.",
-    "vault_full": "[TR] The destination vault is full.",
-    "already_submitted": "[TR] You already have a pending submission for this item.",
-    "submission_not_pending": "[TR] This submission has already been reviewed.",
-    "nothing_to_submit": "[TR] Fill in at least one field to suggest an edit.",
-    "item_not_found": "[TR] Item not found.",
-    "submission_not_found": "[TR] Submission not found.",
-    "steam_not_linked": "[TR] Link your Steam account first.",
-    "vault_not_found": "[TR] Vault not found.",
-    "listing_not_found": "[TR] Listing not found.",
-    "unauthorized": "[TR] Please sign in.",
-    "forbidden": "[TR] You don't have permission to do that.",
-    "not_found": "[TR] Not found.",
-    "unknown": "[TR] Something went wrong. Try again."
+    "vault_locked_in_game": "คลังนี้กำลังเปิดอยู่ในเกม กรุณาปิดแล้วลองใหม่",
+    "listing_no_longer_active": "ประกาศนี้ไม่สามารถใช้งานได้แล้ว — อาจมีคนซื้อไปแล้ว",
+    "cannot_buy_own_listing": "ไม่สามารถซื้อประกาศของตัวเองได้",
+    "insufficient_funds": "Coin ไม่พอ",
+    "not_listing_owner": "เฉพาะผู้ขายเท่านั้นที่แก้ไขประกาศนี้ได้",
+    "vault_full": "คลังปลายทางเต็มแล้ว",
+    "already_submitted": "คุณมีคำขอแก้ไขไอเทมนี้ที่รอตรวจอยู่แล้ว",
+    "submission_not_pending": "คำขอนี้ถูกตรวจสอบไปแล้ว",
+    "nothing_to_submit": "กรอกอย่างน้อย 1 ช่องเพื่อเสนอแก้ไข",
+    "item_not_found": "ไม่พบไอเทม",
+    "submission_not_found": "ไม่พบคำขอ",
+    "steam_not_linked": "กรุณาผูกบัญชี Steam ก่อน",
+    "vault_not_found": "ไม่พบคลัง",
+    "listing_not_found": "ไม่พบประกาศ",
+    "unauthorized": "กรุณาเข้าสู่ระบบ",
+    "forbidden": "คุณไม่มีสิทธิ์ทำรายการนี้",
+    "not_found": "ไม่พบข้อมูล",
+    "unknown": "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง"
   },
   "adminItems": {
     "title": "Master Items",
@@ -425,135 +425,135 @@
   },
   "adminMarketTypeLabel": "ประเภทไอเทม",
   "vaults": {
-    "title": "[TR] My Vaults",
-    "empty": "[TR] This vault is empty.",
-    "delete": "[TR] Delete",
-    "listOnMarket": "[TR] List",
-    "suggestEdit": "[TR] Suggest edit",
+    "title": "คลังของฉัน",
+    "empty": "คลังนี้ว่างเปล่า",
+    "delete": "ลบ",
+    "listOnMarket": "ลงขาย",
+    "suggestEdit": "เสนอแก้ไข",
     "col": {
-      "item": "[TR] Item",
-      "amount": "[TR] Amount",
-      "quality": "[TR] Quality",
-      "actions": "[TR] Actions"
+      "item": "ไอเทม",
+      "amount": "จำนวน",
+      "quality": "คุณภาพ",
+      "actions": "จัดการ"
     }
   },
   "suggestEdit": {
-    "title": "[TR] Suggest edit",
-    "hint": "[TR] Leave fields blank to keep the current value. At least one field is required.",
-    "submit": "[TR] Submit",
-    "noChange": "[TR] No change",
-    "statusPending": "[TR] Submission pending review",
-    "statusApproved": "[TR] Submission approved",
-    "statusRejected": "[TR] Submission was rejected — submit again?",
+    "title": "เสนอแก้ไข",
+    "hint": "เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน ต้องกรอกอย่างน้อย 1 ช่อง",
+    "submit": "ส่งคำขอ",
+    "noChange": "ไม่เปลี่ยนแปลง",
+    "statusPending": "คำขอกำลังรอการตรวจสอบ",
+    "statusApproved": "คำขอได้รับการอนุมัติแล้ว",
+    "statusRejected": "คำขอถูกปฏิเสธ — ส่งใหม่ไหม?",
     "field": {
-      "name": "[TR] Name",
-      "description": "[TR] Description",
-      "imageUrl": "[TR] Image URL",
-      "type": "[TR] Type"
+      "name": "ชื่อ",
+      "description": "รายละเอียด",
+      "imageUrl": "Image URL",
+      "type": "ประเภท"
     }
   },
   "submissions": {
     "status": {
-      "pending": "[TR] Pending",
-      "approved": "[TR] Approved",
-      "rejected": "[TR] Rejected"
+      "pending": "รอตรวจ",
+      "approved": "อนุมัติแล้ว",
+      "rejected": "ปฏิเสธ"
     }
   },
   "verifyStatus": {
-    "pending": "[TR] Pending admin review",
-    "rejected": "[TR] Rejected: {{note}}",
-    "unverified": "[TR] Not verified — click to suggest"
+    "pending": "รอแอดมินตรวจสอบ",
+    "rejected": "ถูกปฏิเสธ: {{note}}",
+    "unverified": "ยังไม่ได้ตรวจสอบ — คลิกเพื่อเสนอแก้ไข"
   },
   "mySubmissions": {
-    "title": "[TR] My Submissions",
-    "empty": "[TR] You haven't submitted any edits yet.",
+    "title": "คำขอของฉัน",
+    "empty": "คุณยังไม่เคยส่งคำขอแก้ไข",
     "col": {
-      "item": "[TR] Item",
-      "proposed": "[TR] Proposed changes",
-      "status": "[TR] Status",
-      "submittedAt": "[TR] Submitted",
-      "adminNote": "[TR] Admin note"
+      "item": "ไอเทม",
+      "proposed": "ข้อมูลที่เสนอแก้",
+      "status": "สถานะ",
+      "submittedAt": "ส่งเมื่อ",
+      "adminNote": "หมายเหตุแอดมิน"
     }
   },
   "adminSubmissions": {
-    "title": "[TR] Item Submissions",
-    "all": "[TR] All",
-    "empty": "[TR] No submissions match.",
-    "approve": "[TR] Approve",
-    "reject": "[TR] Reject",
-    "rejectTitle": "[TR] Reject submission",
-    "adminNote": "[TR] Note (optional)",
+    "title": "คำขอแก้ไขไอเทม",
+    "all": "ทั้งหมด",
+    "empty": "ไม่พบคำขอที่ตรงกัน",
+    "approve": "อนุมัติ",
+    "reject": "ปฏิเสธ",
+    "rejectTitle": "ปฏิเสธคำขอ",
+    "adminNote": "หมายเหตุ (ไม่บังคับ)",
     "diff": {
-      "field": "[TR] Field",
-      "current": "[TR] Current",
-      "proposed": "[TR] Proposed"
+      "field": "ช่อง",
+      "current": "ปัจจุบัน",
+      "proposed": "ที่เสนอ"
     }
   },
   "p2p": {
-    "title": "[TR] P2P Market",
-    "search": "[TR] Search items...",
-    "allTypes": "[TR] All types",
-    "empty": "[TR] No active listings",
-    "seller": "[TR] Seller",
-    "quality": "[TR] Quality",
-    "price": "[TR] Price",
-    "buy": "[TR] Buy",
-    "buying": "[TR] Buying...",
+    "title": "ตลาด P2P",
+    "search": "ค้นหาไอเทม...",
+    "allTypes": "ทุกประเภท",
+    "empty": "ยังไม่มีประกาศที่เปิดอยู่",
+    "seller": "ผู้ขาย",
+    "quality": "คุณภาพ",
+    "price": "ราคา",
+    "buy": "ซื้อ",
+    "buying": "กำลังซื้อ...",
     "status": {
-      "active": "[TR] Active",
-      "sold": "[TR] Sold",
-      "cancelled": "[TR] Cancelled",
-      "expired": "[TR] Expired"
+      "active": "กำลังขาย",
+      "sold": "ขายแล้ว",
+      "cancelled": "ยกเลิก",
+      "expired": "หมดอายุ"
     },
     "list": {
-      "title": "[TR] List on market",
-      "price": "[TR] Price (coins)",
-      "commission": "[TR] Commission",
-      "youReceive": "[TR] You receive",
-      "confirm": "[TR] List"
+      "title": "ลงขายในตลาด",
+      "price": "ราคา (coin)",
+      "commission": "ค่าธรรมเนียม",
+      "youReceive": "ได้รับสุทธิ",
+      "confirm": "ลงขาย"
     }
   },
   "adminVaults": {
-    "title": "[TR] Manage Vaults",
-    "search": "[TR] Search by Steam ID...",
+    "title": "จัดการคลัง",
+    "search": "ค้นหาจาก Steam ID...",
     "mode": {
-      "steam_id": "[TR] Steam ID",
-      "discord_id": "[TR] Discord ID",
-      "q": "[TR] Name / partial"
+      "steam_id": "Steam ID",
+      "discord_id": "Discord ID",
+      "q": "ชื่อ / บางส่วน"
     },
     "searchPlaceholder": {
-      "steam_id": "[TR] Search by Steam ID...",
-      "discord_id": "[TR] Search by Discord ID...",
-      "q": "[TR] Name (substring) or Steam ID (prefix)..."
+      "steam_id": "ค้นหาจาก Steam ID...",
+      "discord_id": "ค้นหาจาก Discord ID...",
+      "q": "ชื่อ (บางส่วน) หรือ Steam ID (ขึ้นต้น)..."
     },
-    "empty": "[TR] No vaults match.",
-    "pickHint": "[TR] Pick a vault from the list to edit.",
+    "empty": "ไม่พบคลังที่ตรงกัน",
+    "pickHint": "เลือกคลังจากรายการเพื่อแก้ไข",
     "stuckListings": {
-      "title": "[TR] Active listings by this seller",
-      "empty": "[TR] This seller has no active listings.",
-      "forceClose": "[TR] Force close",
-      "confirm": "[TR] Force close this listing? The item will be returned to the seller's default vault."
+      "title": "ประกาศที่เปิดอยู่ของผู้ขายนี้",
+      "empty": "ผู้ขายรายนี้ไม่มีประกาศเปิดอยู่",
+      "forceClose": "บังคับปิด",
+      "confirm": "บังคับปิดประกาศนี้? ของจะถูกคืนเข้าคลังหลักของผู้ขาย"
     }
   },
   "myListings": {
-    "title": "[TR] My Listings",
+    "title": "ประกาศขายของฉัน",
     "tab": {
-      "active": "[TR] Active",
-      "sold": "[TR] Sold",
-      "cancelled": "[TR] Cancelled / Expired"
+      "active": "กำลังขาย",
+      "sold": "ขายแล้ว",
+      "cancelled": "ยกเลิก / หมดอายุ"
     },
     "col": {
-      "item": "[TR] Item",
-      "quality": "[TR] Quality",
-      "price": "[TR] Price",
-      "buyer": "[TR] Buyer",
-      "created": "[TR] Created"
+      "item": "ไอเทม",
+      "quality": "คุณภาพ",
+      "price": "ราคา",
+      "buyer": "ผู้ซื้อ",
+      "created": "สร้างเมื่อ"
     },
-    "cancel": "[TR] Cancel",
+    "cancel": "ยกเลิก",
     "empty": {
-      "active": "[TR] You have no active listings.",
-      "sold": "[TR] No completed sales yet.",
-      "cancelled": "[TR] No cancelled or expired listings."
+      "active": "คุณยังไม่มีประกาศที่เปิดอยู่",
+      "sold": "ยังไม่มีรายการที่ขายสำเร็จ",
+      "cancelled": "ไม่มีประกาศที่ยกเลิก/หมดอายุ"
     }
   }
 }
