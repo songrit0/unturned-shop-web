@@ -129,7 +129,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                   <div style="flex:1;min-width:0">
                     <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ l.item_name || ('#' + l.item_id) }}</div>
                     <div class="mono" style="font-size:11px" [class.deleted-actor]="isSellerDeleted(l)">{{ sellerLabel(l) }}</div>
-                    <div class="muted mono" style="font-size:11px">#{{ l.id }} · {{ l.price | number }} · {{ l.created_at | date:'short' }}</div>
+                    <div class="muted mono" style="font-size:11px">#{{ l.id }} · {{ l.price | number }} · Q{{ l.quality }}% · {{ l.created_at | date:'short' }}</div>
                   </div>
                   <button class="btn ghost sm" style="color:var(--rose)" (click)="askForceClose(l)">
                     <span class="mi sm">gpp_bad</span> {{ 'adminVaults.stuckListings.forceClose' | translate }}

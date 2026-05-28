@@ -32,12 +32,14 @@ import { FooterComponent } from './components/footer/footer.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ListOnMarketModalComponent } from './components/list-on-market-modal/list-on-market-modal.component';
 import { SuggestEditModalComponent } from './components/suggest-edit-modal/suggest-edit-modal.component';
+import { QualityBarComponent } from './components/quality-bar/quality-bar.component';
 import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
 import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
 import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
 import { AdminItemSubmissionsComponent } from './pages/admin-item-submissions/admin-item-submissions.component';
+import { InventoryComponent } from './pages/inventory/inventory.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -79,12 +81,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     SidebarComponent,
     ListOnMarketModalComponent,
     SuggestEditModalComponent,
+    QualityBarComponent,
     VaultsComponent,
     P2pMarketComponent,
     AdminVaultsComponent,
     MyListingsComponent,
     MySubmissionsComponent,
     AdminItemSubmissionsComponent,
+    InventoryComponent,
   ],
   imports: [
     BrowserModule,

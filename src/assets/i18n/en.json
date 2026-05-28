@@ -22,6 +22,7 @@
     "p2pMarket": "P2P Market",
     "vaults": "My Vaults",
     "myListings": "My Listings",
+    "inventory": "My Inventory",
     "mySubmissions": "My Submissions",
     "quests": "Quests",
     "basket": "Basket",
@@ -277,7 +278,8 @@
     "cancel": "Cancel",
     "loading": "Loading...",
     "saving": "Saving...",
-    "discard": "Discard"
+    "discard": "Discard",
+    "ok": "OK"
   },
   "errors": {
     "vault_locked_in_game": "This vault is open in-game. Close it and try again.",
@@ -291,6 +293,10 @@
     "nothing_to_submit": "Fill in at least one field to suggest an edit.",
     "item_not_found": "Item not found.",
     "submission_not_found": "Submission not found.",
+    "already_claimed": "This purchase has already been claimed.",
+    "not_buyer": "Only the buyer can claim this item.",
+    "code_collision_retry_exhausted": "Couldn't generate a unique code right now — try again.",
+    "purchase_not_found": "Purchase not found.",
     "steam_not_linked": "Link your Steam account first.",
     "vault_not_found": "Vault not found.",
     "listing_not_found": "Listing not found.",
@@ -474,6 +480,35 @@
       "adminNote": "Admin note"
     }
   },
+  "inventory": {
+    "title": "My Inventory",
+    "empty": "No items in your inventory yet.",
+    "claim": "Claim",
+    "showCode": "Show code",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied",
+    "tab": {
+      "all": "All",
+      "unclaimed": "Unclaimed",
+      "claimed": "Claimed"
+    },
+    "col": {
+      "item": "Item",
+      "amount": "Amount",
+      "quality": "Quality",
+      "status": "Status",
+      "purchased": "Purchased",
+      "action": "Action"
+    },
+    "status": {
+      "unclaimed": "Unclaimed",
+      "claimed": "Claimed"
+    },
+    "codeReady": {
+      "title": "Your redeem code",
+      "instruction": "Use /code {{code}} in-game to receive the item."
+    }
+  },
   "adminSubmissions": {
     "title": "Item Submissions",
     "all": "All",
@@ -498,6 +533,7 @@
     "price": "Price",
     "buy": "Buy",
     "buying": "Buying...",
+    "buySuccessGoTo": "Purchase successful — view in My Inventory",
     "status": {
       "active": "Active",
       "sold": "Sold",

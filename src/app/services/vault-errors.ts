@@ -16,12 +16,16 @@ export function mapVaultP2pErrorKey(e: unknown): string {
     case 'submission_not_pending':
     case 'nothing_to_submit':
     case 'invalid_item_id':
+    case 'already_claimed':
+    case 'not_buyer':
+    case 'code_collision_retry_exhausted':
       return `errors.${msg}`;
   }
   if (msg === 'Discord account not linked to Steam') return 'errors.steam_not_linked';
   if (msg === 'Vault not found') return 'errors.vault_not_found';
   if (msg === 'Listing not found') return 'errors.listing_not_found';
   if (msg === 'Submission not found') return 'errors.submission_not_found';
+  if (msg === 'Purchase not found') return 'errors.purchase_not_found';
 
   const status = err?.status ?? err?.error?.statusCode;
   if (status === 401) return 'errors.unauthorized';

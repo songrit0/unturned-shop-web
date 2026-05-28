@@ -23,6 +23,7 @@ import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
 import { AdminItemSubmissionsComponent } from './pages/admin-item-submissions/admin-item-submissions.component';
+import { InventoryComponent } from './pages/inventory/inventory.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -48,6 +49,7 @@ const routes: Routes = [
   { path: 'admin/vaults', component: AdminVaultsComponent, canActivate: [adminGuard] },
   { path: 'my-submissions', component: MySubmissionsComponent, canActivate: [authGuard] },
   { path: 'admin/submissions', component: AdminItemSubmissionsComponent, canActivate: [adminGuard] },
+  { path: 'inventory', component: InventoryComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];
 

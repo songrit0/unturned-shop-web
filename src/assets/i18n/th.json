@@ -22,6 +22,7 @@
     "p2pMarket": "ตลาด P2P",
     "vaults": "คลังของฉัน",
     "myListings": "ประกาศขายของฉัน",
+    "inventory": "ของที่ซื้อ",
     "mySubmissions": "คำขอของฉัน",
     "quests": "เควส",
     "basket": "ตะกร้า",
@@ -277,7 +278,8 @@
     "cancel": "ยกเลิก",
     "loading": "กำลังโหลด...",
     "saving": "กำลังบันทึก...",
-    "discard": "ยกเลิก"
+    "discard": "ยกเลิก",
+    "ok": "ตกลง"
   },
   "errors": {
     "vault_locked_in_game": "คลังนี้กำลังเปิดอยู่ในเกม กรุณาปิดแล้วลองใหม่",
@@ -291,6 +293,10 @@
     "nothing_to_submit": "กรอกอย่างน้อย 1 ช่องเพื่อเสนอแก้ไข",
     "item_not_found": "ไม่พบไอเทม",
     "submission_not_found": "ไม่พบคำขอ",
+    "already_claimed": "[TR] This purchase has already been claimed.",
+    "not_buyer": "[TR] Only the buyer can claim this item.",
+    "code_collision_retry_exhausted": "[TR] Couldn't generate a unique code right now — try again.",
+    "purchase_not_found": "[TR] Purchase not found.",
     "steam_not_linked": "กรุณาผูกบัญชี Steam ก่อน",
     "vault_not_found": "ไม่พบคลัง",
     "listing_not_found": "ไม่พบประกาศ",
@@ -475,6 +481,35 @@
       "adminNote": "หมายเหตุแอดมิน"
     }
   },
+  "inventory": {
+    "title": "[TR] My Inventory",
+    "empty": "[TR] No items in your inventory yet.",
+    "claim": "[TR] Claim",
+    "showCode": "[TR] Show code",
+    "copyCode": "[TR] Copy code",
+    "codeCopied": "[TR] Copied",
+    "tab": {
+      "all": "[TR] All",
+      "unclaimed": "[TR] Unclaimed",
+      "claimed": "[TR] Claimed"
+    },
+    "col": {
+      "item": "[TR] Item",
+      "amount": "[TR] Amount",
+      "quality": "[TR] Quality",
+      "status": "[TR] Status",
+      "purchased": "[TR] Purchased",
+      "action": "[TR] Action"
+    },
+    "status": {
+      "unclaimed": "[TR] Unclaimed",
+      "claimed": "[TR] Claimed"
+    },
+    "codeReady": {
+      "title": "[TR] Your redeem code",
+      "instruction": "[TR] Use /code {{code}} in-game to receive the item."
+    }
+  },
   "adminSubmissions": {
     "title": "คำขอแก้ไขไอเทม",
     "all": "ทั้งหมด",
@@ -499,6 +534,7 @@
     "price": "ราคา",
     "buy": "ซื้อ",
     "buying": "กำลังซื้อ...",
+    "buySuccessGoTo": "[TR] Purchase successful — view in My Inventory",
     "status": {
       "active": "กำลังขาย",
       "sold": "ขายแล้ว",

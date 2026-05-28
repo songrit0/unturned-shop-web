@@ -45,6 +45,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
           <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
         </a>
+        <a routerLink="/inventory" routerLinkActive="active" class="nav-item">
+          <span class="mi">redeem</span>{{ 'nav.inventory' | translate }}
+        </a>
         <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
           <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
         </a>

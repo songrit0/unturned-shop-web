@@ -30,7 +30,7 @@ type Tab = 'active' | 'sold' | 'cancelled';
                 <tr>
                   <th style="width:56px"></th>
                   <th>{{ 'myListings.col.item' | translate }}</th>
-                  <th style="width:100px">{{ 'myListings.col.quality' | translate }}</th>
+                  <th style="width:140px">{{ 'myListings.col.quality' | translate }}</th>
                   <th style="width:120px">{{ 'myListings.col.price' | translate }}</th>
                   <th *ngIf="tab === 'sold'" style="width:200px">{{ 'myListings.col.buyer' | translate }}</th>
                   <th style="width:160px">{{ 'myListings.col.created' | translate }}</th>
@@ -45,7 +45,10 @@ type Tab = 'active' | 'sold' | 'cancelled';
                     </div>
                   </td>
                   <td><div style="font-weight:600">{{ l.item_name }}</div></td>
-                  <td>Q{{ l.quality }}<ng-container *ngIf="l.amount > 1"> · ×{{ l.amount }}</ng-container></td>
+                  <td>
+                    <app-quality-bar [value]="l.quality" [showPercent]="true"></app-quality-bar>
+                    <div *ngIf="l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
+                  </td>
                   <td class="mono">{{ l.price | number }}</td>
                   <td *ngIf="tab === 'sold'" class="muted mono" style="font-size:12px" [class.deleted-actor]="isBuyerDeleted(l)">{{ buyerLabel(l) }}</td>
                   <td class="muted mono" style="font-size:12px">{{ l.created_at | date:'short' }}</td>

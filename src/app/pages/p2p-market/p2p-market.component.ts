@@ -28,6 +28,14 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
         </div>
       </div>
 
+      <div *ngIf="lastBuyId != null" class="buy-success">
+        <span class="mi sm">check_circle</span>
+        <a routerLink="/inventory">{{ 'p2p.buySuccessGoTo' | translate }}</a>
+        <button class="btn ghost sm" (click)="lastBuyId = null" style="margin-left:auto;color:var(--muted)">
+          <span class="mi sm">close</span>
+        </button>
+      </div>
+
       <ng-container *ngIf="!loading; else loadingTpl">
         <div class="grid-cards">
           <div *ngFor="let l of items" class="listing-card" (click)="select(l)">
@@ -42,9 +50,8 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                   <span class="mi sm">info</span>
                 </span>
               </div>
-              <div class="muted" style="font-size:12px">
-                Q{{ l.quality }}<ng-container *ngIf="l.amount > 1"> · ×{{ l.amount }}</ng-container>
-              </div>
+              <app-quality-bar [value]="l.quality" [showPercent]="true"></app-quality-bar>
+              <div *ngIf="l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
               <div class="price mono">{{ l.price | number }} <span class="muted" style="font-weight:400">coins</span></div>
             </div>
           </div>
@@ -76,7 +83,8 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
               <div class="muted" style="font-size:12px">{{ 'p2p.seller' | translate }}</div>
               <div class="mono" style="font-weight:600;font-size:13px" [class.deleted-actor]="isSellerDeleted(selected)">{{ sellerLabel(selected) }}</div>
               <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.quality' | translate }}</div>
-              <div>Q{{ selected.quality }}<ng-container *ngIf="selected.amount > 1"> · ×{{ selected.amount }}</ng-container></div>
+              <app-quality-bar [value]="selected.quality" [showPercent]="true"></app-quality-bar>
+              <div *ngIf="selected.amount > 1" class="muted mono" style="font-size:11px">×{{ selected.amount }}</div>
               <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.price' | translate }}</div>
               <div class="mono" style="font-weight:700;font-size:18px">{{ selected.price | number }} coins</div>
             </div>
@@ -101,6 +109,10 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
     .name { font-weight: 600; }
     .price { margin-top: 4px; font-size: 15px; font-weight: 700; }
     .verify-icon { display: inline-flex; align-items: center; color: var(--rose); }
+    .buy-success { display: flex; align-items: center; gap: 8px; padding: 10px 14px; margin-bottom: 12px;
+                   background: var(--surface-2); border: 1px solid var(--emerald); border-radius: 6px;
+                   color: var(--emerald); font-size: 13px; }
+    .buy-success a { color: var(--emerald); font-weight: 600; text-decoration: underline; }
   `],
 })
 export class P2pMarketComponent implements OnInit, OnDestroy {
@@ -117,6 +129,7 @@ export class P2pMarketComponent implements OnInit, OnDestroy {
 
   selected: P2pListing | null = null;
   buying = false;
+  lastBuyId: number | null = null;
   buyError: string | null = null;
 
   private search$ = new Subject<string>();
@@ -161,7 +174,12 @@ export class P2pMarketComponent implements OnInit, OnDestroy {
     this.buying = true;
     this.buyError = null;
     this.svc.buy(this.selected.id).subscribe({
-      next: () => { this.buying = false; this.selected = null; this.reload(); },
+      next: bought => {
+        this.buying = false;
+        this.lastBuyId = bought.id;
+        this.selected = null;
+        this.reload();
+      },
       error: e => {
         this.buying = false;
         this.buyError = mapVaultP2pErrorKey(e);
