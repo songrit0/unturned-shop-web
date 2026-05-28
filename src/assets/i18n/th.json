@@ -134,6 +134,8 @@
     "title": "ของที่ซื้อ",
     "empty": "ยังไม่มีของที่ซื้อ",
     "claim": "รับของ",
+    "claimAll": "รับทั้งหมด",
+    "claimAllCount": "โค้ดนี้รวม {{count}} ชิ้น",
     "showCode": "ดูโค้ด",
     "copyCode": "คัดลอกโค้ด",
     "codeCopied": "คัดลอกแล้ว",
@@ -156,6 +158,7 @@
     },
     "codeReady": {
       "title": "โค้ดของคุณพร้อมใช้",
+      "titleAll": "รับของทั้งหมดแล้ว",
       "instruction": "เข้าเกม Unturned แล้วพิมพ์: /code {{code}}"
     }
   },

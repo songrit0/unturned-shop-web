@@ -18,3 +18,17 @@ export interface PurchaseView {
 }
 
 export type PurchaseFilter = 'unclaimed' | 'claimed' | 'all';
+
+// Result of POST /purchases/claim-all — claims every unclaimed purchase into ONE code.
+export interface ClaimAllItem {
+  item_id: number;
+  item_name: string;
+  amount: number;
+  quality: number;
+}
+
+export interface ClaimAllResult {
+  redeem_code: string | null; // single combined redeem code; null when nothing to claim
+  count: number;
+  items: ClaimAllItem[];
+}

@@ -484,6 +484,8 @@
     "title": "My Inventory",
     "empty": "No items in your inventory yet.",
     "claim": "Claim",
+    "claimAll": "Claim all",
+    "claimAllCount": "This code covers {{count}} item(s)",
     "showCode": "Show code",
     "copyCode": "Copy code",
     "codeCopied": "Copied",
@@ -506,6 +508,7 @@
     },
     "codeReady": {
       "title": "Your redeem code",
+      "titleAll": "All items claimed",
       "instruction": "Use /code {{code}} in-game to receive the item."
     }
   },

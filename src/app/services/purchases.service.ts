@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { PurchaseFilter, PurchaseView } from '../models/purchase';
+import { ClaimAllResult, PurchaseFilter, PurchaseView } from '../models/purchase';
 import { buildPagedParams, normalizePaginated } from './paged-http';
 
 // API contract (unturned-shop-api purchases.controller.ts):
 //   GET    /purchases/me   query: page, limit, status? -> Paginated<PurchaseView>
 //   POST   /purchases/:id/claim                        -> PurchaseView (redeem_code populated)
+//   POST   /purchases/claim-all                        -> ClaimAllResult (one combined code for all unclaimed)
 
 @Injectable({ providedIn: 'root' })
 export class PurchasesService {
@@ -23,5 +24,10 @@ export class PurchasesService {
 
   claim(id: number): Observable<PurchaseView> {
     return this.http.post<PurchaseView>(`${this.apiUrl.get()}/purchases/${id}/claim`, {});
+  }
+
+  /** Claim every unclaimed purchase of the caller into ONE combined redeem code. */
+  claimAll(): Observable<ClaimAllResult> {
+    return this.http.post<ClaimAllResult>(`${this.apiUrl.get()}/purchases/claim-all`, {});
   }
 }

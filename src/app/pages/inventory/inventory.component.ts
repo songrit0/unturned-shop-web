@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PurchaseFilter, PurchaseView } from '../../models/purchase';
+import { ClaimAllResult, PurchaseFilter, PurchaseView } from '../../models/purchase';
 import { PurchasesService } from '../../services/purchases.service';
 import { mapVaultP2pErrorKey } from '../../services/vault-errors';
 
@@ -10,6 +10,11 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
       <div class="page-header">
         <div class="h-icon emerald"><span class="mi lg">redeem</span></div>
         <h1>{{ 'inventory.title' | translate }}</h1>
+        <div class="page-actions">
+          <button *ngIf="hasUnclaimed()" class="btn primary" [disabled]="claimingAll" (click)="onClaimAll()">
+            <span class="mi sm">redeem</span> {{ (claimingAll ? 'common.saving' : 'inventory.claimAll') | translate }}
+          </button>
+        </div>
       </div>
 
       <div class="tabs">
@@ -79,25 +84,44 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
       </ng-template>
 
-      <!-- Code modal -->
-      <div *ngIf="codeFor" class="modal-backdrop" (click)="closeCode()">
+      <!-- Code modal — handles both a single claimed purchase and the bulk "claim all" result -->
+      <div *ngIf="codeFor || bulkResult" class="modal-backdrop" (click)="closeCode()">
         <div class="modal-card tactical" style="max-width:480px;text-align:center" (click)="$event.stopPropagation()">
           <h3 style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 12px 0;font-size:18px;font-weight:700">
             <span class="mi">qr_code_2</span>
-            {{ 'inventory.codeReady.title' | translate }}
+            {{ (bulkResult ? 'inventory.codeReady.titleAll' : 'inventory.codeReady.title') | translate }}
           </h3>
-          <p class="muted" style="font-size:13px;margin:0 0 12px 0">
+
+          <!-- Single purchase summary -->
+          <p *ngIf="codeFor" class="muted" style="font-size:13px;margin:0 0 12px 0">
             {{ codeFor.item_name || ('#' + codeFor.item_id) }}
             <ng-container *ngIf="codeFor.amount > 1"> · ×{{ codeFor.amount }}</ng-container>
           </p>
-          <div class="code-box mono">{{ codeFor.redeem_code }}</div>
-          <button class="btn ghost sm" (click)="copy(codeFor.redeem_code!)" style="margin-top:8px">
-            <span class="mi sm">{{ copied ? 'check' : 'content_copy' }}</span>
-            {{ (copied ? 'inventory.codeCopied' : 'inventory.copyCode') | translate }}
-          </button>
-          <p class="muted" style="font-size:12px;margin-top:14px">
-            {{ 'inventory.codeReady.instruction' | translate:{ code: codeFor.redeem_code } }}
-          </p>
+
+          <!-- Bulk summary: one code covering N items -->
+          <ng-container *ngIf="bulkResult">
+            <p class="muted" style="font-size:13px;margin:0 0 10px 0">
+              {{ 'inventory.claimAllCount' | translate:{ count: bulkResult.count } }}
+            </p>
+            <ul *ngIf="bulkResult.items.length" class="claim-all-list">
+              <li *ngFor="let it of bulkResult.items">
+                <span style="font-weight:600">{{ it.item_name || ('#' + it.item_id) }}</span>
+                <span class="muted mono"> ×{{ it.amount }}</span>
+              </li>
+            </ul>
+          </ng-container>
+
+          <ng-container *ngIf="activeCode() as code">
+            <div class="code-box mono">{{ code }}</div>
+            <button class="btn ghost sm" (click)="copy(code)" style="margin-top:8px">
+              <span class="mi sm">{{ copied ? 'check' : 'content_copy' }}</span>
+              {{ (copied ? 'inventory.codeCopied' : 'inventory.copyCode') | translate }}
+            </button>
+            <p class="muted" style="font-size:12px;margin-top:14px">
+              {{ 'inventory.codeReady.instruction' | translate:{ code: code } }}
+            </p>
+          </ng-container>
+
           <p *ngIf="claimError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ claimError | translate }}</p>
           <button class="btn primary" style="margin-top:16px;width:100%" (click)="closeCode()">{{ 'common.ok' | translate }}</button>
         </div>
@@ -119,6 +143,18 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
       letter-spacing: 2px;
       user-select: all;
     }
+    .claim-all-list {
+      list-style: none;
+      margin: 0 0 14px 0;
+      padding: 8px 12px;
+      max-height: 160px;
+      overflow-y: auto;
+      text-align: left;
+      background: var(--surface-2);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .claim-all-list li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
   `],
 })
 export class InventoryComponent implements OnInit {
@@ -128,13 +164,22 @@ export class InventoryComponent implements OnInit {
   items: PurchaseView[] = [];
 
   busyId: number | null = null;
+  claimingAll = false;
   codeFor: PurchaseView | null = null;
+  bulkResult: ClaimAllResult | null = null;
   claimError: string | null = null;
   copied = false;
 
   constructor(private svc: PurchasesService) {}
 
   ngOnInit() { this.reload(); }
+
+  hasUnclaimed(): boolean { return this.items.some(i => !i.claimed_at); }
+
+  /** The redeem code currently shown by the modal, from whichever path is active. */
+  activeCode(): string | null {
+    return this.bulkResult ? this.bulkResult.redeem_code : (this.codeFor?.redeem_code ?? null);
+  }
 
   select(t: PurchaseFilter) {
     if (this.tab === t) return;
@@ -169,7 +214,31 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+  onClaimAll() {
+    this.claimingAll = true;
+    this.claimError = null;
+    this.svc.claimAll().subscribe({
+      next: res => {
+        this.claimingAll = false;
+        // Only show the code modal when there was actually something to claim.
+        if (res.redeem_code && res.count > 0) {
+          this.codeFor = null;
+          this.bulkResult = res;
+          this.copied = false;
+        }
+        // Refetch so every claimed row flips status (and respects the active tab filter).
+        this.reload();
+      },
+      error: e => {
+        this.claimingAll = false;
+        this.claimError = mapVaultP2pErrorKey(e);
+        this.bulkResult = { redeem_code: null, count: 0, items: [] }; // open the modal so the error has somewhere to render
+      },
+    });
+  }
+
   showCode(p: PurchaseView) {
+    this.bulkResult = null;
     this.codeFor = p;
     this.copied = false;
     this.claimError = null;
@@ -177,6 +246,7 @@ export class InventoryComponent implements OnInit {
 
   closeCode() {
     this.codeFor = null;
+    this.bulkResult = null;
     this.copied = false;
     this.claimError = null;
   }
