@@ -1,6 +1,6 @@
 # 🛒 unturned-shop-web
 
-Angular 17 frontend for SellVault — Discord login, shop, coins, admin.
+Angular 17 frontend for meowpow — Discord login, shop, coins, admin.
 
 > Phase 2 = skeleton + login flow + Firestore-driven API URL
 
