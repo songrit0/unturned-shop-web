@@ -115,7 +115,7 @@ export class BasketDrawerComponent implements OnInit {
 
   copyCode() {
     if (!this.result) return;
-    navigator.clipboard.writeText(this.result.code).then(() => {
+    navigator.clipboard.writeText(`/code ${this.result.code}`).then(() => {
       this.copied = true; setTimeout(() => this.copied = false, 2000);
     });
   }

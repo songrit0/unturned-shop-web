@@ -172,7 +172,7 @@ export class HomeComponent implements OnInit {
 
   copy() {
     if (!this.code) return;
-    navigator.clipboard.writeText(this.code).then(() => {
+    navigator.clipboard.writeText(`/link ${this.code}`).then(() => {
       this.copied = true; setTimeout(() => this.copied = false, 2000);
     });
   }

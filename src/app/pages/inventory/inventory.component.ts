@@ -183,12 +183,12 @@ export class InventoryComponent implements OnInit {
 
   copy(code: string) {
     if (!code) return;
+    const text = `/code ${code}`;
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(code).then(() => { this.copied = true; }, () => {});
+      navigator.clipboard.writeText(text).then(() => { this.copied = true; }, () => {});
     } else {
-      // Legacy fallback for non-secure contexts
       const ta = document.createElement('textarea');
-      ta.value = code;
+      ta.value = text;
       document.body.appendChild(ta);
       ta.select();
       try { document.execCommand('copy'); this.copied = true; } catch {}

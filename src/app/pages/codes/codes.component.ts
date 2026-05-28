@@ -93,7 +93,7 @@ export class CodesComponent implements OnInit {
   }
 
   copy(code: string) {
-    navigator.clipboard.writeText(code).then(() => {
+    navigator.clipboard.writeText(`/code ${code}`).then(() => {
       this.copiedCode = code; setTimeout(() => this.copiedCode = null, 2000);
     });
   }
