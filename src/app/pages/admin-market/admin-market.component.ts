@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { AdminMarketItem, AdminMarketService, UpsertPayload } from '../../services/admin-market.service';
+import { AdminMarketItem, AdminMarketService, Paginated, UpsertPayload } from '../../services/admin-market.service';
 import { Item, ItemsService } from '../../services/items.service';
 
 interface FormState {
@@ -23,7 +25,7 @@ interface FormState {
         <div class="page-actions">
           <div class="input-wrap" style="width:260px">
             <span class="mi lead">search</span>
-            <input type="search" class="input" [(ngModel)]="q" [placeholder]="'adminMarket.search' | translate">
+            <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" [placeholder]="'adminMarket.search' | translate">
           </div>
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminMarket.add' | translate }}
@@ -55,7 +57,7 @@ interface FormState {
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let it of filtered()">
+                <tr *ngFor="let it of items">
                   <td>
                     <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
                       <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
@@ -89,7 +91,7 @@ interface FormState {
                     </div>
                   </td>
                 </tr>
-                <tr *ngIf="filtered().length === 0">
+                <tr *ngIf="items.length === 0">
                   <td colspan="10">
                     <div class="empty">
                       <span class="mi xxl">inventory_2</span>
@@ -101,6 +103,12 @@ interface FormState {
             </table>
           </div>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="goPage($event, page.limit)"
+          (limitChange)="goPage(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -208,12 +216,18 @@ interface FormState {
     </div>
   `,
 })
-export class AdminMarketComponent implements OnInit {
+export class AdminMarketComponent implements OnInit, OnDestroy {
   loading = true;
   saving = false;
   error: string | null = null;
   items: AdminMarketItem[] = [];
+  page: Paginated<AdminMarketItem> | null = null;
+  pageNum = 1;
+  pageLimit = 20;
   q = '';
+
+  private search$ = new Subject<string>();
+  private searchSub?: Subscription;
 
   editing: AdminMarketItem | null = null;
   isNew = false;
@@ -231,20 +245,35 @@ export class AdminMarketComponent implements OnInit {
     private itemsSvc: ItemsService,
   ) {}
 
-  ngOnInit() { this.reload(); }
+  ngOnInit() {
+    this.searchSub = this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.pageNum = 1;
+      this.reload();
+    });
+    this.reload();
+  }
+
+  ngOnDestroy() { this.searchSub?.unsubscribe(); }
 
   reload() {
     this.loading = true;
-    this.svc.list().subscribe({
-      next: it => { this.items = it; this.loading = false; },
+    this.svc.list(this.pageNum, this.pageLimit).subscribe({
+      next: p => { this.page = p; this.items = this.applyClientFilter(p.items); this.loading = false; },
       error: () => { this.loading = false; },
     });
   }
 
-  filtered(): AdminMarketItem[] {
+  private applyClientFilter(arr: AdminMarketItem[]): AdminMarketItem[] {
     const s = this.q.trim().toLowerCase();
-    if (!s) return this.items;
-    return this.items.filter(i => i.name.toLowerCase().includes(s) || String(i.item_id).includes(s));
+    if (!s) return arr;
+    return arr.filter(i => i.name.toLowerCase().includes(s) || String(i.item_id).includes(s));
+  }
+
+  onSearch(v: string) { this.search$.next(v ?? ''); }
+  goPage(page: number, limit: number) {
+    this.pageNum = page;
+    this.pageLimit = limit;
+    this.reload();
   }
 
   emptyForm(): FormState {
@@ -283,11 +312,11 @@ export class AdminMarketComponent implements OnInit {
     const q = this.pickerQ.trim();
     if (!q) { this.pickerResults = []; return; }
     this.pickerTimer = setTimeout(() => {
-      this.itemsSvc.adminList(q).subscribe({
-        next: r => this.pickerResults = r.slice(0, 20),
+      this.itemsSvc.adminList(q, null, 1, 20).subscribe({
+        next: p => this.pickerResults = p.items,
         error: () => this.pickerResults = [],
       });
-    }, 250);
+    }, 300);
   }
 
   pickItem(r: Item) {
@@ -347,8 +376,8 @@ export class AdminMarketComponent implements OnInit {
     if (!this.deleting) return;
     const id = this.deleting.item_id;
     this.svc.remove(id).subscribe(() => {
-      this.items = this.items.filter(x => x.item_id !== id);
       this.deleting = null;
+      this.reload();
     });
   }
 }

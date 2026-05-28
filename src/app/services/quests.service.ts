@@ -2,6 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlService } from './api-url.service';
+import { Paginated } from '../models/paginated';
+import { buildPagedParams } from './paged-http';
+
+export { Paginated };
 
 export type QuestResetType = 'once' | 'daily' | 'weekly';
 
@@ -56,8 +60,9 @@ export class QuestsService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
 
   // ---- Admin ----
-  adminList(): Observable<AdminQuest[]> {
-    return this.http.get<AdminQuest[]>(`${this.apiUrl.get()}/admin/quests`);
+  adminList(page = 1, limit = 20): Observable<Paginated<AdminQuest>> {
+    const params = buildPagedParams(page, limit);
+    return this.http.get<Paginated<AdminQuest>>(`${this.apiUrl.get()}/admin/quests`, { params });
   }
   adminCreate(p: AdminQuestPayload): Observable<AdminQuest> {
     return this.http.post<AdminQuest>(`${this.apiUrl.get()}/admin/quests`, p);
@@ -76,7 +81,14 @@ export class QuestsService {
   get(id: number): Observable<PlayerQuest> {
     return this.http.get<PlayerQuest>(`${this.apiUrl.get()}/quests/${id}`);
   }
-  history(): Observable<PlayerQuest[]> {
-    return this.http.get<PlayerQuest[]>(`${this.apiUrl.get()}/quests/history`);
+  history(page = 1, limit = 20): Observable<Paginated<PlayerQuest>> {
+    const params = buildPagedParams(page, limit);
+    return this.http.get<Paginated<PlayerQuest>>(`${this.apiUrl.get()}/quests/history`, { params });
+  }
+  claim(questId: number): Observable<{ ok: boolean; coins_claimed?: number; new_balance?: number; reason?: string }> {
+    return this.http.post<{ ok: boolean; coins_claimed?: number; new_balance?: number; reason?: string }>(
+      `${this.apiUrl.get()}/quests/${questId}/claim`,
+      {}
+    );
   }
 }

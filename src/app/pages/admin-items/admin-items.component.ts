@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Item, ItemPayload, ItemsService } from '../../services/items.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Item, ItemPayload, ItemsService, Paginated } from '../../services/items.service';
 import { ItemType, ItemTypesService } from '../../services/item-types.service';
 
 @Component({
@@ -11,11 +13,11 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
         <h1>{{ 'adminItems.title' | translate }}</h1>
         <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
         <div class="page-actions">
-          <!-- <div class="input-wrap" style="width:240px">
+          <div class="input-wrap" style="width:240px">
             <span class="mi lead">search</span>
-            <input type="search" class="input" [(ngModel)]="q" [placeholder]="'adminItems.search' | translate">
-          </div> -->
-          <select class="select" [(ngModel)]="typeFilter">
+            <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" [placeholder]="'adminItems.search' | translate">
+          </div>
+          <select class="select" [(ngModel)]="typeFilter" (ngModelChange)="onTypeChange()">
             <option [ngValue]="null">{{ 'adminItems.allTypes' | translate }}</option>
             <option *ngFor="let t of types" [ngValue]="t.id">{{ t.name }}</option>
           </select>
@@ -39,7 +41,7 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let it of filtered()">
+                <tr *ngFor="let it of items">
                   <td>
                     <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
                       <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
@@ -62,7 +64,7 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
                     </div>
                   </td>
                 </tr>
-                <tr *ngIf="filtered().length === 0">
+                <tr *ngIf="items.length === 0">
                   <td colspan="5">
                     <div class="empty">
                       <span class="mi xxl">inventory_2</span>
@@ -74,6 +76,12 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
             </table>
           </div>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="goPage($event, page.limit)"
+          (limitChange)="goPage(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -147,14 +155,20 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
     </div>
   `,
 })
-export class AdminItemsComponent implements OnInit {
+export class AdminItemsComponent implements OnInit, OnDestroy {
   loading = true;
   saving = false;
   error: string | null = null;
   items: Item[] = [];
+  page: Paginated<Item> | null = null;
+  pageNum = 1;
+  pageLimit = 20;
   types: ItemType[] = [];
   q = '';
   typeFilter: number | null = null;
+
+  private search$ = new Subject<string>();
+  private searchSub?: Subscription;
 
   editing: Item | null = null;
   isNew = false;
@@ -172,24 +186,30 @@ export class AdminItemsComponent implements OnInit {
   constructor(private svc: ItemsService, private typesSvc: ItemTypesService) { }
 
   ngOnInit() {
+    this.searchSub = this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.pageNum = 1;
+      this.reload();
+    });
     this.reload();
-    this.typesSvc.list().subscribe({ next: t => this.types = t, error: () => { } });
+    this.typesSvc.list().subscribe({ next: p => this.types = p.items, error: () => { } });
   }
+
+  ngOnDestroy() { this.searchSub?.unsubscribe(); }
 
   reload() {
     this.loading = true;
-    this.svc.adminList().subscribe({
-      next: it => { this.items = it; this.loading = false; },
+    this.svc.adminList(this.q.trim(), this.typeFilter, this.pageNum, this.pageLimit).subscribe({
+      next: p => { this.page = p; this.items = p.items; this.loading = false; },
       error: () => { this.loading = false; },
     });
   }
 
-  filtered(): Item[] {
-    const s = this.q.trim().toLowerCase();
-    let arr = this.items;
-    if (this.typeFilter != null) arr = arr.filter(i => i.type_id === this.typeFilter);
-    if (s) arr = arr.filter(i => i.name.toLowerCase().includes(s) || String(i.id).includes(s));
-    return arr;
+  onSearch(v: string) { this.search$.next(v ?? ''); }
+  onTypeChange() { this.pageNum = 1; this.reload(); }
+  goPage(page: number, limit: number) {
+    this.pageNum = page;
+    this.pageLimit = limit;
+    this.reload();
   }
 
   emptyForm() {
@@ -247,9 +267,9 @@ export class AdminItemsComponent implements OnInit {
     this.deleteError = null;
     this.svc.adminDelete(id).subscribe({
       next: () => {
-        this.items = this.items.filter(x => x.id !== id);
         this.deleting = null;
         this.deletingBusy = false;
+        this.reload();
       },
       error: e => {
         this.deletingBusy = false;

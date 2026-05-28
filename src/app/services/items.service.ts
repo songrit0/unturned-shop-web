@@ -1,7 +1,11 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlService } from './api-url.service';
+import { Paginated } from '../models/paginated';
+import { buildPagedParams } from './paged-http';
+
+export { Paginated };
 
 export interface Item {
   id: number;
@@ -25,11 +29,9 @@ export class ItemsService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
 
   // ---- Admin ----
-  adminList(q = '', typeId: number | null = null): Observable<Item[]> {
-    let params = new HttpParams();
-    if (q) params = params.set('q', q);
-    if (typeId != null) params = params.set('type_id', String(typeId));
-    return this.http.get<Item[]>(`${this.apiUrl.get()}/admin/items`, { params });
+  adminList(q = '', typeId: number | null = null, page = 1, limit = 20): Observable<Paginated<Item>> {
+    const params = buildPagedParams(page, limit, { q, type_id: typeId });
+    return this.http.get<Paginated<Item>>(`${this.apiUrl.get()}/admin/items`, { params });
   }
   adminGet(id: number): Observable<Item> {
     return this.http.get<Item>(`${this.apiUrl.get()}/admin/items/${id}`);
@@ -45,10 +47,8 @@ export class ItemsService {
   }
 
   // ---- Public ----
-  list(q = '', typeId: number | null = null): Observable<Item[]> {
-    let params = new HttpParams();
-    if (q) params = params.set('q', q);
-    if (typeId != null) params = params.set('type_id', String(typeId));
-    return this.http.get<Item[]>(`${this.apiUrl.get()}/items`, { params });
+  list(q = '', typeId: number | null = null, page = 1, limit = 20): Observable<Paginated<Item>> {
+    const params = buildPagedParams(page, limit, { q, type_id: typeId });
+    return this.http.get<Paginated<Item>>(`${this.apiUrl.get()}/items`, { params });
   }
 }

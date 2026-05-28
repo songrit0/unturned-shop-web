@@ -60,19 +60,20 @@ import { MarketHistoryService, MarketTxn } from '../../services/market-history.s
         </table>
         </div>
         <div *ngIf="loading" class="empty" style="padding:24px;"><div class="spinner"></div></div>
-        <div *ngIf="pages > 1" class="row gap-2" style="justify-content:center; padding:12px;">
-          <button class="btn ghost sm" (click)="goPage(page - 1)" [disabled]="page <= 1">←</button>
-          <span class="muted mono">{{ page }} / {{ pages }}</span>
-          <button class="btn ghost sm" (click)="goPage(page + 1)" [disabled]="page >= pages">→</button>
-        </div>
       </div>
+
+      <app-pager *ngIf="total > 0"
+        [page]="page" [pages]="pages"
+        [total]="total" [limit]="limit"
+        (pageChange)="goPage($event)"
+        (limitChange)="changeLimit($event)"></app-pager>
     </div>
   `,
 })
 export class MarketHistoryComponent implements OnInit {
   loading = false;
   txns: MarketTxn[] = [];
-  page = 1; limit = 50; total = 0; pages = 1;
+  page = 1; limit = 20; total = 0; pages = 1;
   kind: 'buy' | 'sell' | 'all' = 'all';
   q = '';
 
@@ -85,7 +86,7 @@ export class MarketHistoryComponent implements OnInit {
       next: p => {
         this.txns = p.items;
         this.total = p.total;
-        this.pages = Math.max(1, Math.ceil(p.total / this.limit));
+        this.pages = p.pages;
         this.loading = false;
       },
       error: () => { this.txns = []; this.loading = false; },
@@ -99,7 +100,8 @@ export class MarketHistoryComponent implements OnInit {
   }
 
   onKindChange() { this.page = 1; this.load(); }
-  goPage(p: number) { if (p < 1 || p > this.pages || p === this.page) return; this.page = p; this.load(); }
+  goPage(p: number) { this.page = p; this.load(); }
+  changeLimit(l: number) { this.limit = l; this.page = 1; this.load(); }
   goItem(t: MarketTxn) { if (t.item_id) this.router.navigate(['/market', t.item_id]); }
   shortId(id: string | null | undefined) { if (!id) return ''; return id.length > 8 ? '…' + id.slice(-6) : id; }
 }

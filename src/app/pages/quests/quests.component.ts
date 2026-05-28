@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PlayerQuest, QuestsService } from '../../services/quests.service';
+import { PlayerQuest, Paginated, QuestsService } from '../../services/quests.service';
+import { CoinsService } from '../../services/coins.service';
 
 @Component({
   selector: 'app-quests',
@@ -52,19 +53,29 @@ import { PlayerQuest, QuestsService } from '../../services/quests.service';
                 </div>
               </div>
 
-              <button *ngIf="q.status === 'completed'" class="btn primary full mt-4">
-                <span class="mi">redeem</span>Claim {{ q.reward_coins | number }} coins
+              <button *ngIf="q.status === 'completed'" class="btn primary full mt-4" [disabled]="claimingId === q.id" (click)="claim(q)">
+                <ng-container *ngIf="claimingId === q.id; else claimLabel">
+                  <span class="spinner sm"></span>{{ 'quests.claim' | translate:{ n: (q.reward_coins | number) } }}
+                </ng-container>
+                <ng-template #claimLabel>
+                  <ng-container *ngIf="claimedId === q.id; else claimReady">
+                    <span class="mi">check</span>{{ 'quests.claimed' | translate }}
+                  </ng-container>
+                  <ng-template #claimReady>
+                    <span class="mi">redeem</span>{{ 'quests.claim' | translate:{ n: (q.reward_coins | number) } }}
+                  </ng-template>
+                </ng-template>
               </button>
             </article>
           </div>
         </ng-container>
 
         <ng-container *ngIf="tab === 'history'">
-          <div *ngIf="history.length === 0" class="empty">
+          <div *ngIf="historyPage && historyPage.items.length === 0" class="empty">
             <span class="mi xxl">history</span>
             <div class="empty-title">{{ 'quests.emptyHistory' | translate }}</div>
           </div>
-          <div *ngIf="history.length > 0" class="card flush">
+          <div *ngIf="historyPage && historyPage.items.length > 0" class="card flush">
             <div class="table-wrap">
             <table class="tbl">
               <thead>
@@ -76,7 +87,7 @@ import { PlayerQuest, QuestsService } from '../../services/quests.service';
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let q of history">
+                <tr *ngFor="let q of historyPage.items">
                   <td class="fw-6">{{ q.name }}</td>
                   <td><span class="badge slate">{{ q.reset_type }}</span></td>
                   <td class="r mono fw-7" style="color:var(--accent-hi);">+{{ q.reward_coins | number }}</td>
@@ -86,6 +97,12 @@ import { PlayerQuest, QuestsService } from '../../services/quests.service';
             </table>
             </div>
           </div>
+
+          <app-pager *ngIf="historyPage"
+            [page]="historyPage.page" [pages]="historyPage.pages"
+            [total]="historyPage.total" [limit]="historyPage.limit"
+            (pageChange)="loadHistory($event, historyPage.limit)"
+            (limitChange)="loadHistory(1, $event)"></app-pager>
         </ng-container>
       </ng-container>
       <ng-template #loadingTpl><div class="empty"><div class="spinner"></div></div></ng-template>
@@ -96,16 +113,35 @@ export class QuestsComponent implements OnInit {
   loading = true;
   tab: 'active' | 'history' = 'active';
   active: PlayerQuest[] = [];
-  history: PlayerQuest[] = [];
-  private historyLoaded = false;
-  constructor(private svc: QuestsService) {}
+  historyPage: Paginated<PlayerQuest> | null = null;
+  claimingId: number | null = null;
+  claimedId: number | null = null;
+  constructor(private svc: QuestsService, private coins: CoinsService) {}
   ngOnInit() {
     this.svc.list().subscribe({ next: q => { this.active = q; this.loading = false; }, error: () => this.loading = false });
   }
-  loadHistory() {
-    if (this.historyLoaded) return;
+  loadHistory(page = 1, limit = 20) {
+    if (this.historyPage && page === this.historyPage.page && limit === this.historyPage.limit) return;
     this.loading = true;
-    this.svc.history().subscribe({ next: q => { this.history = q; this.historyLoaded = true; this.loading = false; }, error: () => this.loading = false });
+    this.svc.history(page, limit).subscribe({
+      next: p => { this.historyPage = p; this.loading = false; },
+      error: () => this.loading = false,
+    });
+  }
+  claim(q: PlayerQuest) {
+    if (this.claimingId != null || this.claimedId === q.id) return;
+    this.claimingId = q.id;
+    this.svc.claim(q.id).subscribe({
+      next: res => {
+        this.claimingId = null;
+        if (res.ok) {
+          this.claimedId = q.id;
+          this.coins.refreshMe().subscribe();
+          this.svc.list().subscribe({ next: list => this.active = list });
+        }
+      },
+      error: () => { this.claimingId = null; },
+    });
   }
   pct(cur: number, req: number) { if (!req) return 0; return Math.min(100, Math.round((cur / req) * 100)); }
 }

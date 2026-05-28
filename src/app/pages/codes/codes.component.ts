@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { CodesService, MyCode } from '../../services/codes.service';
+import { CodesService, MyCode, Paginated } from '../../services/codes.service';
 
 @Component({
   selector: 'app-codes',
@@ -12,13 +12,13 @@ import { CodesService, MyCode } from '../../services/codes.service';
       </div>
 
       <ng-container *ngIf="!loading; else loadingTpl">
-        <div *ngIf="codes.length === 0" class="empty">
+        <div *ngIf="page && page.items.length === 0" class="empty">
           <span class="mi xxl">receipt_long</span>
           <div class="empty-title">{{ 'codes.empty' | translate }}</div>
         </div>
 
         <div class="col gap-3">
-          <div *ngFor="let c of codes" class="card" style="padding:18px;">
+          <div *ngFor="let c of page?.items" class="card" style="padding:18px;">
             <div class="row gap-3 wrap between">
               <div class="row gap-3">
                 <div style="width:56px; height:56px; background: rgb(245 158 11 / 0.12); border:1px solid rgb(245 158 11 / 0.3); border-radius: var(--radius); display:flex; align-items:center; justify-content:center;">
@@ -62,6 +62,12 @@ import { CodesService, MyCode } from '../../services/codes.service';
             </p>
           </div>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="load($event, page.limit)"
+          (limitChange)="load(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div class="empty"><div class="spinner"></div></div>
@@ -71,14 +77,17 @@ import { CodesService, MyCode } from '../../services/codes.service';
 })
 export class CodesComponent implements OnInit {
   loading = true;
-  codes: MyCode[] = [];
+  page: Paginated<MyCode> | null = null;
   copiedCode: string | null = null;
 
   constructor(private svc: CodesService, private t: TranslateService) {}
 
-  ngOnInit() {
-    this.svc.listMine(100).subscribe({
-      next: c => { this.codes = c; this.loading = false; },
+  ngOnInit() { this.load(1, 20); }
+
+  load(page: number, limit: number) {
+    this.loading = true;
+    this.svc.listMine(page, limit).subscribe({
+      next: p => { this.page = p; this.loading = false; },
       error: () => this.loading = false,
     });
   }

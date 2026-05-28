@@ -131,11 +131,11 @@ const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
             </tbody>
           </table>
           </div>
-          <div *ngIf="txnPages > 1" class="row gap-2" style="justify-content:center; padding:12px;">
-            <button class="btn ghost sm" (click)="goPage(txnPage - 1)" [disabled]="txnPage <= 1">←</button>
-            <span class="muted mono">{{ txnPage }} / {{ txnPages }}</span>
-            <button class="btn ghost sm" (click)="goPage(txnPage + 1)" [disabled]="txnPage >= txnPages">→</button>
-          </div>
+          <app-pager *ngIf="txnTotal > 0"
+            [page]="txnPage" [pages]="txnPages"
+            [total]="txnTotal" [limit]="txnLimit"
+            (pageChange)="goPage($event)"
+            (limitChange)="changeTxnLimit($event)"></app-pager>
         </div>
       </ng-container>
       <ng-template #loadingTpl>
@@ -158,7 +158,7 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   txns: MarketTxn[] = [];
   txnPage = 1;
-  txnLimit = 25;
+  txnLimit = 20;
   txnTotal = 0;
   txnPages = 1;
   txnLoading = false;
@@ -311,7 +311,7 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       next: p => {
         this.txns = p.items;
         this.txnTotal = p.total;
-        this.txnPages = Math.max(1, Math.ceil(p.total / this.txnLimit));
+        this.txnPages = p.pages;
         this.txnLoading = false;
       },
       error: () => { this.txns = []; this.txnLoading = false; },
@@ -319,8 +319,13 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goPage(p: number) {
-    if (p < 1 || p > this.txnPages || p === this.txnPage) return;
     this.txnPage = p;
+    this.loadTxns();
+  }
+
+  changeTxnLimit(l: number) {
+    this.txnLimit = l;
+    this.txnPage = 1;
     this.loadTxns();
   }
 

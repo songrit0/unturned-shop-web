@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AdminQuest, AdminQuestPayload, QuestResetType, QuestsService } from '../../services/quests.service';
+import { AdminQuest, AdminQuestPayload, Paginated, QuestResetType, QuestsService } from '../../services/quests.service';
 
 interface ItemRow { item_id: number | null; qty_required: number; }
 
@@ -68,6 +68,12 @@ interface ItemRow { item_id: number | null; qty_required: number; }
             </table>
           </div>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="goPage($event, page.limit)"
+          (limitChange)="goPage(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -165,6 +171,9 @@ export class AdminQuestsComponent implements OnInit {
   saving = false;
   error: string | null = null;
   quests: AdminQuest[] = [];
+  page: Paginated<AdminQuest> | null = null;
+  pageNum = 1;
+  pageLimit = 20;
 
   editing: AdminQuest | null = null;
   isNew = false;
@@ -187,10 +196,16 @@ export class AdminQuestsComponent implements OnInit {
 
   reload() {
     this.loading = true;
-    this.svc.adminList().subscribe({
-      next: q => { this.quests = q; this.loading = false; },
+    this.svc.adminList(this.pageNum, this.pageLimit).subscribe({
+      next: p => { this.page = p; this.quests = p.items; this.loading = false; },
       error: () => { this.loading = false; },
     });
+  }
+
+  goPage(page: number, limit: number) {
+    this.pageNum = page;
+    this.pageLimit = limit;
+    this.reload();
   }
 
   emptyForm() {
@@ -262,8 +277,8 @@ export class AdminQuestsComponent implements OnInit {
     if (!this.deleting) return;
     const id = this.deleting.id;
     this.svc.adminDelete(id).subscribe(() => {
-      this.quests = this.quests.filter(x => x.id !== id);
       this.deleting = null;
+      this.reload();
     });
   }
 }

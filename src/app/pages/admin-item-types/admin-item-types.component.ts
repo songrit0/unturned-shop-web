@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ItemType, ItemTypePayload, ItemTypesService } from '../../services/item-types.service';
+import { ItemType, ItemTypePayload, ItemTypesService, Paginated } from '../../services/item-types.service';
 
 @Component({
   selector: 'app-admin-item-types',
@@ -52,6 +52,12 @@ import { ItemType, ItemTypePayload, ItemTypesService } from '../../services/item
             </table>
           </div>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="goPage($event, page.limit)"
+          (limitChange)="goPage(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -102,6 +108,9 @@ export class AdminItemTypesComponent implements OnInit {
   saving = false;
   error: string | null = null;
   types: ItemType[] = [];
+  page: Paginated<ItemType> | null = null;
+  pageNum = 1;
+  pageLimit = 20;
   editing: ItemType | null = null;
   isNew = false;
   deleting: ItemType | null = null;
@@ -113,10 +122,16 @@ export class AdminItemTypesComponent implements OnInit {
 
   reload() {
     this.loading = true;
-    this.svc.list().subscribe({
-      next: t => { this.types = t; this.loading = false; },
+    this.svc.list(this.pageNum, this.pageLimit).subscribe({
+      next: p => { this.page = p; this.types = p.items; this.loading = false; },
       error: () => { this.loading = false; },
     });
+  }
+
+  goPage(page: number, limit: number) {
+    this.pageNum = page;
+    this.pageLimit = limit;
+    this.reload();
   }
 
   openNew() {
@@ -150,8 +165,8 @@ export class AdminItemTypesComponent implements OnInit {
     if (!this.deleting) return;
     const id = this.deleting.id;
     this.svc.remove(id).subscribe(() => {
-      this.types = this.types.filter(x => x.id !== id);
       this.deleting = null;
+      this.reload();
     });
   }
 }

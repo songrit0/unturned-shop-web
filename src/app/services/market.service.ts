@@ -1,7 +1,11 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlService } from './api-url.service';
+import { Paginated } from '../models/paginated';
+import { buildPagedParams } from './paged-http';
+
+export { Paginated };
 
 export interface MarketItem {
   item_id: number;
@@ -26,10 +30,9 @@ export type MarketKind = 'normal' | 'bills' | 'all';
 export class MarketService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
 
-  list(kind: MarketKind = 'normal', typeId: number | null = null): Observable<MarketItem[]> {
-    let params = new HttpParams().set('type', kind);
-    if (typeId != null) params = params.set('type_id', String(typeId));
-    return this.http.get<MarketItem[]>(`${this.apiUrl.get()}/market`, { params });
+  list(kind: MarketKind = 'normal', typeId: number | null = null, page = 1, limit = 20): Observable<Paginated<MarketItem>> {
+    const params = buildPagedParams(page, limit, { type: kind, type_id: typeId });
+    return this.http.get<Paginated<MarketItem>>(`${this.apiUrl.get()}/market`, { params });
   }
 
   get(id: number): Observable<MarketItem> {

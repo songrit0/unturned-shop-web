@@ -146,8 +146,8 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.market.list('normal', null).subscribe({
-      next: items => { this.topItems = [...items].sort((a, b) => b.price - a.price).slice(0, 4); },
+    this.market.list('normal', null, 1, 4).subscribe({
+      next: p => { this.topItems = [...p.items].sort((a, b) => b.price - a.price).slice(0, 4); },
       error: () => this.topItems = [],
     });
   }

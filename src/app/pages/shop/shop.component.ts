@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../services/market.service';
+import { MarketItem, MarketKind, MarketService, MarketTypeOption, Paginated } from '../../services/market.service';
 
 @Component({
   selector: 'app-shop',
@@ -11,7 +11,7 @@ import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../s
           <span class="h-icon" [class.emerald]="kind === 'bills'"><span class="mi">{{ kind === 'bills' ? 'payments' : 'shopping_bag' }}</span></span>
           {{ (kind === 'bills' ? 'shop.billsTitle' : 'shop.title') | translate }}
         </h1>
-        <span class="h-sub mono">Showing {{ filtered.length }} of {{ items.length }}</span>
+        <span class="h-sub mono">Showing {{ filtered.length }} of {{ page?.total ?? 0 }}</span>
         <div class="page-actions">
           <div class="segmented">
             <button [class.active]="view === 'grid'" (click)="view='grid'"><span class="mi">grid_view</span>Grid</button>
@@ -37,6 +37,8 @@ import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../s
               <span class="mi">whatshot</span>{{ 'shop.hot' | translate }}<span class="count">{{ countHot }}</span>
             </button>
           </div>
+          <!-- NOTE: q/filter/sort still operate on current page only (server returns one page at a time) -->
+
           <div class="row gap-2" style="margin-left:auto;">
             <select class="select" [(ngModel)]="typeId" (ngModelChange)="onTypeChange()">
               <option [ngValue]="null">{{ 'shop.allTypes' | translate }}</option>
@@ -60,6 +62,12 @@ import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../s
         <div [class.item-grid]="view === 'grid'" [class.item-list]="view === 'list'">
           <app-item-card *ngFor="let it of filtered; trackBy: trackById" [item]="it" [layout]="view"></app-item-card>
         </div>
+
+        <app-pager *ngIf="page"
+          [page]="page.page" [pages]="page.pages"
+          [total]="page.total" [limit]="page.limit"
+          (pageChange)="goPage($event, page.limit)"
+          (limitChange)="goPage(1, $event)"></app-pager>
       </ng-container>
       <ng-template #loadingTpl>
         <div class="empty"><div class="spinner"></div></div>
@@ -70,6 +78,7 @@ import { MarketItem, MarketKind, MarketService, MarketTypeOption } from '../../s
 export class ShopComponent implements OnInit {
   @Input() kind: MarketKind = 'normal';
   loading = true;
+  page: Paginated<MarketItem> | null = null;
   items: MarketItem[] = [];
   filtered: MarketItem[] = [];
   q = '';
@@ -80,6 +89,8 @@ export class ShopComponent implements OnInit {
   countHot = 0;
   types: MarketTypeOption[] = [];
   typeId: number | null = null;
+  pageNum = 1;
+  pageLimit = 20;
 
   constructor(private market: MarketService, private route: ActivatedRoute, private router: Router) {}
 
@@ -94,11 +105,12 @@ export class ShopComponent implements OnInit {
 
   fetch() {
     this.loading = true;
-    this.market.list(this.kind, this.typeId).subscribe({
-      next: items => {
-        this.items = items;
-        this.countSale = items.filter(i => this.discountPct(i) > 0).length;
-        this.countHot = items.filter(i => i.amount > 0 && i.amount <= 5).length;
+    this.market.list(this.kind, this.typeId, this.pageNum, this.pageLimit).subscribe({
+      next: p => {
+        this.page = p;
+        this.items = p.items;
+        this.countSale = p.items.filter(i => this.discountPct(i) > 0).length;
+        this.countHot = p.items.filter(i => i.amount > 0 && i.amount <= 5).length;
         this.apply();
         this.loading = false;
       },
@@ -107,7 +119,14 @@ export class ShopComponent implements OnInit {
   }
 
   onTypeChange() {
+    this.pageNum = 1;
     this.router.navigate([], { relativeTo: this.route, queryParams: { type_id: this.typeId ?? null }, queryParamsHandling: 'merge' });
+    this.fetch();
+  }
+
+  goPage(page: number, limit: number) {
+    this.pageNum = page;
+    this.pageLimit = limit;
     this.fetch();
   }
 

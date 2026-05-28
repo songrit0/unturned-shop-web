@@ -2,6 +2,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlService } from './api-url.service';
+import { Paginated } from '../models/paginated';
+import { buildPagedParams } from './paged-http';
+
+export { Paginated };
 
 export type CandleInterval = '1m' | '5m' | '15m' | '1h' | '4h' | '1d';
 
@@ -40,12 +44,7 @@ export interface MarketTxn {
   image_url?: string | null;
 }
 
-export interface TxnPage {
-  items: MarketTxn[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export type TxnPage = Paginated<MarketTxn>;
 
 @Injectable({ providedIn: 'root' })
 export class MarketHistoryService {
@@ -62,13 +61,13 @@ export class MarketHistoryService {
     return this.http.get<Forecast>(`${this.apiUrl.get()}/market/${itemId}/forecast`);
   }
 
-  itemTxns(itemId: number, page = 1, limit = 50): Observable<TxnPage> {
-    const params = new HttpParams().set('page', page).set('limit', limit);
-    return this.http.get<TxnPage>(`${this.apiUrl.get()}/market/${itemId}/transactions`, { params });
+  itemTxns(itemId: number, page = 1, limit = 50): Observable<Paginated<MarketTxn>> {
+    const params = buildPagedParams(page, limit);
+    return this.http.get<Paginated<MarketTxn>>(`${this.apiUrl.get()}/market/${itemId}/transactions`, { params });
   }
 
-  globalTxns(page = 1, limit = 50, kind: 'buy' | 'sell' | 'all' = 'all'): Observable<TxnPage> {
-    const params = new HttpParams().set('page', page).set('limit', limit).set('kind', kind);
-    return this.http.get<TxnPage>(`${this.apiUrl.get()}/market/transactions`, { params });
+  globalTxns(page = 1, limit = 50, kind: 'buy' | 'sell' | 'all' = 'all'): Observable<Paginated<MarketTxn>> {
+    const params = buildPagedParams(page, limit, { kind });
+    return this.http.get<Paginated<MarketTxn>>(`${this.apiUrl.get()}/market/transactions`, { params });
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPage } from '../../services/admin-coins.service';
+import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPage, Paginated } from '../../services/admin-coins.service';
 
 @Component({
   selector: 'app-admin-coins',
@@ -121,9 +121,9 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
           </div>
           <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ showHistory.steam_id }}</p>
           <div style="max-height:360px;overflow-y:auto">
-            <p *ngIf="history.length === 0" class="muted" style="text-align:center;padding:32px 0">{{ 'adminCoins.noHistory' | translate }}</p>
-            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
-              <li *ngFor="let h of history" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:8px 0;font-size:13px">
+            <p *ngIf="historyPage && historyPage.items.length === 0" class="muted" style="text-align:center;padding:32px 0">{{ 'adminCoins.noHistory' | translate }}</p>
+            <ul *ngIf="historyPage" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
+              <li *ngFor="let h of historyPage.items" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:8px 0;font-size:13px">
                 <span>
                   <span class="mono" style="font-size:11px">{{ h.kind }}</span>
                   <span class="faint mono" style="font-size:11px;margin-left:8px">{{ h.at | date:'short' }}</span>
@@ -134,6 +134,11 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
               </li>
             </ul>
           </div>
+          <app-pager *ngIf="historyPage && showHistory"
+            [page]="historyPage.page" [pages]="historyPage.pages"
+            [total]="historyPage.total" [limit]="historyPage.limit"
+            (pageChange)="loadHistory(showHistory.steam_id, $event, historyPage.limit)"
+            (limitChange)="loadHistory(showHistory.steam_id, 1, $event)"></app-pager>
         </div>
       </div>
     </div>
@@ -153,7 +158,7 @@ export class AdminCoinsComponent implements OnInit {
   error: string | null = null;
 
   showHistory: CoinUserRow | null = null;
-  history: ActivityRow[] = [];
+  historyPage: Paginated<ActivityRow> | null = null;
 
   constructor(private svc: AdminCoinsService, private t: TranslateService) {}
 
@@ -198,7 +203,12 @@ export class AdminCoinsComponent implements OnInit {
   }
 
   openHistory(u: CoinUserRow) {
-    this.showHistory = u; this.history = [];
-    this.svc.history(u.steam_id, 50).subscribe(h => this.history = h);
+    this.showHistory = u;
+    this.historyPage = null;
+    this.loadHistory(u.steam_id, 1, 20);
+  }
+
+  loadHistory(steamId: string, page: number, limit: number) {
+    this.svc.history(steamId, page, limit).subscribe(p => this.historyPage = p);
   }
 }
