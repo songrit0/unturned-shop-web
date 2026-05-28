@@ -22,7 +22,7 @@ export class ItemSubmissionsService {
   create(itemId: number, patch: SubmissionPatch): Observable<ItemSubmission> {
     return this.http.post<ItemSubmission>(
       `${this.apiUrl.get()}/items/${itemId}/submissions`,
-      patch,
+      cleanPatch(patch),
     );
   }
 
@@ -46,4 +46,30 @@ export class ItemSubmissionsService {
   reject(id: number, adminNote: string | null): Observable<ItemSubmission> {
     return this.http.post<ItemSubmission>(`${this.apiUrl.get()}/admin/items/submissions/${id}/reject`, { admin_note: adminNote });
   }
+}
+
+/**
+ * Strip empty values from a submission patch before POST. NestJS validators reject
+ * empty strings on numeric/optional fields (e.g. `type_id: ""` fails Number coercion).
+ * Empty string / null / undefined → drop the key; NaN → drop the key (defensive).
+ */
+function cleanPatch(patch: SubmissionPatch): SubmissionPatch {
+  const out: SubmissionPatch = {};
+  for (const k of Object.keys(patch) as (keyof SubmissionPatch)[]) {
+    const v = patch[k];
+    if (v == null) continue;
+    if (typeof v === 'string') {
+      const trimmed = v.trim();
+      if (trimmed) (out as Record<string, unknown>)[k] = trimmed;
+      continue;
+    }
+    if (typeof v === 'number') {
+      if (Number.isFinite(v)) (out as Record<string, unknown>)[k] = v;
+      continue;
+    }
+    // Defensive: stringified numeric (e.g. from a <select> bound with value="">) — coerce.
+    const n = Number(v);
+    if (Number.isFinite(n)) (out as Record<string, unknown>)[k] = n;
+  }
+  return out;
 }
