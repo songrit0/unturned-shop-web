@@ -3,207 +3,148 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-help',
   template: `
-    <div class="max-w-4xl mx-auto p-4 space-y-6">
-      <header>
-        <h1 class="text-3xl font-bold flex items-center gap-2">
-          <span class="mi lg text-brand-500">help</span> {{ 'help.title' | translate }}
-        </h1>
-        <p class="text-slate-500 mt-1">{{ 'help.subtitle' | translate }}</p>
-      </header>
+    <div class="page">
+      <div class="page-header">
+        <h1><span class="h-icon"><span class="mi fill">help</span></span>{{ 'help.title' | translate }}</h1>
+        <span class="h-sub">{{ 'help.subtitle' | translate }}</span>
+      </div>
 
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-emerald-500">rocket_launch</span> {{ 'help.firstUse' | translate }}
-        </h2>
-        <ol class="space-y-3 text-sm">
-          <li class="flex gap-3">
-            <span class="w-7 h-7 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold shrink-0">1</span>
+      <section class="card tactical mb-4">
+        <div class="card-title"><span class="mi">rocket_launch</span>{{ 'help.firstUse' | translate }}</div>
+        <div class="col gap-3">
+          <div class="row gap-3" *ngFor="let s of steps">
+            <div style="width:36px; height:36px; background:var(--accent); color:#18130a; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; flex-shrink:0;">{{ s.n }}</div>
             <div>
-              <p class="font-medium">{{ 'help.step1Title' | translate }}</p>
-              <p class="text-slate-500">{{ 'help.step1Desc' | translate }}</p>
+              <div class="fw-6">{{ s.titleKey | translate }}</div>
+              <div class="muted text-sm mt-1">{{ s.descKey | translate }}</div>
             </div>
-          </li>
-          <li class="flex gap-3">
-            <span class="w-7 h-7 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold shrink-0">2</span>
-            <div>
-              <p class="font-medium">{{ 'help.step2Title' | translate }}</p>
-              <p class="text-slate-500">{{ 'help.step2Desc' | translate }}</p>
-            </div>
-          </li>
-          <li class="flex gap-3">
-            <span class="w-7 h-7 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold shrink-0">3</span>
-            <div>
-              <p class="font-medium">{{ 'help.step3Title' | translate }}</p>
-              <p class="text-slate-500">{{ 'help.step3Desc' | translate }}</p>
-            </div>
-          </li>
-        </ol>
-      </section>
-
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-brand-500">shopping_bag</span> {{ 'help.howToBuy' | translate }}
-        </h2>
-        <div class="text-sm space-y-2">
-          <p>1. {{ 'help.buy1' | translate }}</p>
-          <p>2. {{ 'help.buy2' | translate }}</p>
-          <p>3. {{ 'help.buy3' | translate }}</p>
-          <p>4. {{ 'help.buy4' | translate }}</p>
-          <p>5. {{ 'help.buy5' | translate }}</p>
-          <p class="text-xs text-slate-500">{{ 'help.buyForget' | translate }}</p>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-emerald-500">sell</span> {{ 'help.howToSell' | translate }}
-        </h2>
-        <div class="text-sm space-y-3">
-          <div>
-            <p class="font-medium">{{ 'help.sell1Title' | translate }}</p>
-            <p class="text-slate-500 mt-1">{{ 'help.sell1Desc' | translate }}</p>
-          </div>
-          <div>
-            <p class="font-medium">{{ 'help.sell2Title' | translate }}</p>
-            <p class="text-slate-500 mt-1">{{ 'help.sell2Desc' | translate }}</p>
-          </div>
-          <div class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-            <p class="text-amber-700 dark:text-amber-300 text-xs font-medium flex items-center gap-1">
-              <span class="mi">info</span> {{ 'help.sellNote' | translate }}
-            </p>
           </div>
         </div>
       </section>
 
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-amber-500">payments</span> {{ 'help.economy' | translate }}
-        </h2>
+      <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom: 16px;">
+        <section class="card">
+          <div class="card-title"><span class="mi">shopping_bag</span>{{ 'help.howToBuy' | translate }}</div>
+          <ol class="col gap-2 text-sm" style="padding-left:18px;">
+            <li>{{ 'help.buy1' | translate }}</li>
+            <li>{{ 'help.buy2' | translate }}</li>
+            <li>{{ 'help.buy3' | translate }}</li>
+            <li>{{ 'help.buy4' | translate }}</li>
+            <li>{{ 'help.buy5' | translate }}</li>
+          </ol>
+          <p class="muted text-xs mt-3">{{ 'help.buyForget' | translate }}</p>
+        </section>
 
-        <div class="grid md:grid-cols-2 gap-4 text-sm">
+        <section class="card">
+          <div class="card-title"><span class="mi" style="color:var(--emerald);">sell</span>{{ 'help.howToSell' | translate }}</div>
+          <div class="col gap-3 text-sm">
+            <div>
+              <div class="fw-6">{{ 'help.sell1Title' | translate }}</div>
+              <p class="muted mt-1">{{ 'help.sell1Desc' | translate }}</p>
+            </div>
+            <div>
+              <div class="fw-6">{{ 'help.sell2Title' | translate }}</div>
+              <p class="muted mt-1">{{ 'help.sell2Desc' | translate }}</p>
+            </div>
+            <div class="welcome-alert" style="margin:0; padding:12px;">
+              <span class="mi" style="color:var(--accent-hi);">info</span>
+              <span class="text-xs fw-6" style="color:var(--accent-hi);">{{ 'help.sellNote' | translate }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card mb-4">
+        <div class="card-title"><span class="mi fill">paid</span>{{ 'help.economy' | translate }}</div>
+        <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
           <div>
-            <h3 class="font-medium mb-2 flex items-center gap-1">
-              <span class="mi text-emerald-500">trending_up</span> {{ 'help.earnTitle' | translate }}
-            </h3>
-            <ul class="space-y-1 text-slate-600 dark:text-slate-300">
-              <li>{{ 'help.earn1' | translate }}</li>
-              <li>{{ 'help.earn2' | translate }}</li>
-              <li>{{ 'help.earn3' | translate }}</li>
-              <li>{{ 'help.earn4' | translate }}</li>
-              <li>{{ 'help.earn5' | translate }}</li>
-              <li>{{ 'help.earn6' | translate }}</li>
-              <li>{{ 'help.earn7' | translate }}</li>
-              <li>{{ 'help.earn8' | translate }}</li>
-              <li>{{ 'help.earn9' | translate }}</li>
+            <h3 class="row gap-2 mb-2"><span class="mi" style="color:var(--emerald);">trending_up</span>{{ 'help.earnTitle' | translate }}</h3>
+            <ul class="col gap-1 text-sm muted" style="padding-left:0; list-style:none;">
+              <li *ngFor="let e of earns" class="row gap-2" style="align-items:flex-start;">
+                <span class="mi sm" style="color:var(--emerald); flex-shrink:0; margin-top:2px;">{{ e.icon }}</span>
+                <span>{{ e.key | translate }}</span>
+              </li>
             </ul>
           </div>
-
           <div>
-            <h3 class="font-medium mb-2 flex items-center gap-1">
-              <span class="mi text-rose-500">trending_down</span> {{ 'help.loseTitle' | translate }}
-            </h3>
-            <ul class="space-y-1 text-slate-600 dark:text-slate-300">
-              <li>{{ 'help.lose1' | translate }}</li>
-              <li>{{ 'help.lose2' | translate }}</li>
-              <li>{{ 'help.lose3' | translate }}</li>
+            <h3 class="row gap-2 mb-2"><span class="mi" style="color:var(--rose);">trending_down</span>{{ 'help.loseTitle' | translate }}</h3>
+            <ul class="col gap-1 text-sm muted" style="padding-left:0; list-style:none;">
+              <li *ngFor="let l of loses" class="row gap-2" style="align-items:flex-start;">
+                <span class="mi sm" style="color:var(--rose); flex-shrink:0; margin-top:2px;">{{ l.icon }}</span>
+                <span>{{ l.key | translate }}</span>
+              </li>
             </ul>
           </div>
         </div>
-
-        <div class="mt-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-xs text-slate-600 dark:text-slate-300">
-          <p class="font-medium mb-1">{{ 'help.exampleTitle' | translate }}</p>
-          <p>{{ 'help.exampleDesc' | translate }}</p>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-emerald-500">payments</span> {{ 'help.billsTitle' | translate }}
-        </h2>
-        <div class="text-sm space-y-2">
-          <p>{{ 'help.billsDesc' | translate }}</p>
-          <ul class="space-y-1 text-slate-600 dark:text-slate-300">
-            <li>{{ 'help.billsList' | translate }}</li>
-          </ul>
-          <p class="text-xs text-slate-500">{{ 'help.billsNote' | translate }}</p>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-slate-500">terminal</span> {{ 'help.commandsTitle' | translate }}
-        </h2>
-        <div class="grid sm:grid-cols-2 gap-2 text-sm font-mono">
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/link &lt;code&gt;</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdLinkDesc' | translate }}</p>
-          </div>
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/code &lt;code&gt;</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdCodeDesc' | translate }}</p>
-          </div>
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/sell</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdSellDesc' | translate }}</p>
-          </div>
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/coins</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdCoinsDesc' | translate }}</p>
-          </div>
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/itemid</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdItemIdDesc' | translate }}</p>
-          </div>
-          <div class="bg-slate-50 dark:bg-slate-700 rounded p-2">
-            <code class="text-brand-600">/decay</code>
-            <p class="text-xs text-slate-500 font-sans mt-1">{{ 'help.cmdDecayDesc' | translate }}</p>
+        <div class="welcome-alert mt-4" style="margin-bottom:0;">
+          <span class="mi">calculate</span>
+          <div>
+            <div class="fw-6">{{ 'help.exampleTitle' | translate }}</div>
+            <p class="muted text-sm mt-1">{{ 'help.exampleDesc' | translate }}</p>
           </div>
         </div>
       </section>
 
-      <section class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5">
-        <h2 class="font-semibold text-lg flex items-center gap-2 mb-3">
-          <span class="mi text-violet-500">contact_support</span> {{ 'help.faqTitle' | translate }}
-        </h2>
-        <div class="space-y-3 text-sm">
-          <details class="group">
-            <summary class="cursor-pointer font-medium flex items-center gap-1">
-              <span class="mi group-open:rotate-90 transition">chevron_right</span>
-              {{ 'help.faq1Q' | translate }}
+      <section class="card mb-4">
+        <div class="card-title"><span class="mi">terminal</span>{{ 'help.commandsTitle' | translate }}</div>
+        <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:8px;">
+          <div *ngFor="let c of commands" style="background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px;">
+            <code class="mono fw-7" style="color:var(--accent);">{{ c.cmd }}</code>
+            <p class="muted text-xs mt-1">{{ c.descKey | translate }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="mi">contact_support</span>{{ 'help.faqTitle' | translate }}</div>
+        <div class="col gap-2">
+          <details *ngFor="let f of faqs" class="group" style="border-bottom: 1px solid var(--border); padding: 8px 0;">
+            <summary style="cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px; list-style:none;">
+              <span class="mi sm">chevron_right</span>{{ f.q | translate }}
             </summary>
-            <p class="text-slate-500 mt-2 pl-6">{{ 'help.faq1A' | translate }}</p>
-          </details>
-          <details class="group">
-            <summary class="cursor-pointer font-medium flex items-center gap-1">
-              <span class="mi group-open:rotate-90 transition">chevron_right</span>
-              {{ 'help.faq2Q' | translate }}
-            </summary>
-            <p class="text-slate-500 mt-2 pl-6">{{ 'help.faq2A' | translate }}</p>
-          </details>
-          <details class="group">
-            <summary class="cursor-pointer font-medium flex items-center gap-1">
-              <span class="mi group-open:rotate-90 transition">chevron_right</span>
-              {{ 'help.faq3Q' | translate }}
-            </summary>
-            <p class="text-slate-500 mt-2 pl-6">{{ 'help.faq3A' | translate }}</p>
-          </details>
-          <details class="group">
-            <summary class="cursor-pointer font-medium flex items-center gap-1">
-              <span class="mi group-open:rotate-90 transition">chevron_right</span>
-              {{ 'help.faq4Q' | translate }}
-            </summary>
-            <p class="text-slate-500 mt-2 pl-6">{{ 'help.faq4A' | translate }}</p>
-          </details>
-          <details class="group">
-            <summary class="cursor-pointer font-medium flex items-center gap-1">
-              <span class="mi group-open:rotate-90 transition">chevron_right</span>
-              {{ 'help.faq5Q' | translate }}
-            </summary>
-            <p class="text-slate-500 mt-2 pl-6">{{ 'help.faq5A' | translate }}</p>
+            <p class="muted text-sm mt-2" style="padding-left:24px;">{{ f.a | translate }}</p>
           </details>
         </div>
       </section>
     </div>
   `,
+  styles: [`details[open] summary .mi { transform: rotate(90deg); transition: transform 0.15s; }`],
 })
-export class HelpComponent {}
+export class HelpComponent {
+  steps = [
+    { n: 1, titleKey: 'help.step1Title', descKey: 'help.step1Desc' },
+    { n: 2, titleKey: 'help.step2Title', descKey: 'help.step2Desc' },
+    { n: 3, titleKey: 'help.step3Title', descKey: 'help.step3Desc' },
+  ];
+  earns = [
+    { icon: 'card_giftcard', key: 'help.earn1' },
+    { icon: 'schedule', key: 'help.earn2' },
+    { icon: 'coronavirus', key: 'help.earn3' },
+    { icon: 'pets', key: 'help.earn4' },
+    { icon: 'sports_martial_arts', key: 'help.earn5' },
+    { icon: 'construction', key: 'help.earn6' },
+    { icon: 'park', key: 'help.earn7' },
+    { icon: 'sell', key: 'help.earn8' },
+    { icon: 'payments', key: 'help.earn9' },
+  ];
+  loses = [
+    { icon: 'shopping_cart', key: 'help.lose1' },
+    { icon: 'percent', key: 'help.lose2' },
+    { icon: 'account_balance', key: 'help.lose3' },
+  ];
+  commands = [
+    { cmd: '/link <code>', descKey: 'help.cmdLinkDesc' },
+    { cmd: '/code <code>', descKey: 'help.cmdCodeDesc' },
+    { cmd: '/sell', descKey: 'help.cmdSellDesc' },
+    { cmd: '/coins', descKey: 'help.cmdCoinsDesc' },
+    // { cmd: '/itemid', descKey: 'help.cmdItemIdDesc' },
+    // { cmd: '/decay', descKey: 'help.cmdDecayDesc' },
+  ];
+  faqs = [
+    { q: 'help.faq1Q', a: 'help.faq1A' },
+    { q: 'help.faq2Q', a: 'help.faq2A' },
+    { q: 'help.faq3Q', a: 'help.faq3A' },
+    { q: 'help.faq4Q', a: 'help.faq4A' },
+    { q: 'help.faq5Q', a: 'help.faq5A' },
+  ];
+}

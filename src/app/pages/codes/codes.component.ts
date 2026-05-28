@@ -5,66 +5,66 @@ import { CodesService, MyCode } from '../../services/codes.service';
 @Component({
   selector: 'app-codes',
   template: `
-    <div class="max-w-4xl mx-auto p-4 space-y-4">
-      <h1 class="text-2xl font-bold flex items-center gap-2">
-        <span class="mi lg text-brand-500">history</span> {{ 'codes.title' | translate }}
-      </h1>
-      <p class="text-sm text-slate-500">{{ 'codes.desc' | translate }}</p>
+    <div class="page">
+      <div class="page-header">
+        <h1><span class="h-icon"><span class="mi fill">qr_code_2</span></span>{{ 'codes.title' | translate }}</h1>
+        <span class="h-sub">{{ 'codes.desc' | translate }}</span>
+      </div>
 
       <ng-container *ngIf="!loading; else loadingTpl">
-        <div *ngIf="codes.length === 0" class="text-center py-12 text-slate-400">
-          <span class="mi xl block mb-2">receipt_long</span>
-          {{ 'codes.empty' | translate }}
+        <div *ngIf="codes.length === 0" class="empty">
+          <span class="mi xxl">receipt_long</span>
+          <div class="empty-title">{{ 'codes.empty' | translate }}</div>
         </div>
 
-        <div *ngFor="let c of codes" class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
-          <div class="flex items-center justify-between gap-2 flex-wrap">
-            <div class="flex items-center gap-3">
-              <code class="font-mono text-xl font-bold tracking-widest"
-                    [class.text-emerald-600]="c.status === 'available'"
-                    [class.text-slate-400]="c.status !== 'available'"
-                    [class.line-through]="c.status === 'used' || c.status === 'expired'">
-                {{ c.code }}
-              </code>
-              <span class="text-xs px-2 py-0.5 rounded-full"
-                    [class.bg-emerald-100]="c.status === 'available'"
-                    [class.text-emerald-700]="c.status === 'available'"
-                    [class.bg-slate-200]="c.status === 'used'"
-                    [class.text-slate-600]="c.status === 'used'"
-                    [class.bg-rose-100]="c.status === 'expired' || c.status === 'disabled'"
-                    [class.text-rose-700]="c.status === 'expired' || c.status === 'disabled'">
-                {{ statusText(c.status) }}
-              </span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500">{{ c.created_at | date:'short' }}</span>
-              <button (click)="copy(c.code)" [disabled]="c.status !== 'available'"
-                      class="text-sm px-3 py-1 rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 disabled:opacity-40 flex items-center gap-1">
-                <span class="mi">{{ copiedCode === c.code ? 'check' : 'content_copy' }}</span>
+        <div class="col gap-3">
+          <div *ngFor="let c of codes" class="card" style="padding:18px;">
+            <div class="row gap-3 wrap between">
+              <div class="row gap-3">
+                <div style="width:56px; height:56px; background: rgb(245 158 11 / 0.12); border:1px solid rgb(245 158 11 / 0.3); border-radius: var(--radius); display:flex; align-items:center; justify-content:center;">
+                  <span class="mi md" style="color:var(--accent-hi);">qr_code_2</span>
+                </div>
+                <div>
+                  <code class="mono fw-7" style="font-size:22px; letter-spacing:0.18em;"
+                    [style.color]="c.status === 'available' ? 'var(--accent)' : 'var(--text-faint)'"
+                    [style.text-decoration]="(c.status === 'used' || c.status === 'expired') ? 'line-through' : 'none'">
+                    {{ c.code }}
+                  </code>
+                  <div class="row gap-2 mt-1">
+                    <span class="badge"
+                      [class.emerald]="c.status === 'available'"
+                      [class.slate]="c.status === 'used'"
+                      [class.rose]="c.status === 'expired' || c.status === 'disabled'">{{ statusText(c.status) }}</span>
+                    <span class="mono faint text-xs">{{ c.created_at | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+              <button class="btn secondary sm" (click)="copy(c.code)" [disabled]="c.status !== 'available'">
+                <span class="mi sm">{{ copiedCode === c.code ? 'check' : 'content_copy' }}</span>
                 {{ (copiedCode === c.code ? 'welcome.copied' : 'welcome.copy') | translate }}
               </button>
             </div>
-          </div>
 
-          <div class="mt-3 flex flex-wrap gap-2">
-            <div *ngFor="let it of c.items" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 rounded-lg px-3 py-1.5 text-sm">
-              <img *ngIf="it.image_url; else noImg" [src]="it.image_url" class="w-6 h-6 object-contain">
-              <ng-template #noImg><span class="mi text-slate-400">inventory_2</span></ng-template>
-              <span>{{ it.name || ('#' + it.item_id) }}</span>
-              <span class="text-xs text-slate-500">x{{ it.amount }}</span>
+            <div class="row gap-2 wrap mt-3">
+              <div *ngFor="let it of c.items" class="row gap-2" style="background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding: 4px 12px 4px 4px;">
+                <div style="width:24px; height:24px; background:var(--surface-3); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:80%; height:80%; object-fit:contain;">
+                  <ng-template #noImg><span class="mi sm faint">inventory_2</span></ng-template>
+                </div>
+                <span class="text-xs">{{ it.name || ('#' + it.item_id) }}</span>
+                <span class="mono faint text-xs">×{{ it.amount }}</span>
+              </div>
             </div>
-          </div>
 
-          <p *ngIf="c.status === 'available'" class="text-xs text-slate-500 mt-3">
-            {{ 'codes.useInGame' | translate }} <code class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded font-mono">/code {{ c.code }}</code>
-          </p>
+            <p *ngIf="c.status === 'available'" class="muted text-xs mt-3">
+              {{ 'codes.useInGame' | translate }}
+              <code class="mono" style="background:var(--surface-2); padding:2px 6px; border-radius:4px;">/code {{ c.code }}</code>
+            </p>
+          </div>
         </div>
       </ng-container>
-
       <ng-template #loadingTpl>
-        <div class="text-center py-12">
-          <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <div class="empty"><div class="spinner"></div></div>
       </ng-template>
     </div>
   `,
@@ -79,18 +79,15 @@ export class CodesComponent implements OnInit {
   ngOnInit() {
     this.svc.listMine(100).subscribe({
       next: c => { this.codes = c; this.loading = false; },
-      error: () => { this.loading = false; },
+      error: () => this.loading = false,
     });
   }
 
   copy(code: string) {
     navigator.clipboard.writeText(code).then(() => {
-      this.copiedCode = code;
-      setTimeout(() => this.copiedCode = null, 2000);
+      this.copiedCode = code; setTimeout(() => this.copiedCode = null, 2000);
     });
   }
 
-  statusText(s: MyCode['status']): string {
-    return this.t.instant('codes.status.' + s);
-  }
+  statusText(s: MyCode['status']): string { return this.t.instant('codes.status.' + s); }
 }

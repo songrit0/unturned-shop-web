@@ -5,59 +5,62 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
 @Component({
   selector: 'app-admin-coins',
   template: `
-    <div class="max-w-6xl mx-auto p-4 space-y-4">
-      <header class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="mi lg text-amber-500">account_balance_wallet</span> {{ 'adminCoins.title' | translate }}
-        </h1>
-      </header>
+    <div class="page">
+      <div class="page-header">
+        <div class="h-icon rose"><span class="mi lg">account_balance_wallet</span></div>
+        <h1>{{ 'adminCoins.title' | translate }}</h1>
+        <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
+        <!-- <div class="page-actions">
+          <div class="input-wrap" style="width:280px">
+            <span class="mi lead">search</span>
+            <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch()" [placeholder]="'adminCoins.search' | translate">
+          </div>
+        </div> -->
+      </div>
 
-      <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-sm flex gap-2">
-        <span class="mi text-amber-500">info</span>
+      <div class="welcome-alert" style="margin-bottom:16px">
+        <span class="alert-icon mi">info</span>
         <div>{{ 'adminCoins.info' | translate }}</div>
       </div>
 
-      <div class="relative max-w-sm">
-        <span class="mi absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-        <input type="search" [(ngModel)]="q" (ngModelChange)="onSearch()" [placeholder]="'adminCoins.search' | translate"
-               class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
-      </div>
-
       <ng-container *ngIf="!loading; else loadingTpl">
-        <div class="overflow-x-auto bg-white dark:bg-slate-800 rounded-xl shadow">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
-              <tr>
-                <th class="p-3">{{ 'adminCoins.col.steamId' | translate }}</th>
-                <th class="p-3">{{ 'adminCoins.col.discordId' | translate }}</th>
-                <th class="p-3">{{ 'adminCoins.col.linkedAt' | translate }}</th>
-                <th class="p-3 text-right">{{ 'adminCoins.col.balance' | translate }}</th>
-                <th class="p-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let u of page?.items" class="border-t border-slate-100 dark:border-slate-700">
-                <td class="p-3 font-mono text-xs">{{ u.steam_id }}</td>
-                <td class="p-3 font-mono text-xs text-slate-500">{{ u.discord_id || '—' }}</td>
-                <td class="p-3 text-xs text-slate-500">{{ u.linked_at ? (u.linked_at | date:'short') : '—' }}</td>
-                <td class="p-3 text-right font-bold text-amber-500">{{ u.balance | number }}</td>
-                <td class="p-3 text-right whitespace-nowrap">
-                  <button (click)="openAdjust(u, 1)" class="text-xs px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded flex-inline items-center gap-1">
-                    <span class="mi">add</span> {{ 'adminCoins.grant' | translate }}
-                  </button>
-                  <button (click)="openAdjust(u, -1)" class="text-xs px-2 py-1 bg-rose-500 hover:bg-rose-600 text-white rounded ml-1">
-                    <span class="mi">remove</span> {{ 'adminCoins.take' | translate }}
-                  </button>
-                  <button (click)="openHistory(u)" class="text-xs px-2 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded ml-1">
-                    <span class="mi">history</span>
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="page && page.items.length === 0">
-                <td colspan="5" class="p-12 text-center text-slate-400">{{ 'adminCoins.noUser' | translate }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="card flush">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>{{ 'adminCoins.col.steamId' | translate }}</th>
+                  <th>{{ 'adminCoins.col.discordId' | translate }}</th>
+                  <th>{{ 'adminCoins.col.linkedAt' | translate }}</th>
+                  <th class="r">{{ 'adminCoins.col.balance' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let u of page?.items">
+                  <td class="mono" style="font-size:12px">{{ u.steam_id }}</td>
+                  <td class="mono muted" style="font-size:12px">{{ u.discord_id || '—' }}</td>
+                  <td class="mono muted" style="font-size:12px">{{ u.linked_at ? (u.linked_at | date:'short') : '—' }}</td>
+                  <td class="r mono" style="font-weight:700;color:var(--accent-hi)">{{ u.balance | number }}</td>
+                  <td>
+                    <div class="row gap-1" style="justify-content:flex-end">
+                      <button (click)="openAdjust(u, 1)" class="btn emerald sm"><span class="mi sm">add</span> {{ 'adminCoins.grant' | translate }}</button>
+                      <button (click)="openAdjust(u, -1)" class="btn danger sm"><span class="mi sm">remove</span> {{ 'adminCoins.take' | translate }}</button>
+                      <button (click)="openHistory(u)" class="btn ghost sm"><span class="mi sm">history</span></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="page && page.items.length === 0">
+                  <td colspan="5">
+                    <div class="empty">
+                      <span class="mi xxl">person_off</span>
+                      <div class="empty-title">{{ 'adminCoins.noUser' | translate }}</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <app-pager *ngIf="page"
@@ -68,43 +71,39 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
       </ng-container>
 
       <ng-template #loadingTpl>
-        <div class="text-center py-12">
-          <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
       </ng-template>
 
       <!-- Adjust modal -->
-      <div *ngIf="adjusting" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6">
-          <h3 class="text-xl font-bold mb-2 flex items-center gap-2">
-            <span class="mi" [class.text-emerald-500]="sign>0" [class.text-rose-500]="sign<0">
+      <div *ngIf="adjusting" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:420px">
+          <h3 style="display:flex;align-items:center;gap:8px;margin:0 0 8px 0;font-size:18px;font-weight:700">
+            <span class="mi" [style.color]="sign>0 ? 'var(--emerald)' : 'var(--rose)'">
               {{ sign > 0 ? 'add_circle' : 'remove_circle' }}
             </span>
             {{ (sign > 0 ? 'adminCoins.grantTitle' : 'adminCoins.takeTitle') | translate }}
           </h3>
-          <p class="text-xs text-slate-500 mb-3 font-mono">{{ adjusting.steam_id }}</p>
-          <p class="text-sm">{{ 'adminCoins.currentBalance' | translate }} <strong class="text-amber-500">{{ adjusting.balance | number }}</strong></p>
+          <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ adjusting.steam_id }}</p>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:16px;background:var(--surface-2);border-radius:8px;margin-bottom:16px">
+            <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminCoins.currentBalance' | translate }}</span>
+            <div class="coin-amt lg" style="margin-top:4px"><span class="mi">paid</span>{{ adjusting.balance | number }}</div>
+          </div>
 
-          <div class="space-y-3 text-sm mt-4">
-            <label class="block">
-              <span class="text-slate-500">{{ 'adminCoins.amount' | translate }}</span>
-              <input type="number" [(ngModel)]="amount" min="1"
-                     class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:block">
+              <span class="muted" style="font-size:12px">{{ 'adminCoins.amount' | translate }}</span>
+              <input type="number" class="input mono" [(ngModel)]="amount" min="1" style="margin-top:4px">
             </label>
-            <label class="block">
-              <span class="text-slate-500">{{ 'adminCoins.reason' | translate }}</span>
-              <input type="text" [(ngModel)]="reason" maxlength="80" [placeholder]="'adminCoins.reasonPlaceholder' | translate"
-                     class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+            <label style="display:block">
+              <span class="muted" style="font-size:12px">{{ 'adminCoins.reason' | translate }}</span>
+              <input type="text" class="input" [(ngModel)]="reason" maxlength="80" [placeholder]="'adminCoins.reasonPlaceholder' | translate" style="margin-top:4px">
             </label>
           </div>
 
-          <p *ngIf="error" class="text-sm text-rose-500 mt-3">{{ error }}</p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="adjusting = null" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg">{{ 'common.cancel' | translate }}</button>
-            <button (click)="confirmAdjust()" [disabled]="saving"
-                    class="flex-1 py-2 text-white rounded-lg disabled:opacity-50"
-                    [class.bg-emerald-500]="sign>0" [class.hover:bg-emerald-600]="sign>0"
-                    [class.bg-rose-500]="sign<0" [class.hover:bg-rose-600]="sign<0">
+          <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:12px 0 0 0">{{ error }}</p>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="adjusting = null" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="confirmAdjust()" [disabled]="saving" [class.emerald]="sign>0" [class.danger]="sign<0" class="btn" style="flex:1">
               {{ saving ? ('adminCoins.saving' | translate) : ((sign > 0 ? 'adminCoins.grant' : 'adminCoins.take') | translate) }}
             </button>
           </div>
@@ -112,26 +111,24 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
       </div>
 
       <!-- History modal -->
-      <div *ngIf="showHistory" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold flex items-center gap-2">
+      <div *ngIf="showHistory" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:560px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3 style="display:flex;align-items:center;gap:8px;margin:0;font-size:16px;font-weight:700">
               <span class="mi">history</span> {{ 'adminCoins.history' | translate }}
             </h3>
-            <button (click)="showHistory = null" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700">
-              <span class="mi">close</span>
-            </button>
+            <button (click)="showHistory = null" class="btn ghost sm"><span class="mi sm">close</span></button>
           </div>
-          <p class="text-xs text-slate-500 font-mono mb-3">{{ showHistory.steam_id }}</p>
-          <div class="max-h-80 overflow-y-auto">
-            <p *ngIf="history.length === 0" class="text-center text-slate-400 py-8">{{ 'adminCoins.noHistory' | translate }}</p>
-            <ul class="space-y-1 text-sm">
-              <li *ngFor="let h of history" class="flex justify-between border-b border-slate-100 dark:border-slate-700 py-1.5">
+          <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ showHistory.steam_id }}</p>
+          <div style="max-height:360px;overflow-y:auto">
+            <p *ngIf="history.length === 0" class="muted" style="text-align:center;padding:32px 0">{{ 'adminCoins.noHistory' | translate }}</p>
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
+              <li *ngFor="let h of history" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:8px 0;font-size:13px">
                 <span>
-                  <span class="font-mono text-xs">{{ h.kind }}</span>
-                  <span class="text-slate-400 text-xs ml-2">{{ h.at | date:'short' }}</span>
+                  <span class="mono" style="font-size:11px">{{ h.kind }}</span>
+                  <span class="faint mono" style="font-size:11px;margin-left:8px">{{ h.at | date:'short' }}</span>
                 </span>
-                <span [class.text-emerald-600]="h.coins > 0" [class.text-rose-600]="h.coins < 0">
+                <span class="mono" [style.color]="h.coins > 0 ? 'var(--emerald)' : (h.coins < 0 ? 'var(--rose)' : null)">
                   {{ h.coins > 0 ? '+' : '' }}{{ h.coins | number }}
                 </span>
               </li>

@@ -23,12 +23,14 @@ export class ThemeService {
   private detect(): Theme {
     const saved = localStorage.getItem(KEY) as Theme | null;
     if (saved === 'dark' || saved === 'light') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return 'dark';
   }
 
   private apply(t: Theme) {
+    const body = document.body;
+    body.classList.remove('theme-dark', 'theme-light');
+    body.classList.add(t === 'dark' ? 'theme-dark' : 'theme-light');
     const root = document.documentElement;
-    if (t === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
+    if (t === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
   }
 }

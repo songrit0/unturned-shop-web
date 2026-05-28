@@ -1,16 +1,37 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, map, startWith } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   template: `
-    <app-header></app-header>
-    <main class="min-h-[calc(100vh-7rem)]"><router-outlet></router-outlet></main>
-    <app-footer></app-footer>
-    <app-basket-drawer></app-basket-drawer>
+    <ng-container *ngIf="fullscreen$ | async; else withShell">
+      <router-outlet></router-outlet>
+    </ng-container>
+    <ng-template #withShell>
+      <div class="app-shell">
+        <app-sidebar></app-sidebar>
+        <app-header></app-header>
+        <main class="app-main">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+      <app-basket-drawer></app-basket-drawer>
+    </ng-template>
   `,
 })
 export class AppComponent implements OnInit {
-  constructor(private auth: AuthService) {}
+  fullscreen$ = this.router.events.pipe(
+    filter(e => e instanceof NavigationEnd),
+    map(() => this.isFullscreen(this.router.url)),
+    startWith(this.isFullscreen(this.router.url)),
+  );
+
+  constructor(private auth: AuthService, private router: Router) {}
   ngOnInit() { this.auth.refreshMe().subscribe(); }
+
+  private isFullscreen(url: string): boolean {
+    return url.startsWith('/login') || url.startsWith('/auth/callback');
+  }
 }

@@ -15,191 +15,178 @@ interface FormState {
 @Component({
   selector: 'app-admin-market',
   template: `
-    <div class="max-w-7xl mx-auto p-4 space-y-4">
-      <header class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="mi lg text-rose-500">build</span> {{ 'adminMarket.title' | translate }}
-        </h1>
-        <button (click)="openNew()" class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg flex items-center gap-1">
-          <span class="mi">add</span> {{ 'adminMarket.add' | translate }}
-        </button>
-      </header>
+    <div class="page">
+      <div class="page-header">
+        <div class="h-icon rose"><span class="mi lg">build</span></div>
+        <h1>{{ 'adminMarket.title' | translate }}</h1>
+        <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
+        <div class="page-actions">
+          <div class="input-wrap" style="width:260px">
+            <span class="mi lead">search</span>
+            <input type="search" class="input" [(ngModel)]="q" [placeholder]="'adminMarket.search' | translate">
+          </div>
+          <button (click)="openNew()" class="btn primary">
+            <span class="mi sm">add</span> {{ 'adminMarket.add' | translate }}
+          </button>
+        </div>
+      </div>
 
-      <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 text-sm flex gap-2">
-        <span class="mi text-blue-500">info</span>
+      <div class="welcome-alert" style="margin-bottom:16px">
+        <span class="alert-icon mi">info</span>
         <div>{{ 'adminMarket.supplyDemand' | translate }}</div>
       </div>
 
-      <input type="search" [(ngModel)]="q" [placeholder]="'adminMarket.search' | translate"
-             class="w-full sm:w-80 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
-
       <ng-container *ngIf="!loading; else loadingTpl">
-        <div class="overflow-x-auto bg-white dark:bg-slate-800 rounded-xl shadow">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
-              <tr>
-                <th class="p-3">{{ 'adminMarket.col.image' | translate }}</th>
-                <th class="p-3">{{ 'adminMarket.col.id' | translate }}</th>
-                <th class="p-3">{{ 'adminMarket.col.name' | translate }}</th>
-                <th class="p-3 text-right" [title]="'adminMarket.col.priceTitle' | translate">{{ 'adminMarket.col.price' | translate }}</th>
-                <th class="p-3 text-right" [title]="'adminMarket.col.baseTitle' | translate">{{ 'adminMarket.col.base' | translate }}</th>
-                <th class="p-3 text-right">{{ 'adminMarket.col.stock' | translate }}</th>
-                <th class="p-3 text-right" [title]="'adminMarket.col.targetTitle' | translate">{{ 'adminMarket.col.target' | translate }}</th>
-                <th class="p-3 text-right" [title]="'adminMarket.col.elasTitle' | translate">{{ 'adminMarket.col.elas' | translate }}</th>
-                <th class="p-3 text-center">{{ 'adminMarket.col.enabled' | translate }}</th>
-                <th class="p-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let it of filtered()" class="border-t border-slate-100 dark:border-slate-700">
-                <td class="p-3">
-                  <div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden">
-                    <img *ngIf="it.image_url; else noImg" [src]="it.image_url" class="w-full h-full object-contain p-1">
-                    <ng-template #noImg><span class="mi text-slate-400">inventory_2</span></ng-template>
-                  </div>
-                </td>
-                <td class="p-3 font-mono text-xs">{{ it.item_id }}</td>
-                <td class="p-3 font-medium">
-                  {{ it.name }}
-                  <span *ngIf="it.type_name"
-                        class="ml-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                    {{ it.type_name }}
-                  </span>
-                </td>
-                <td class="p-3 text-right font-semibold"
-                    [class.text-emerald-600]="it.price < it.base_price"
-                    [class.text-rose-600]="it.price > it.base_price">
-                  {{ it.price | number }}
-                  <span *ngIf="it.price < it.base_price" class="mi text-xs">trending_down</span>
-                  <span *ngIf="it.price > it.base_price" class="mi text-xs">trending_up</span>
-                </td>
-                <td class="p-3 text-right text-slate-500">{{ it.base_price | number }}</td>
-                <td class="p-3 text-right">{{ it.amount | number }}</td>
-                <td class="p-3 text-right text-slate-500">{{ it.target_stock | number }}</td>
-                <td class="p-3 text-right text-slate-500">{{ it.elasticity | number:'1.0-2' }}</td>
-                <td class="p-3 text-center">
-                  <button (click)="toggle(it)" class="px-2 py-1 rounded text-xs"
-                          [class.bg-emerald-100]="it.enabled" [class.text-emerald-700]="it.enabled"
-                          [class.bg-slate-200]="!it.enabled" [class.text-slate-500]="!it.enabled">
-                    {{ (it.enabled ? 'adminMarket.on' : 'adminMarket.off') | translate }}
-                  </button>
-                </td>
-                <td class="p-3 text-right whitespace-nowrap">
-                  <button (click)="openEdit(it)" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700">
-                    <span class="mi">edit</span>
-                  </button>
-                  <button (click)="confirmDel(it)" class="p-1 rounded hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-500">
-                    <span class="mi">delete</span>
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="filtered().length === 0">
-                <td colspan="10" class="p-12 text-center text-slate-400">{{ 'adminMarket.empty' | translate }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="card flush">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:64px">{{ 'adminMarket.col.image' | translate }}</th>
+                  <th>{{ 'adminMarket.col.id' | translate }}</th>
+                  <th>{{ 'adminMarket.col.name' | translate }}</th>
+                  <th class="r" [title]="'adminMarket.col.priceTitle' | translate">{{ 'adminMarket.col.price' | translate }}</th>
+                  <th class="r" [title]="'adminMarket.col.baseTitle' | translate">{{ 'adminMarket.col.base' | translate }}</th>
+                  <th class="r">{{ 'adminMarket.col.stock' | translate }}</th>
+                  <th class="r" [title]="'adminMarket.col.targetTitle' | translate">{{ 'adminMarket.col.target' | translate }}</th>
+                  <th class="r" [title]="'adminMarket.col.elasTitle' | translate">{{ 'adminMarket.col.elas' | translate }}</th>
+                  <th>{{ 'adminMarket.col.enabled' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let it of filtered()">
+                  <td>
+                    <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                      <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
+                      <ng-template #noImg><span class="mi faint">inventory_2</span></ng-template>
+                    </div>
+                  </td>
+                  <td class="mono faint">{{ it.item_id }}</td>
+                  <td>
+                    <span style="font-weight:600">{{ it.name }}</span>
+                    <span *ngIf="it.type_name" class="badge violet" style="margin-left:6px">{{ it.type_name }}</span>
+                  </td>
+                  <td class="r mono" style="font-weight:600"
+                      [style.color]="it.price < it.base_price ? 'var(--emerald)' : (it.price > it.base_price ? 'var(--rose)' : null)">
+                    {{ it.price | number }}
+                    <span *ngIf="it.price < it.base_price" class="mi sm">trending_down</span>
+                    <span *ngIf="it.price > it.base_price" class="mi sm">trending_up</span>
+                  </td>
+                  <td class="r mono muted">{{ it.base_price | number }}</td>
+                  <td class="r mono">{{ it.amount | number }}</td>
+                  <td class="r mono muted">{{ it.target_stock | number }}</td>
+                  <td class="r mono muted">{{ it.elasticity | number:'1.0-2' }}</td>
+                  <td>
+                    <button (click)="toggle(it)" class="badge" [class.emerald]="it.enabled" [class.slate]="!it.enabled" style="cursor:pointer;border:none">
+                      {{ (it.enabled ? 'adminMarket.on' : 'adminMarket.off') | translate }}
+                    </button>
+                  </td>
+                  <td>
+                    <div class="row gap-1">
+                      <button (click)="openEdit(it)" class="btn ghost sm"><span class="mi sm">edit</span></button>
+                      <button (click)="confirmDel(it)" class="btn ghost sm" style="color:var(--rose)"><span class="mi sm">delete</span></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="filtered().length === 0">
+                  <td colspan="10">
+                    <div class="empty">
+                      <span class="mi xxl">inventory_2</span>
+                      <div class="empty-title">{{ 'adminMarket.empty' | translate }}</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ng-container>
       <ng-template #loadingTpl>
-        <div class="text-center py-12">
-          <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
       </ng-template>
 
       <!-- Edit/Create modal -->
-      <div *ngIf="editing" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 my-8">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <div *ngIf="editing" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:560px">
+          <h3 style="display:flex;align-items:center;gap:8px;margin:0 0 16px 0;font-size:18px;font-weight:700">
             <span class="mi">{{ isNew ? 'add_circle' : 'edit' }}</span>
             {{ (isNew ? 'adminMarket.addTitle' : 'adminMarket.editTitle') | translate }}
           </h3>
-          <div class="space-y-3 text-sm">
-            <!-- Item picker (new) / read-only display (edit) -->
-            <div *ngIf="isNew" class="space-y-2">
-              <span class="text-slate-500">{{ 'adminMarket.form.pickItem' | translate }}</span>
-              <div class="relative">
-                <input type="search" [(ngModel)]="pickerQ" (ngModelChange)="onPickerSearch()"
-                       [placeholder]="'adminMarket.form.pickItemSearch' | translate"
-                       class="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div *ngIf="isNew">
+              <label class="muted" style="font-size:12px;display:block;margin-bottom:4px">{{ 'adminMarket.form.pickItem' | translate }}</label>
+              <div style="position:relative">
+                <input type="search" class="input" [(ngModel)]="pickerQ" (ngModelChange)="onPickerSearch()"
+                       [placeholder]="'adminMarket.form.pickItemSearch' | translate">
                 <div *ngIf="pickerResults.length > 0 && !selectedItem"
-                     class="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg">
+                     style="position:absolute;z-index:10;margin-top:4px;width:100%;max-height:240px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-lg)">
                   <button *ngFor="let r of pickerResults" type="button" (click)="pickItem(r)"
-                          class="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 last:border-0">
-                    <div class="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
-                      <img *ngIf="r.image_url; else noPickImg" [src]="r.image_url" class="w-full h-full object-contain">
-                      <ng-template #noPickImg><span class="mi text-slate-400 text-sm">inventory_2</span></ng-template>
+                          style="width:100%;text-align:left;padding:8px 12px;background:transparent;border:none;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text)">
+                    <div style="width:32px;height:32px;background:var(--surface-2);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+                      <img *ngIf="r.image_url; else noPickImg" [src]="r.image_url" style="width:100%;height:100%;object-fit:contain">
+                      <ng-template #noPickImg><span class="mi sm faint">inventory_2</span></ng-template>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="font-medium truncate">{{ r.name }}</p>
-                      <p class="text-xs text-slate-500">#{{ r.id }}<span *ngIf="r.type_name"> · {{ r.type_name }}</span></p>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-weight:600">{{ r.name }}</div>
+                      <div class="muted" style="font-size:11px">#{{ r.id }}<span *ngIf="r.type_name"> · {{ r.type_name }}</span></div>
                     </div>
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Selected item preview -->
-            <div *ngIf="selectedItem" class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3">
-              <div class="w-14 h-14 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden">
-                <img *ngIf="selectedItem.image_url; else noSelImg" [src]="selectedItem.image_url" class="w-full h-full object-contain p-1">
-                <ng-template #noSelImg><span class="mi text-slate-400">inventory_2</span></ng-template>
+            <div *ngIf="selectedItem" style="display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:8px;padding:12px">
+              <div style="width:56px;height:56px;background:var(--surface-3);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <img *ngIf="selectedItem.image_url; else noSelImg" [src]="selectedItem.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
+                <ng-template #noSelImg><span class="mi faint">inventory_2</span></ng-template>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium">{{ selectedItem.name }}</p>
-                <p class="text-xs text-slate-500">
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600">{{ selectedItem.name }}</div>
+                <div class="muted" style="font-size:11px">
                   #{{ selectedItem.id }}
-                  <span *ngIf="selectedItem.type_name" class="ml-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                    {{ selectedItem.type_name }}
-                  </span>
-                </p>
+                  <span *ngIf="selectedItem.type_name" class="badge violet" style="margin-left:4px">{{ selectedItem.type_name }}</span>
+                </div>
               </div>
-              <button *ngIf="isNew" type="button" (click)="clearPick()"
-                      class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-500">
-                <span class="mi text-sm">close</span>
-              </button>
+              <button *ngIf="isNew" type="button" (click)="clearPick()" class="btn ghost sm"><span class="mi sm">close</span></button>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.basePrice' | translate }}</span>
-                <input type="number" [(ngModel)]="form.base_price" min="0" step="0.1"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.basePrice' | translate }}</span>
+                <input type="number" class="input mono" [(ngModel)]="form.base_price" min="0" step="0.1" style="margin-top:4px">
               </label>
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.stockNow' | translate }}</span>
-                <input type="number" [(ngModel)]="form.amount" min="0"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.stockNow' | translate }}</span>
+                <input type="number" class="input mono" [(ngModel)]="form.amount" min="0" style="margin-top:4px">
               </label>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.targetStock' | translate }} <span class="text-xs">{{ 'adminMarket.form.targetStockHint' | translate }}</span></span>
-                <input type="number" [(ngModel)]="form.target_stock" min="1"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.targetStock' | translate }} <span class="faint">{{ 'adminMarket.form.targetStockHint' | translate }}</span></span>
+                <input type="number" class="input mono" [(ngModel)]="form.target_stock" min="1" style="margin-top:4px">
               </label>
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminMarket.form.elasticity' | translate }} <span class="text-xs">{{ 'adminMarket.form.elasticityHint' | translate }}</span></span>
-                <input type="number" [(ngModel)]="form.elasticity" min="0" max="2" step="0.1"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.elasticity' | translate }} <span class="faint">{{ 'adminMarket.form.elasticityHint' | translate }}</span></span>
+                <input type="number" class="input mono" [(ngModel)]="form.elasticity" min="0" max="2" step="0.1" style="margin-top:4px">
               </label>
             </div>
 
-            <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-xs space-y-1">
-              <p class="font-medium">{{ 'adminMarket.form.preview' | translate }}</p>
-              <p [innerHTML]="'adminMarket.form.previewLine1' | translate:{ amount: form.amount, price: '<strong>' + (preview() | number) + '</strong>' }"></p>
-              <p class="text-slate-500">{{ 'adminMarket.form.previewLine2' | translate:{ target: form.target_stock, base: (form.base_price | number) } }}</p>
+            <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;display:flex;flex-direction:column;gap:4px">
+              <div style="font-weight:600">{{ 'adminMarket.form.preview' | translate }}</div>
+              <div [innerHTML]="'adminMarket.form.previewLine1' | translate:{ amount: form.amount, price: '<strong>' + (preview() | number) + '</strong>' }"></div>
+              <div class="muted">{{ 'adminMarket.form.previewLine2' | translate:{ target: form.target_stock, base: (form.base_price | number) } }}</div>
             </div>
 
-            <label class="flex items-center gap-2">
+            <label style="display:flex;align-items:center;gap:8px">
               <input type="checkbox" [(ngModel)]="form.enabled">
               <span>{{ 'adminMarket.form.enabled' | translate }}</span>
             </label>
           </div>
-          <p *ngIf="error" class="text-sm text-rose-500 mt-3">{{ error }}</p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="editing = null" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg">{{ 'common.cancel' | translate }}</button>
-            <button (click)="save()" [disabled]="saving"
-                    class="flex-1 py-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-lg">
+          <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:12px 0 0 0">{{ error }}</p>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="editing = null" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="save()" [disabled]="saving" class="btn primary" style="flex:1">
               {{ (saving ? 'common.saving' : 'common.save') | translate }}
             </button>
           </div>
@@ -207,14 +194,14 @@ interface FormState {
       </div>
 
       <!-- Delete confirm -->
-      <div *ngIf="deleting" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-          <span class="mi xl text-rose-500">warning</span>
-          <h3 class="text-lg font-bold mt-2">{{ 'adminMarket.deleteConfirm' | translate }}</h3>
-          <p class="text-sm text-slate-500 mt-1">{{ deleting.name }} (#{{ deleting.item_id }})</p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="deleting = null" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg">{{ 'common.cancel' | translate }}</button>
-            <button (click)="confirmDelete()" class="flex-1 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg">{{ 'adminMarket.delete' | translate }}</button>
+      <div *ngIf="deleting" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:380px;text-align:center">
+          <span class="mi xl" style="color:var(--rose)">warning</span>
+          <h3 style="margin:8px 0 0 0;font-size:16px;font-weight:700">{{ 'adminMarket.deleteConfirm' | translate }}</h3>
+          <p class="muted" style="font-size:13px;margin:4px 0 0 0">{{ deleting.name }} <span class="mono">(#{{ deleting.item_id }})</span></p>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="deleting = null" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="confirmDelete()" class="btn danger" style="flex:1">{{ 'adminMarket.delete' | translate }}</button>
           </div>
         </div>
       </div>

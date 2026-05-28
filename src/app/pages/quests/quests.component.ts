@@ -4,106 +4,91 @@ import { PlayerQuest, QuestsService } from '../../services/quests.service';
 @Component({
   selector: 'app-quests',
   template: `
-    <div class="max-w-4xl mx-auto p-4 space-y-4">
-      <header class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="mi lg text-amber-500">flag</span> {{ 'quests.title' | translate }}
-        </h1>
-      </header>
+    <div class="page">
+      <div class="page-header">
+        <h1><span class="h-icon"><span class="mi fill">flag</span></span>{{ 'quests.title' | translate }}</h1>
+      </div>
 
-      <div class="flex gap-2 border-b border-slate-200 dark:border-slate-700">
-        <button (click)="tab = 'active'" class="px-3 py-2 text-sm font-medium border-b-2"
-                [class.border-brand-500]="tab === 'active'" [class.text-brand-600]="tab === 'active'"
-                [class.border-transparent]="tab !== 'active'" [class.text-slate-500]="tab !== 'active'">
-          {{ 'quests.active' | translate }}
+      <div class="tabs">
+        <button [class.active]="tab === 'active'" (click)="tab = 'active'">
+          <span class="mi sm">flag</span>{{ 'quests.active' | translate }}
         </button>
-        <button (click)="tab = 'history'; loadHistory()" class="px-3 py-2 text-sm font-medium border-b-2"
-                [class.border-brand-500]="tab === 'history'" [class.text-brand-600]="tab === 'history'"
-                [class.border-transparent]="tab !== 'history'" [class.text-slate-500]="tab !== 'history'">
-          {{ 'quests.history' | translate }}
+        <button [class.active]="tab === 'history'" (click)="tab = 'history'; loadHistory()">
+          <span class="mi sm">history</span>{{ 'quests.history' | translate }}
         </button>
       </div>
 
       <ng-container *ngIf="!loading; else loadingTpl">
         <ng-container *ngIf="tab === 'active'">
-          <p *ngIf="active.length === 0" class="text-slate-500 text-center py-12">
-            <span class="mi xl block mb-2">flag</span>
-            {{ 'quests.emptyActive' | translate }}
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <article *ngFor="let q of active" class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 space-y-3"
-                     [class.ring-2]="q.status === 'completed'" [class.ring-emerald-400]="q.status === 'completed'">
-              <header class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="font-semibold flex items-center gap-2">
-                    {{ q.name }}
-                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500">{{ q.reset_type }}</span>
-                  </h3>
-                  <p *ngIf="q.description" class="text-xs text-slate-500 mt-0.5">{{ q.description }}</p>
+          <div *ngIf="active.length === 0" class="empty">
+            <span class="mi xxl">flag</span>
+            <div class="empty-title">{{ 'quests.emptyActive' | translate }}</div>
+          </div>
+          <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:16px;">
+            <article *ngFor="let q of active" class="card">
+              <div class="row gap-2 mb-2">
+                <span class="badge slate">{{ q.reset_type }}</span>
+                <span *ngIf="q.status === 'completed'" class="badge emerald"><span class="mi sm">check</span>{{ 'quests.completed' | translate }}</span>
+                <div class="grow"></div>
+                <div class="col" style="align-items:flex-end; gap:0;">
+                  <span class="stat-label">REWARD</span>
+                  <span class="coin-amt lg" style="color:var(--accent-hi);">+{{ q.reward_coins | number }} <span class="mi fill">paid</span></span>
                 </div>
-                <div class="text-right">
-                  <p class="font-bold text-amber-600 flex items-center gap-1">
-                    +{{ q.reward_coins | number }} <span class="mi text-amber-500">paid</span>
-                  </p>
-                  <span *ngIf="q.status === 'completed'"
-                        class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
-                    {{ 'quests.completed' | translate }}
-                  </span>
-                </div>
-              </header>
-              <div class="space-y-2">
-                <div *ngFor="let it of q.items" class="space-y-1">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="font-medium">{{ it.name || ('#' + it.item_id) }}</span>
-                    <span class="text-slate-500 font-mono">{{ it.sold_qty }} / {{ it.qty_required }}</span>
+              </div>
+              <h3>{{ q.name }}</h3>
+              <p *ngIf="q.description" class="muted text-sm mt-1">{{ q.description }}</p>
+
+              <div class="divider"></div>
+
+              <div class="col gap-3">
+                <div *ngFor="let it of q.items">
+                  <div class="row between text-sm mb-2">
+                    <span class="fw-6">{{ it.name || ('#' + it.item_id) }}</span>
+                    <span class="mono muted">{{ it.sold_qty }} / {{ it.qty_required }}</span>
                   </div>
-                  <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden">
-                    <div class="h-full transition-all"
-                         [class.bg-emerald-500]="it.sold_qty >= it.qty_required"
-                         [class.bg-brand-500]="it.sold_qty < it.qty_required"
-                         [style.width.%]="pct(it.sold_qty, it.qty_required)"></div>
+                  <div class="progress">
+                    <div class="progress-bar" [class.complete]="it.sold_qty >= it.qty_required" [style.width.%]="pct(it.sold_qty, it.qty_required)"></div>
                   </div>
                 </div>
               </div>
+
+              <button *ngIf="q.status === 'completed'" class="btn primary full mt-4">
+                <span class="mi">redeem</span>Claim {{ q.reward_coins | number }} coins
+              </button>
             </article>
           </div>
         </ng-container>
 
         <ng-container *ngIf="tab === 'history'">
-          <p *ngIf="history.length === 0" class="text-slate-500 text-center py-12">
-            <span class="mi xl block mb-2">history</span>
-            {{ 'quests.emptyHistory' | translate }}
-          </p>
-          <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
+          <div *ngIf="history.length === 0" class="empty">
+            <span class="mi xxl">history</span>
+            <div class="empty-title">{{ 'quests.emptyHistory' | translate }}</div>
+          </div>
+          <div *ngIf="history.length > 0" class="card flush">
+            <div class="table-wrap">
+            <table class="tbl">
+              <thead>
                 <tr>
-                  <th class="p-3">{{ 'quests.col.name' | translate }}</th>
-                  <th class="p-3">{{ 'quests.col.reset' | translate }}</th>
-                  <th class="p-3 text-right">{{ 'quests.col.reward' | translate }}</th>
-                  <th class="p-3">{{ 'quests.col.completedAt' | translate }}</th>
+                  <th>{{ 'quests.col.name' | translate }}</th>
+                  <th>{{ 'quests.col.reset' | translate }}</th>
+                  <th class="r">{{ 'quests.col.reward' | translate }}</th>
+                  <th>{{ 'quests.col.completedAt' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let q of history" class="border-t border-slate-100 dark:border-slate-700">
-                  <td class="p-3 font-medium">{{ q.name }}</td>
-                  <td class="p-3">
-                    <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700">{{ q.reset_type }}</span>
-                  </td>
-                  <td class="p-3 text-right font-semibold text-amber-600">+{{ q.reward_coins | number }}</td>
-                  <td class="p-3 text-slate-500 text-xs">{{ q.completed_at | date:'short' }}</td>
+                <tr *ngFor="let q of history">
+                  <td class="fw-6">{{ q.name }}</td>
+                  <td><span class="badge slate">{{ q.reset_type }}</span></td>
+                  <td class="r mono fw-7" style="color:var(--accent-hi);">+{{ q.reward_coins | number }}</td>
+                  <td class="muted mono text-xs">{{ q.completed_at | date:'short' }}</td>
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </ng-container>
       </ng-container>
-
-      <ng-template #loadingTpl>
-        <div class="text-center py-12">
-          <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      </ng-template>
+      <ng-template #loadingTpl><div class="empty"><div class="spinner"></div></div></ng-template>
     </div>
   `,
 })
@@ -113,27 +98,14 @@ export class QuestsComponent implements OnInit {
   active: PlayerQuest[] = [];
   history: PlayerQuest[] = [];
   private historyLoaded = false;
-
   constructor(private svc: QuestsService) {}
-
   ngOnInit() {
-    this.svc.list().subscribe({
-      next: q => { this.active = q; this.loading = false; },
-      error: () => { this.loading = false; },
-    });
+    this.svc.list().subscribe({ next: q => { this.active = q; this.loading = false; }, error: () => this.loading = false });
   }
-
   loadHistory() {
     if (this.historyLoaded) return;
     this.loading = true;
-    this.svc.history().subscribe({
-      next: q => { this.history = q; this.historyLoaded = true; this.loading = false; },
-      error: () => { this.loading = false; },
-    });
+    this.svc.history().subscribe({ next: q => { this.history = q; this.historyLoaded = true; this.loading = false; }, error: () => this.loading = false });
   }
-
-  pct(cur: number, req: number): number {
-    if (!req || req <= 0) return 0;
-    return Math.min(100, Math.round((cur / req) * 100));
-  }
+  pct(cur: number, req: number) { if (!req) return 0; return Math.min(100, Math.round((cur / req) * 100)); }
 }

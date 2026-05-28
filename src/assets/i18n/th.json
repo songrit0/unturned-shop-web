@@ -3,6 +3,7 @@
     "title": "SellVault Shop"
   },
   "nav": {
+    "home": "หน้าแรก",
     "shop": "ร้านค้า",
     "bills": "ธนบัตร",
     "coins": "Coin",
@@ -17,7 +18,15 @@
     "adminItems": "จัดการ Items",
     "marketHistory": "ประวัติตลาด",
     "quests": "เควส",
-    "basket": "ตะกร้า"
+    "basket": "ตะกร้า",
+    "section": {
+      "main": "MAIN",
+      "account": "ACCOUNT",
+      "admin": "ADMIN"
+    }
+  },
+  "header": {
+    "search": "ค้นหาไอเทม..."
   },
   "login": {
     "title": "SellVault Shop",
@@ -139,20 +148,20 @@
     "sellNote": "ของที่อยู่ใน Shop เท่านั้นที่ขายได้ — ของอื่นจะถูกคืน",
     "economy": "ระบบเศรษฐกิจ",
     "earnTitle": "ทาง ได้ Coin",
-    "earn1": "🎁 Welcome Pack (ครั้งเดียว)",
-    "earn2": "⏱ ออนไลน์ในเกม +10/5 นาที (ต้องไม่ AFK + ยังเป็น)",
-    "earn3": "🧟 ฆ่า zombie +1, Mega +5",
-    "earn4": "🦌 ฆ่าสัตว์ +2",
-    "earn5": "⚔️ ฆ่าผู้เล่น (PvP) +5 (cooldown 120s ต่อเหยื่อ)",
-    "earn6": "🔨 สร้าง barricade/structure +2",
-    "earn7": "🌳 เก็บทรัพยากร +1",
-    "earn8": "💰 ขายของในตลาด (60% ของราคา)",
-    "earn9": "💵 ขาย Bills (100% เต็มราคา ไม่หัก)",
+    "earn1": "Welcome Pack (ครั้งเดียว)",
+    "earn2": "ออนไลน์ในเกม +10/5 นาที (ต้องไม่ AFK + ยังเป็น)",
+    "earn3": "ฆ่า zombie +1, Mega +5",
+    "earn4": "ฆ่าสัตว์ +2",
+    "earn5": "ฆ่าผู้เล่น (PvP) +5 (cooldown 120s ต่อเหยื่อ)",
+    "earn6": "สร้าง barricade/structure +2",
+    "earn7": "เก็บทรัพยากร +1",
+    "earn8": "ขายของในตลาด (60% ของราคา)",
+    "earn9": "ขาย Bills (100% เต็มราคา ไม่หัก)",
     "loseTitle": "ทาง เสีย Coin",
-    "lose1": "🛒 ซื้อของจากร้าน (เต็มราคา)",
-    "lose2": "📉 Commission 40% เมื่อขาย (ราคาขาย = ราคา × 0.6)",
-    "lose3": "🏛 Wealth Tax 2% ทุกวัน 03:00 (เฉพาะคนที่มี > 10,000)",
-    "exampleTitle": "📐 ตัวอย่างคำนวณ:",
+    "lose1": "ซื้อของจากร้าน (เต็มราคา)",
+    "lose2": "Commission 40% เมื่อขาย (ราคาขาย = ราคา × 0.6)",
+    "lose3": "Wealth Tax 2% ทุกวัน 03:00 (เฉพาะคนที่มี > 10,000)",
+    "exampleTitle": "ตัวอย่างคำนวณ:",
     "exampleDesc": "Sentinel ราคา 50 → ซื้อ 1 ชิ้น = −50 coin, ขายคืน 1 ชิ้น = +30 coin (50 × 60%)",
     "billsTitle": "Bills (ธนบัตร)",
     "billsDesc": "ธนบัตรเหมือน Cash item — ขายได้ เต็มราคา ไม่หัก commission",

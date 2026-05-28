@@ -6,162 +6,154 @@ interface ItemRow { item_id: number | null; qty_required: number; }
 @Component({
   selector: 'app-admin-quests',
   template: `
-    <div class="max-w-7xl mx-auto p-4 space-y-4">
-      <header class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="mi lg text-amber-500">flag</span> {{ 'adminQuests.title' | translate }}
-        </h1>
-        <button (click)="openNew()" class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg flex items-center gap-1">
-          <span class="mi">add</span> {{ 'adminQuests.add' | translate }}
-        </button>
-      </header>
+    <div class="page">
+      <div class="page-header">
+        <div class="h-icon rose"><span class="mi lg">flag</span></div>
+        <h1>{{ 'adminQuests.title' | translate }}</h1>
+        <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
+        <div class="page-actions">
+          <button (click)="openNew()" class="btn primary">
+            <span class="mi sm">add</span> {{ 'adminQuests.add' | translate }}
+          </button>
+        </div>
+      </div>
 
       <ng-container *ngIf="!loading; else loadingTpl">
-        <div class="overflow-x-auto bg-white dark:bg-slate-800 rounded-xl shadow">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
-              <tr>
-                <th class="p-3 w-14">ID</th>
-                <th class="p-3">{{ 'adminQuests.col.name' | translate }}</th>
-                <th class="p-3">{{ 'adminQuests.col.reset' | translate }}</th>
-                <th class="p-3 text-right">{{ 'adminQuests.col.reward' | translate }}</th>
-                <th class="p-3 text-right">{{ 'adminQuests.col.items' | translate }}</th>
-                <th class="p-3 text-center">{{ 'adminQuests.col.enabled' | translate }}</th>
-                <th class="p-3 w-24"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let q of quests" class="border-t border-slate-100 dark:border-slate-700">
-                <td class="p-3 font-mono text-xs">{{ q.id }}</td>
-                <td class="p-3 font-medium">{{ q.name }}</td>
-                <td class="p-3">
-                  <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700">{{ q.reset_type }}</span>
-                </td>
-                <td class="p-3 text-right">
-                  <span class="font-semibold flex items-center justify-end gap-1">
-                    {{ q.reward_coins | number }} <span class="mi text-amber-500">paid</span>
-                  </span>
-                </td>
-                <td class="p-3 text-right">{{ q.items?.length || 0 }}</td>
-                <td class="p-3 text-center">
-                  <span class="text-xs px-2 py-0.5 rounded"
-                        [class.bg-emerald-100]="q.enabled" [class.text-emerald-700]="q.enabled"
-                        [class.bg-slate-200]="!q.enabled" [class.text-slate-500]="!q.enabled">
-                    {{ q.enabled ? 'ON' : 'OFF' }}
-                  </span>
-                </td>
-                <td class="p-3 text-right whitespace-nowrap">
-                  <button (click)="openEdit(q)" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700">
-                    <span class="mi">edit</span>
-                  </button>
-                  <button (click)="deleting = q" class="p-1 rounded hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-500">
-                    <span class="mi">delete</span>
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="quests.length === 0">
-                <td colspan="7" class="p-12 text-center text-slate-400">{{ 'adminQuests.empty' | translate }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="card flush">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:56px">ID</th>
+                  <th>{{ 'adminQuests.col.name' | translate }}</th>
+                  <th>{{ 'adminQuests.col.reset' | translate }}</th>
+                  <th class="r">{{ 'adminQuests.col.reward' | translate }}</th>
+                  <th class="r">{{ 'adminQuests.col.items' | translate }}</th>
+                  <th>{{ 'adminQuests.col.enabled' | translate }}</th>
+                  <th style="width:100px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let q of quests">
+                  <td class="mono faint">{{ q.id }}</td>
+                  <td style="font-weight:600">{{ q.name }}</td>
+                  <td><span class="badge slate">{{ q.reset_type }}</span></td>
+                  <td class="r">
+                    <span class="mono" style="color:var(--accent-hi);font-weight:600;display:inline-flex;align-items:center;gap:4px;justify-content:flex-end">
+                      {{ q.reward_coins | number }} <span class="mi sm">paid</span>
+                    </span>
+                  </td>
+                  <td class="r"><span class="badge slate">{{ q.items?.length || 0 }}</span></td>
+                  <td>
+                    <span class="badge" [class.emerald]="q.enabled" [class.slate]="!q.enabled">
+                      {{ q.enabled ? 'ON' : 'OFF' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row gap-1">
+                      <button (click)="openEdit(q)" class="btn ghost sm"><span class="mi sm">edit</span></button>
+                      <button (click)="deleting = q" class="btn ghost sm" style="color:var(--rose)"><span class="mi sm">delete</span></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="quests.length === 0">
+                  <td colspan="7">
+                    <div class="empty">
+                      <span class="mi xxl">flag</span>
+                      <div class="empty-title">{{ 'adminQuests.empty' | translate }}</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ng-container>
       <ng-template #loadingTpl>
-        <div class="text-center py-12">
-          <div class="inline-block w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
       </ng-template>
 
       <!-- Edit/Create modal -->
-      <div *ngIf="editing" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 my-8">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <div *ngIf="editing" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:680px">
+          <h3 style="display:flex;align-items:center;gap:8px;margin:0 0 16px 0;font-size:18px;font-weight:700">
             <span class="mi">{{ isNew ? 'add_circle' : 'edit' }}</span>
             {{ (isNew ? 'adminQuests.addTitle' : 'adminQuests.editTitle') | translate }}
           </h3>
-          <div class="space-y-3 text-sm">
-            <label class="block">
-              <span class="text-slate-500">{{ 'adminQuests.form.name' | translate }}</span>
-              <input type="text" [(ngModel)]="form.name" maxlength="128"
-                     class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:block">
+              <span class="muted" style="font-size:12px">{{ 'adminQuests.form.name' | translate }}</span>
+              <input type="text" class="input" [(ngModel)]="form.name" maxlength="128" style="margin-top:4px">
             </label>
-            <label class="block">
-              <span class="text-slate-500">{{ 'adminQuests.form.description' | translate }}</span>
-              <textarea [(ngModel)]="form.description" maxlength="512" rows="2"
-                        class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700"></textarea>
+            <label style="display:block">
+              <span class="muted" style="font-size:12px">{{ 'adminQuests.form.description' | translate }}</span>
+              <textarea [(ngModel)]="form.description" maxlength="512" rows="2" class="input" style="margin-top:4px;height:auto;padding:8px 12px;font-family:inherit"></textarea>
             </label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminQuests.form.reward' | translate }}</span>
-                <input type="number" [(ngModel)]="form.reward_coins" min="0"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminQuests.form.reward' | translate }}</span>
+                <input type="number" class="input mono" [(ngModel)]="form.reward_coins" min="0" style="margin-top:4px">
               </label>
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminQuests.form.reset' | translate }}</span>
-                <select [(ngModel)]="form.reset_type"
-                        class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminQuests.form.reset' | translate }}</span>
+                <select class="select" [(ngModel)]="form.reset_type" style="margin-top:4px;width:100%">
                   <option value="once">once</option>
                   <option value="daily">daily</option>
                   <option value="weekly">weekly</option>
                 </select>
               </label>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminQuests.form.startAt' | translate }}</span>
-                <input type="datetime-local" [(ngModel)]="form.start_at"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminQuests.form.startAt' | translate }}</span>
+                <input type="datetime-local" class="input" [(ngModel)]="form.start_at" style="margin-top:4px">
               </label>
-              <label class="block">
-                <span class="text-slate-500">{{ 'adminQuests.form.endAt' | translate }}</span>
-                <input type="datetime-local" [(ngModel)]="form.end_at"
-                       class="mt-1 w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminQuests.form.endAt' | translate }}</span>
+                <input type="datetime-local" class="input" [(ngModel)]="form.end_at" style="margin-top:4px">
               </label>
             </div>
-            <label class="flex items-center gap-2">
+            <label style="display:flex;align-items:center;gap:8px">
               <input type="checkbox" [(ngModel)]="form.enabled">
               <span>{{ 'adminQuests.form.enabled' | translate }}</span>
             </label>
 
-            <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 space-y-2">
-              <div class="flex items-center justify-between">
-                <p class="font-medium">{{ 'adminQuests.form.items' | translate }}</p>
-                <button type="button" (click)="addItem()" class="text-xs px-2 py-1 rounded bg-brand-500 text-white flex items-center gap-1">
-                  <span class="mi text-sm">add</span> {{ 'adminQuests.form.addItem' | translate }}
+            <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-weight:600">{{ 'adminQuests.form.items' | translate }}</div>
+                <button type="button" (click)="addItem()" class="btn secondary sm">
+                  <span class="mi sm">add</span> {{ 'adminQuests.form.addItem' | translate }}
                 </button>
               </div>
-              <div *ngFor="let row of items; let i = index" class="flex items-center gap-2">
-                <input type="number" [(ngModel)]="row.item_id" placeholder="item_id"
-                       class="w-32 px-2 py-1 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-xs">
-                <span class="text-xs text-slate-500">×</span>
-                <input type="number" [(ngModel)]="row.qty_required" min="1" placeholder="qty"
-                       class="w-24 px-2 py-1 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-xs">
-                <button type="button" (click)="removeItem(i)" class="p-1 rounded hover:bg-rose-100 text-rose-500">
-                  <span class="mi text-sm">close</span>
+              <div *ngFor="let row of items; let i = index" class="row gap-2">
+                <input type="number" class="input mono" [(ngModel)]="row.item_id" placeholder="item_id" style="width:140px;height:32px;font-size:12px">
+                <span class="muted" style="font-size:12px">×</span>
+                <input type="number" class="input mono" [(ngModel)]="row.qty_required" min="1" placeholder="qty" style="width:100px;height:32px;font-size:12px">
+                <button type="button" (click)="removeItem(i)" class="btn ghost sm" style="color:var(--rose)">
+                  <span class="mi sm">close</span>
                 </button>
               </div>
-              <p *ngIf="items.length === 0" class="text-xs text-slate-400 text-center py-2">{{ 'adminQuests.form.noItems' | translate }}</p>
+              <p *ngIf="items.length === 0" class="faint" style="font-size:11px;text-align:center;padding:8px 0;margin:0">{{ 'adminQuests.form.noItems' | translate }}</p>
             </div>
           </div>
-          <p *ngIf="error" class="text-sm text-rose-500 mt-3">{{ error }}</p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="editing = null" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg">{{ 'common.cancel' | translate }}</button>
-            <button (click)="save()" [disabled]="saving"
-                    class="flex-1 py-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-lg">
+          <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:12px 0 0 0">{{ error }}</p>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="editing = null" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="save()" [disabled]="saving" class="btn primary" style="flex:1">
               {{ (saving ? 'common.saving' : 'common.save') | translate }}
             </button>
           </div>
         </div>
       </div>
 
-      <div *ngIf="deleting" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-          <span class="mi xl text-rose-500">warning</span>
-          <h3 class="text-lg font-bold mt-2">{{ 'adminQuests.deleteConfirm' | translate }}</h3>
-          <p class="text-sm text-slate-500 mt-1">{{ deleting.name }} (#{{ deleting.id }})</p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="deleting = null" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg">{{ 'common.cancel' | translate }}</button>
-            <button (click)="confirmDelete()" class="flex-1 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg">{{ 'adminQuests.delete' | translate }}</button>
+      <div *ngIf="deleting" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:380px;text-align:center">
+          <span class="mi xl" style="color:var(--rose)">warning</span>
+          <h3 style="margin:8px 0 0 0;font-size:16px;font-weight:700">{{ 'adminQuests.deleteConfirm' | translate }}</h3>
+          <p class="muted" style="font-size:13px;margin:4px 0 0 0">{{ deleting.name }} <span class="mono">(#{{ deleting.id }})</span></p>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="deleting = null" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="confirmDelete()" class="btn danger" style="flex:1">{{ 'adminQuests.delete' | translate }}</button>
           </div>
         </div>
       </div>

@@ -7,87 +7,73 @@ import { CoinsService } from '../../services/coins.service';
   selector: 'app-basket-drawer',
   template: `
     <ng-container *ngIf="basket.open$ | async">
-      <div class="fixed inset-0 bg-black/40 z-40" (click)="close()"></div>
+      <div class="drawer-backdrop" (click)="close()"></div>
 
-      <aside class="fixed right-0 top-0 bottom-0 w-full sm:w-[420px] bg-white dark:bg-slate-900 shadow-2xl z-50 flex flex-col">
-        <header class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 class="font-bold text-lg flex items-center gap-2">
-            <span class="mi lg">shopping_cart</span> {{ 'basket.title' | translate }}
-          </h2>
-          <button (click)="close()" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span class="mi">close</span>
-          </button>
+      <aside class="drawer">
+        <header class="drawer-head">
+          <h2><span class="mi">shopping_cart</span>{{ 'basket.title' | translate }}</h2>
+          <button class="icon-btn" (click)="close()"><span class="mi">close</span></button>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-3" *ngIf="basket.basket$ | async as b">
-          <p *ngIf="b.items.length === 0" class="text-center text-slate-400 py-12">
-            <span class="mi xl block mb-2">remove_shopping_cart</span>
-            {{ 'basket.empty' | translate }}
-          </p>
+        <div class="basket-body" *ngIf="basket.basket$ | async as b">
+          <div *ngIf="b.items.length === 0" class="empty" style="padding:48px 16px;">
+            <span class="mi xxl">remove_shopping_cart</span>
+            <div class="empty-title">{{ 'basket.empty' | translate }}</div>
+          </div>
 
-          <div *ngFor="let it of b.items" class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-            <div class="w-14 h-14 bg-white dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden shrink-0">
-              <img *ngIf="it.image_url; else noImg" [src]="it.image_url" [alt]="it.name" class="w-full h-full object-contain p-1">
-              <ng-template #noImg><span class="mi lg text-slate-400">inventory_2</span></ng-template>
+          <div *ngFor="let it of b.items" class="basket-line">
+            <div class="basket-thumb">
+              <img *ngIf="it.image_url; else noImg" [src]="it.image_url" [alt]="it.name">
+              <ng-template #noImg><span class="mi md faint">inventory_2</span></ng-template>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-medium truncate">{{ it.name }}</p>
-              <p class="text-sm text-slate-500">{{ it.price | number }} <span class="mi text-amber-500">paid</span> / {{ 'basket.perItem' | translate }}</p>
+            <div class="grow" style="min-width:0;">
+              <div class="fw-6" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ it.name }}</div>
+              <div class="muted text-xs row gap-1">{{ it.price | number }} <span class="mi sm" style="color:var(--accent-hi)">paid</span> / {{ 'basket.perItem' | translate }}</div>
             </div>
-            <div class="flex items-center gap-1">
-              <button (click)="dec(it)" class="w-7 h-7 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 flex items-center justify-center">
-                <span class="mi">remove</span>
-              </button>
-              <span class="w-8 text-center font-mono">{{ it.qty }}</span>
-              <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail"
-                      class="w-7 h-7 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 flex items-center justify-center disabled:opacity-40">
-                <span class="mi">add</span>
-              </button>
+            <div class="qty-stepper">
+              <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
+              <span>{{ it.qty }}</span>
+              <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail"><span class="mi sm">add</span></button>
             </div>
-            <button (click)="remove(it)" class="text-slate-400 hover:text-rose-500">
-              <span class="mi">delete</span>
-            </button>
+            <button class="icon-btn" (click)="remove(it)" style="width:30px; height:30px;"><span class="mi sm">delete</span></button>
           </div>
         </div>
 
-        <footer class="border-t border-slate-200 dark:border-slate-700 p-4 space-y-3" *ngIf="basket.basket$ | async as b">
-          <div class="flex justify-between text-sm text-slate-500">
+        <footer class="basket-foot" *ngIf="basket.basket$ | async as b">
+          <div class="row-between muted text-sm">
             <span>{{ 'basket.balance' | translate }}</span>
-            <span class="font-mono">{{ (coins.balance$ | async) ?? '—' }}</span>
+            <span class="mono">{{ (coins.balance$ | async) ?? '—' }}</span>
           </div>
-          <div class="flex justify-between font-semibold text-lg">
+          <div class="row-between fw-7" style="font-size:16px;">
             <span>{{ 'basket.total' | translate }}</span>
-            <span class="text-amber-500">{{ b.total | number }} Coin</span>
+            <span class="coin-amt lg">{{ b.total | number }} <span class="mi fill">paid</span></span>
           </div>
-          <button (click)="checkout()" [disabled]="b.items.length === 0 || loading"
-                  class="w-full py-3 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold rounded-xl flex items-center justify-center gap-2">
+          <button class="btn primary lg full" (click)="checkout()" [disabled]="b.items.length === 0 || loading">
             <span *ngIf="!loading" class="mi">payments</span>
-            <span *ngIf="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span *ngIf="loading" class="spinner sm"></span>
             {{ (loading ? 'basket.checkoutLoading' : 'basket.checkout') | translate }}
           </button>
-          <p *ngIf="error" class="text-sm text-rose-500 text-center">{{ error }}</p>
+          <p *ngIf="error" class="text-rose text-sm" style="text-align:center; margin:0;">{{ error }}</p>
         </footer>
       </aside>
 
-      <!-- success modal -->
-      <div *ngIf="result" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
-          <span class="mi xl text-emerald-500">check_circle</span>
-          <h3 class="text-xl font-bold mt-3">{{ 'basket.successTitle' | translate }}</h3>
-          <p class="text-sm text-slate-500 mt-1">{{ 'basket.successHint' | translate }}</p>
-          <div class="my-4 p-3 bg-slate-100 dark:bg-slate-700 rounded-xl">
-            <code class="font-mono text-2xl font-bold tracking-widest text-brand-600">{{ result.code }}</code>
+      <div *ngIf="result" class="modal-backdrop">
+        <div class="modal-card tactical">
+          <span class="mi xxl" style="color:var(--emerald);">check_circle</span>
+          <h2 style="margin-top:8px;">{{ 'basket.successTitle' | translate }}</h2>
+          <p class="muted text-sm mt-2">{{ 'basket.successHint' | translate }}</p>
+          <div class="code-display" style="justify-content:center; margin:20px 0 12px;">
+            <code>{{ result.code }}</code>
           </div>
           <p class="text-sm">{{ 'basket.useInGame' | translate }}
-            <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded font-mono">/code {{ result.code }}</code>
+            <code class="mono" style="background:var(--surface-2); padding:2px 6px; border-radius:4px;">/code {{ result.code }}</code>
           </p>
-          <div class="flex gap-2 mt-5">
-            <button (click)="copyCode()" class="flex-1 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300">
-              <span class="mi">content_copy</span> {{ (copied ? 'welcome.copied' : 'welcome.copy') | translate }}
+          <div class="row gap-2 mt-4">
+            <button class="btn secondary grow" (click)="copyCode()">
+              <span class="mi">{{ copied ? 'check' : 'content_copy' }}</span>
+              {{ (copied ? 'welcome.copied' : 'welcome.copy') | translate }}
             </button>
-            <button (click)="closeResult()" class="flex-1 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600">
-              {{ 'basket.ok' | translate }}
-            </button>
+            <button class="btn primary grow" (click)="closeResult()">{{ 'basket.ok' | translate }}</button>
           </div>
         </div>
       </div>
@@ -102,12 +88,9 @@ export class BasketDrawerComponent implements OnInit {
 
   constructor(public basket: BasketService, public coins: CoinsService, private t: TranslateService) {}
 
-  ngOnInit() {
-    this.basket.view().subscribe();
-  }
+  ngOnInit() { this.basket.view().subscribe(); }
 
   close() { this.basket.setOpen(false); }
-
   inc(it: BasketItem) { this.basket.setQty(it.item_id, it.qty + 1).subscribe(); }
   dec(it: BasketItem) { this.basket.setQty(it.item_id, it.qty - 1).subscribe(); }
   remove(it: BasketItem) { this.basket.remove(it.item_id).subscribe(); }

@@ -9,116 +9,73 @@ import { BasketService } from '../../services/basket.service';
 @Component({
   selector: 'app-header',
   template: `
-    <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
-      <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 p-3">
-        <a routerLink="/" class="font-bold text-lg whitespace-nowrap flex items-center gap-2">
-          <img src="assets/220750.png" alt="logo" class="w-9 h-9 rounded-lg">
-          <span class="hidden sm:inline">{{ 'app.title' | translate }}</span>
-        </a>
+    <header class="app-header">
+      <!-- <div class="app-header-search">
+        <span class="mi lead">search</span>
+        <input type="search" [(ngModel)]="q" (keydown.enter)="search()" [placeholder]="'header.search' | translate">
+        <kbd>⌘K</kbd>
+      </div> -->
 
-        <nav *ngIf="auth.me$ | async" class="flex items-center gap-1 text-sm">
-          <a routerLink="/shop" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi">shopping_bag</span>
-            <span class="hidden sm:inline">{{ 'nav.shop' | translate }}</span>
-          </a>
-          <a routerLink="/bills" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi">payments</span>
-            <span class="hidden sm:inline">{{ 'nav.bills' | translate }}</span>
-          </a>
-          <a routerLink="/codes" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi">history</span>
-            <span class="hidden sm:inline">{{ 'nav.codes' | translate }}</span>
-          </a>
-          <a routerLink="/market/history" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi">receipt_long</span>
-            <span class="hidden sm:inline">{{ 'nav.marketHistory' | translate }}</span>
-          </a>
-          <a routerLink="/coins" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi text-amber-500">paid</span>
-            <span class="font-mono">{{ (coins.balance$ | async) ?? '—' }}</span>
-          </a>
-          <a routerLink="/quests" routerLinkActive="text-brand-600"
-             class="px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1">
-            <span class="mi text-amber-500">flag</span>
-            <span class="hidden sm:inline">{{ 'nav.quests' | translate }}</span>
-          </a>
-          <details *ngIf="(auth.me$ | async)?.is_admin" #adminMenu class="relative">
-            <summary class="list-none cursor-pointer px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1 text-rose-500">
-              <span class="mi">admin_panel_settings</span>
-              <span class="hidden lg:inline">Admin</span>
-              <span class="mi text-xs">expand_more</span>
-            </summary>
-            <div class="absolute right-0 mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-40"
-                 (click)="adminMenu.open = false">
-              <a routerLink="/admin/market" routerLinkActive="text-rose-600"
-                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
-                <span class="mi">build</span><span>Market</span>
-              </a>
-              <a routerLink="/admin/coins" routerLinkActive="text-rose-600"
-                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
-                <span class="mi">account_balance_wallet</span><span>Coins</span>
-              </a>
-              <a routerLink="/admin/quests" routerLinkActive="text-rose-600"
-                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
-                <span class="mi">flag</span><span>Quests</span>
-              </a>
-              <a routerLink="/admin/item-types" routerLinkActive="text-rose-600"
-                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
-                <span class="mi">category</span><span>Types</span>
-              </a>
-              <a routerLink="/admin/items" routerLinkActive="text-rose-600"
-                 class="px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-500">
-                <span class="mi">inventory_2</span><span>Items</span>
-              </a>
+      <div class="header-actions">
+        <ng-container *ngIf="auth.me$ | async as me; else loginBtn">
+          <button class="coin-pill" (click)="goCoins()" title="Coins">
+            <span class="mi fill">paid</span>
+            <div class="col" style="gap:0; line-height:1;">
+              <span class="coin-amount">{{ (coins.balance$ | async) ?? '—' }}</span>
+              <span class="coin-label">BALANCE</span>
             </div>
-          </details>
-        </nav>
-
-        <div class="flex items-center gap-1">
-          <button *ngIf="auth.me$ | async" (click)="basket.toggle()" title="Basket"
-                  class="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span class="mi lg">shopping_cart</span>
-            <span *ngIf="(basket.basket$ | async)?.items?.length"
-                  class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
-              {{ basketCount() }}
-            </span>
           </button>
 
-          <a routerLink="/help" [title]="'nav.help' | translate"
-             class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span class="mi">help</span>
-          </a>
-          <button (click)="lang.toggle()" title="Language"
-                  class="text-xs px-2 py-1 rounded font-mono uppercase hover:bg-slate-100 dark:hover:bg-slate-700">
+          <button class="icon-btn" (click)="basket.toggle()" [title]="'basket.title' | translate">
+            <span class="mi">shopping_cart</span>
+            <span *ngIf="basketCount() > 0" class="badge-dot">{{ basketCount() }}</span>
+          </button>
+
+          <button class="icon-btn" (click)="lang.toggle()" title="Language" style="width:auto; padding: 0 10px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing:0.08em;">
             {{ (lang.lang$ | async) === 'th' ? 'TH' : 'EN' }}
           </button>
-          <button (click)="theme.toggle()" title="Theme"
-                  class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+
+          <button class="icon-btn" (click)="theme.toggle()" title="Theme">
             <span class="mi">{{ (theme.theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
           </button>
 
-          <ng-container *ngIf="auth.me$ | async as me; else loginBtn">
-            <img *ngIf="me.avatar" class="w-8 h-8 rounded-full hidden sm:block ml-1"
-                 [src]="'https://cdn.discordapp.com/avatars/' + me.discord_id + '/' + me.avatar + '.png'" alt="">
-            <button (click)="logout()" class="text-sm text-slate-500 hover:text-rose-500 px-2">
-              <span class="mi sm:hidden">logout</span>
-              <span class="hidden sm:inline">{{ 'nav.logout' | translate }}</span>
+          <!-- <button class="icon-btn" title="Notifications">
+            <span class="mi">notifications</span>
+            <span class="dot-amber"></span>
+          </button> -->
+
+          <div class="h-divider"></div>
+
+          <div class="user-block" [title]="me.username">
+            <div class="avatar">
+              <img *ngIf="me.avatar; else initials"
+                [src]="'https://cdn.discordapp.com/avatars/' + me.discord_id + '/' + me.avatar + '.png'" [alt]="me.username">
+              <ng-template #initials>{{ initial(me.username) }}</ng-template>
+            </div>
+            <div class="col" style="gap:0;">
+              <span class="user-name">{{ me.username }}</span>
+              <span class="user-id">{{ me.discord_id | slice:0:10 }}…</span>
+            </div>
+            <button class="icon-btn" (click)="logout()" [title]="'nav.logout' | translate" style="width:32px;height:32px;">
+              <span class="mi sm">logout</span>
             </button>
-          </ng-container>
-          <ng-template #loginBtn>
-            <a routerLink="/login" class="text-sm text-brand-600 hover:underline">{{ 'nav.login' | translate }}</a>
-          </ng-template>
-        </div>
+          </div>
+        </ng-container>
+        <ng-template #loginBtn>
+          <button class="icon-btn" (click)="lang.toggle()" style="width:auto; padding: 0 10px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">
+            {{ (lang.lang$ | async) === 'th' ? 'TH' : 'EN' }}
+          </button>
+          <button class="icon-btn" (click)="theme.toggle()">
+            <span class="mi">{{ (theme.theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+          <a routerLink="/login" class="btn primary">{{ 'nav.login' | translate }}</a>
+        </ng-template>
       </div>
     </header>
   `,
 })
 export class HeaderComponent implements OnInit {
+  q = '';
   constructor(
     public auth: AuthService,
     public coins: CoinsService,
@@ -126,7 +83,7 @@ export class HeaderComponent implements OnInit {
     public lang: LangService,
     public basket: BasketService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.auth.me$.subscribe(me => {
@@ -137,10 +94,13 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  basketCount(): number {
-    return this.basket.count;
+  basketCount(): number { return this.basket.count; }
+  initial(name: string): string { return (name?.[0] || '?').toUpperCase(); }
+  goCoins() { this.router.navigate(['/coins']); }
+  search() {
+    const s = this.q.trim();
+    if (!s) return;
+    this.router.navigate(['/shop'], { queryParams: { q: s } });
   }
-
   logout() { this.auth.clear(); this.router.navigate(['/login']); }
-
 }

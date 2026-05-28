@@ -1,62 +1,48 @@
-import { Component, Input } from '@angular/core';
+import { Component, HostBinding, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { MarketItem } from '../../services/market.service';
 import { BasketService } from '../../services/basket.service';
 
 @Component({
   selector: 'app-item-card',
   template: `
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow hover:shadow-lg transition flex flex-col overflow-hidden relative">
-      <!-- price-change badge -->
-      <span *ngIf="discountPct() > 0"
-            class="absolute top-2 left-2 z-10 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-        <span class="mi text-sm">trending_down</span>
-        −{{ discountPct() }}%
-      </span>
-      <span *ngIf="discountPct() < 0"
-            class="absolute top-2 left-2 z-10 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-        <span class="mi text-sm">trending_up</span>
-        +{{ -discountPct() }}%
-      </span>
-      <span *ngIf="item.amount > 0 && item.amount <= 5"
-            class="absolute top-2 right-2 z-10 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-        <span class="mi text-sm">whatshot</span>
-        {{ 'shop.lowStock' | translate }}
-      </span>
+    <div class="item-card" [class.list]="layout === 'list'" (click)="open()">
+      <div class="badge-stack" *ngIf="discountPct() !== 0">
+        <span class="badge emerald" *ngIf="discountPct() > 0">
+          <span class="mi">trending_down</span>−{{ discountPct() }}%
+        </span>
+        <span class="badge rose" *ngIf="discountPct() < 0">
+          <span class="mi">trending_up</span>+{{ -discountPct() }}%
+        </span>
+      </div>
+      <div class="badge-stack-right" *ngIf="item.amount > 0 && item.amount <= 5">
+        <span class="badge amber"><span class="mi">whatshot</span>{{ 'shop.lowStock' | translate }}</span>
+      </div>
 
-      <a [routerLink]="['/market', item.item_id]" class="aspect-square bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:opacity-90">
-        <img *ngIf="item.image_url; else noImg" [src]="item.image_url" [alt]="item.name"
-             class="w-full h-full object-contain p-2" loading="lazy">
-        <ng-template #noImg>
-          <span class="mi xl text-slate-400">inventory_2</span>
-        </ng-template>
-      </a>
-      <div class="p-3 flex-1 flex flex-col">
-        <a [routerLink]="['/market', item.item_id]" class="font-semibold truncate hover:underline" [title]="item.name">{{ item.name }}</a>
-        <div class="flex items-center gap-1 mb-2">
-          <p class="text-xs text-slate-500">#{{ item.item_id }}</p>
-          <span *ngIf="item.type_name"
-                class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-            {{ item.type_name }}
-          </span>
-        </div>
-        <div class="mt-auto flex items-end justify-between gap-2">
-          <div>
-            <div class="flex items-baseline gap-2">
-              <p class="text-lg font-bold flex items-center gap-1"
-                 [class.text-emerald-600]="discountPct() > 0"
-                 [class.text-rose-600]="discountPct() < 0"
-                 [class.text-brand-600]="discountPct() === 0">
-                {{ item.price | number }}
-                <span class="mi text-amber-500">paid</span>
-              </p>
-              <span *ngIf="discountPct() !== 0" class="text-xs text-slate-400 line-through">{{ item.base_price | number }}</span>
-            </div>
-            <p class="text-xs text-slate-500">{{ 'shop.stock' | translate:{ n: item.amount } }}</p>
+      <div class="item-img">
+        <img *ngIf="item.image_url; else noImg" [src]="item.image_url" [alt]="item.name" loading="lazy">
+        <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+      </div>
+
+      <div class="item-body" [class.col]="layout !== 'list'">
+        <div [class.item-info]="layout === 'list'" style="min-width:0; flex:1;">
+          <div class="item-name" [title]="item.name">{{ item.name }}</div>
+          <div class="item-meta">
+            <span class="item-id">#{{ item.item_id }}</span>
+            <span *ngIf="item.type_name" class="badge violet">{{ item.type_name }}</span>
           </div>
-          <button (click)="add()" [disabled]="loading || added"
-                  class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm rounded-lg disabled:opacity-60 flex items-center gap-1 whitespace-nowrap">
-            <span class="mi">{{ added ? 'check' : 'add_shopping_cart' }}</span>
-            {{ (added ? 'shop.added' : 'shop.addToCart') | translate }}
+        </div>
+        <div class="item-foot">
+          <div class="item-price">
+            <div class="item-price-main" [class.discount]="discountPct() > 0" [class.up]="discountPct() < 0">
+              {{ item.price | number }} <span class="mi fill">paid</span>
+            </div>
+            <span *ngIf="discountPct() !== 0" class="item-price-old">{{ item.base_price | number }}</span>
+            <span class="item-stock">{{ 'shop.stock' | translate:{ n: item.amount } }}</span>
+          </div>
+          <button class="add-btn" [class.added]="added" [disabled]="loading || added || item.amount <= 0"
+                  (click)="add($event)" [title]="'shop.addToCart' | translate">
+            <span class="mi">{{ added ? 'check' : 'add' }}</span>
           </button>
         </div>
       </div>
@@ -65,12 +51,12 @@ import { BasketService } from '../../services/basket.service';
 })
 export class ItemCardComponent {
   @Input({ required: true }) item!: MarketItem;
+  @Input() layout: 'grid' | 'list' = 'grid';
   loading = false;
   added = false;
 
-  constructor(private basket: BasketService) {}
+  constructor(private basket: BasketService, private router: Router) {}
 
-  /** Returns % discount: positive = cheaper than base; negative = pricier; 0 = equal/no anchor */
   discountPct(): number {
     const base = Number(this.item.base_price);
     const price = Number(this.item.price);
@@ -78,7 +64,10 @@ export class ItemCardComponent {
     return Math.round(((base - price) / base) * 100);
   }
 
-  add() {
+  open() { this.router.navigate(['/market', this.item.item_id]); }
+
+  add(ev: Event) {
+    ev.stopPropagation();
     this.loading = true;
     this.basket.add(this.item.item_id).subscribe({
       next: () => { this.loading = false; this.added = true; setTimeout(() => this.added = false, 1500); },

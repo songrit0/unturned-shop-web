@@ -1,78 +1,69 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MarketHistoryService, MarketTxn } from '../../services/market-history.service';
 
 @Component({
   selector: 'app-market-history',
   template: `
-    <div class="max-w-6xl mx-auto p-4 space-y-4">
-      <header class="flex items-center justify-between gap-2 flex-wrap">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="mi lg text-slate-500">receipt_long</span>
-          {{ 'marketHistory.title' | translate }}
-        </h1>
-        <div class="flex gap-2 items-center flex-wrap">
-          <input type="search" [(ngModel)]="q" [placeholder]="'marketHistory.searchItem' | translate"
-                 class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 text-sm">
-          <select [(ngModel)]="kind" (ngModelChange)="onKindChange()"
-                  class="text-sm px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800">
-            <option value="all">{{ 'marketHistory.kindAll' | translate }}</option>
-            <option value="buy">{{ 'marketHistory.kindBuy' | translate }}</option>
-            <option value="sell">{{ 'marketHistory.kindSell' | translate }}</option>
-          </select>
+    <div class="page">
+      <div class="page-header">
+        <h1><span class="h-icon"><span class="mi">receipt_long</span></span>{{ 'marketHistory.title' | translate }}</h1>
+        <div class="page-actions">
+          <div class="input-wrap" style="width:240px;">
+            <span class="mi lead">search</span>
+            <input class="input" type="search" [(ngModel)]="q" [placeholder]="'marketHistory.searchItem' | translate">
+          </div>
+          <div class="segmented">
+            <button [class.active]="kind === 'all'" (click)="kind='all'; onKindChange()">{{ 'marketHistory.kindAll' | translate }}</button>
+            <button [class.active]="kind === 'buy'" (click)="kind='buy'; onKindChange()"><span class="mi sm">shopping_cart</span>{{ 'marketHistory.kindBuy' | translate }}</button>
+            <button [class.active]="kind === 'sell'" (click)="kind='sell'; onKindChange()"><span class="mi sm">sell</span>{{ 'marketHistory.kindSell' | translate }}</button>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-slate-50 dark:bg-slate-700/50 text-left">
+      <div class="card flush">
+        <div class="table-wrap">
+        <table class="tbl">
+          <thead>
             <tr>
-              <th class="p-3">{{ 'marketHistory.col.at' | translate }}</th>
-              <th class="p-3">{{ 'marketHistory.col.item' | translate }}</th>
-              <th class="p-3">{{ 'marketHistory.col.user' | translate }}</th>
-              <th class="p-3">{{ 'marketHistory.col.kind' | translate }}</th>
-              <th class="p-3 text-right">{{ 'marketHistory.col.qty' | translate }}</th>
-              <th class="p-3 text-right">{{ 'marketHistory.col.unit' | translate }}</th>
-              <th class="p-3 text-right">{{ 'marketHistory.col.total' | translate }}</th>
+              <th>{{ 'marketHistory.col.at' | translate }}</th>
+              <th>{{ 'marketHistory.col.item' | translate }}</th>
+              <th>{{ 'marketHistory.col.user' | translate }}</th>
+              <th>{{ 'marketHistory.col.kind' | translate }}</th>
+              <th class="r">{{ 'marketHistory.col.qty' | translate }}</th>
+              <th class="r">{{ 'marketHistory.col.unit' | translate }}</th>
+              <th class="r">{{ 'marketHistory.col.total' | translate }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let t of filtered()" class="border-t border-slate-100 dark:border-slate-700">
-              <td class="p-3 text-xs text-slate-500 whitespace-nowrap">{{ t.at | date:'short' }}</td>
-              <td class="p-3">
-                <a *ngIf="t.item_id" [routerLink]="['/market', t.item_id]" class="flex items-center gap-2 hover:underline">
-                  <div class="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
-                    <img *ngIf="t.image_url; else noImg" [src]="t.image_url" class="w-full h-full object-contain">
-                    <ng-template #noImg><span class="mi text-slate-400 text-sm">inventory_2</span></ng-template>
+            <tr *ngFor="let t of filtered()" class="clickable" (click)="goItem(t)">
+              <td class="mono muted text-xs" style="white-space:nowrap;">{{ t.at | date:'short' }}</td>
+              <td>
+                <div class="row gap-2">
+                  <div style="width:30px; height:30px; background: var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                    <img *ngIf="t.image_url; else noImg" [src]="t.image_url" style="width:80%; height:80%; object-fit:contain;">
+                    <ng-template #noImg><span class="mi sm faint">inventory_2</span></ng-template>
                   </div>
-                  <span class="font-medium text-xs">{{ t.item_name || ('#' + t.item_id) }}</span>
-                </a>
+                  <span class="fw-6 text-xs">{{ t.item_name || ('#' + t.item_id) }}</span>
+                </div>
               </td>
-              <td class="p-3 text-xs font-mono" [title]="t.discord_id || t.steam_id">{{ shortId(t.discord_id || t.steam_id) }}</td>
-              <td class="p-3">
-                <span class="text-xs px-2 py-0.5 rounded"
-                      [class.bg-emerald-100]="t.kind === 'sell'" [class.text-emerald-700]="t.kind === 'sell'"
-                      [class.bg-rose-100]="t.kind === 'buy'" [class.text-rose-700]="t.kind === 'buy'">
-                  {{ t.kind }}
-                </span>
-              </td>
-              <td class="p-3 text-right">{{ t.amount | number }}</td>
-              <td class="p-3 text-right text-slate-500">{{ t.price_per_unit | number }}</td>
-              <td class="p-3 text-right font-medium">{{ t.coins | number }}</td>
+              <td class="mono text-xs" [title]="t.discord_id || t.steam_id">{{ shortId(t.discord_id || t.steam_id) }}</td>
+              <td><span class="badge" [class.emerald]="t.kind === 'sell'" [class.rose]="t.kind === 'buy'">{{ t.kind }}</span></td>
+              <td class="r mono">{{ t.amount | number }}</td>
+              <td class="r mono muted">{{ t.price_per_unit | number }}</td>
+              <td class="r mono fw-6">{{ t.coins | number }}</td>
             </tr>
             <tr *ngIf="!loading && filtered().length === 0">
-              <td colspan="7" class="p-12 text-center text-slate-400">{{ 'marketHistory.empty' | translate }}</td>
+              <td colspan="7" style="text-align:center; padding:48px;" class="muted">{{ 'marketHistory.empty' | translate }}</td>
             </tr>
           </tbody>
         </table>
-        <div *ngIf="loading" class="text-center py-6">
-          <div class="inline-block w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <div *ngIf="pages > 1" class="p-3 flex items-center justify-center gap-2 text-sm">
-          <button (click)="goPage(page - 1)" [disabled]="page <= 1"
-                  class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 disabled:opacity-50">←</button>
-          <span class="text-slate-500">{{ page }} / {{ pages }}</span>
-          <button (click)="goPage(page + 1)" [disabled]="page >= pages"
-                  class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 disabled:opacity-50">→</button>
+        <div *ngIf="loading" class="empty" style="padding:24px;"><div class="spinner"></div></div>
+        <div *ngIf="pages > 1" class="row gap-2" style="justify-content:center; padding:12px;">
+          <button class="btn ghost sm" (click)="goPage(page - 1)" [disabled]="page <= 1">←</button>
+          <span class="muted mono">{{ page }} / {{ pages }}</span>
+          <button class="btn ghost sm" (click)="goPage(page + 1)" [disabled]="page >= pages">→</button>
         </div>
       </div>
     </div>
@@ -81,15 +72,11 @@ import { MarketHistoryService, MarketTxn } from '../../services/market-history.s
 export class MarketHistoryComponent implements OnInit {
   loading = false;
   txns: MarketTxn[] = [];
-  page = 1;
-  limit = 50;
-  total = 0;
-  pages = 1;
+  page = 1; limit = 50; total = 0; pages = 1;
   kind: 'buy' | 'sell' | 'all' = 'all';
   q = '';
 
-  constructor(private hist: MarketHistoryService) {}
-
+  constructor(private hist: MarketHistoryService, private router: Router) {}
   ngOnInit() { this.load(); }
 
   load() {
@@ -108,22 +95,11 @@ export class MarketHistoryComponent implements OnInit {
   filtered(): MarketTxn[] {
     const s = this.q.trim().toLowerCase();
     if (!s) return this.txns;
-    return this.txns.filter(t =>
-      (t.item_name || '').toLowerCase().includes(s) ||
-      String(t.item_id || '').includes(s),
-    );
+    return this.txns.filter(t => (t.item_name || '').toLowerCase().includes(s) || String(t.item_id || '').includes(s));
   }
 
   onKindChange() { this.page = 1; this.load(); }
-
-  goPage(p: number) {
-    if (p < 1 || p > this.pages || p === this.page) return;
-    this.page = p;
-    this.load();
-  }
-
-  shortId(id: string | null | undefined): string {
-    if (!id) return '';
-    return id.length > 8 ? '…' + id.slice(-6) : id;
-  }
+  goPage(p: number) { if (p < 1 || p > this.pages || p === this.page) return; this.page = p; this.load(); }
+  goItem(t: MarketTxn) { if (t.item_id) this.router.navigate(['/market', t.item_id]); }
+  shortId(id: string | null | undefined) { if (!id) return ''; return id.length > 8 ? '…' + id.slice(-6) : id; }
 }

@@ -1,114 +1,156 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { LinkService, WelcomeResult } from '../../services/link.service';
+import { CoinsService } from '../../services/coins.service';
+import { BasketService } from '../../services/basket.service';
+import { MarketItem, MarketService } from '../../services/market.service';
 
 @Component({
   selector: 'app-home',
   template: `
-    <div class="max-w-4xl mx-auto p-6">
-      <ng-container *ngIf="auth.me$ | async as me">
-        <div class="bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl p-6 shadow-lg mb-6">
-          <h2 class="text-2xl font-bold flex items-center gap-2">
-            <span class="mi lg">waving_hand</span> {{ 'home.hello' | translate:{ name: me.username } }} 👋
-          </h2>
-          <p class="text-white/80 mt-1 flex items-center gap-2">
-            <span class="mi">{{ me.linked ? 'verified' : 'link_off' }}</span>
-            {{ me.linked ? ('home.linked' | translate:{ id: me.steam_id }) : ('home.notLinked' | translate) }}
-          </p>
-        </div>
-
-        <div *ngIf="!me.linked" class="mb-6 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/30 p-5">
-          <div class="flex items-start gap-3">
-            <span class="mi xl text-amber-600">redeem</span>
-            <div class="flex-1">
-              <p class="font-semibold text-amber-700 dark:text-amber-300">{{ 'welcome.title' | translate }}</p>
-              <p class="text-sm mt-1 text-amber-700/80 dark:text-amber-200/80">
-                {{ 'welcome.descPrefix' | translate }} <code class="bg-amber-100 dark:bg-amber-800 px-1 rounded">/link &lt;code&gt;</code> {{ 'welcome.descSuffix' | translate }}
-              </p>
-
-              <ng-container *ngIf="!code; else codeBox">
-                <button (click)="generate()" [disabled]="loading"
-                        class="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg disabled:opacity-50">
-                  <span *ngIf="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  <span *ngIf="!loading" class="mi">card_giftcard</span>
-                  {{ (loading ? 'welcome.generating' : 'welcome.generate') | translate }}
-                </button>
-                <p *ngIf="error" class="text-sm text-rose-600 mt-2">{{ error }}</p>
-              </ng-container>
-
-              <ng-template #codeBox>
-                <div class="mt-3 bg-white dark:bg-slate-800 rounded-lg p-4 border border-amber-200">
-                  <p class="text-xs text-slate-500">{{ 'welcome.yourCode' | translate }}</p>
-                  <div class="flex items-center gap-2 mt-1">
-                    <code class="text-2xl font-mono font-bold tracking-widest text-amber-600">{{ code }}</code>
-                    <button (click)="copy()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 flex items-center gap-1">
-                      <span class="mi">{{ copied ? 'check' : 'content_copy' }}</span>
-                      {{ (copied ? 'welcome.copied' : 'welcome.copy') | translate }}
-                    </button>
-                  </div>
-                  <p class="text-sm mt-3">
-                    {{ 'welcome.useInGame' | translate }}
-                    <code class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded font-mono">/link {{ code }}</code>
-                  </p>
-                </div>
-              </ng-template>
-            </div>
+    <div class="page" *ngIf="auth.me$ | async as me">
+      <section class="hero">
+        <div class="hero-row">
+          <div class="grow">
+            <div class="hero-greet">HELLO, {{ me.username }}</div>
+            <h1>Ready to dive in, {{ me.username }}?</h1>
+            <p class="row gap-2">
+              <span class="mi fill" [style.color]="me.linked ? 'var(--emerald)' : 'var(--rose)'">{{ me.linked ? 'verified' : 'link_off' }}</span>
+              {{ me.linked ? ('home.linked' | translate:{ id: me.steam_id }) : ('home.notLinked' | translate) }}
+            </p>
+          </div>
+          <div class="row gap-2">
+            <a routerLink="/shop" class="btn primary lg"><span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}</a>
+            <a routerLink="/quests" class="btn secondary lg"><span class="mi">flag</span>{{ 'nav.quests' | translate }}</a>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <a routerLink="/shop" class="block bg-white dark:bg-slate-800 rounded-xl shadow hover:shadow-lg p-5 transition">
-            <span class="mi xl text-brand-500">shopping_bag</span>
-            <p class="font-semibold mt-2">{{ 'nav.shop' | translate }}</p>
-            <p class="text-xs text-slate-500">{{ 'home.shopDesc' | translate }}</p>
-          </a>
-          <a routerLink="/bills" class="block bg-white dark:bg-slate-800 rounded-xl shadow hover:shadow-lg p-5 transition">
-            <span class="mi xl text-emerald-500">payments</span>
-            <p class="font-semibold mt-2">{{ 'nav.bills' | translate }}</p>
-            <p class="text-xs text-slate-500">{{ 'home.billsDesc' | translate }}</p>
-          </a>
-          <a routerLink="/coins" class="block bg-white dark:bg-slate-800 rounded-xl shadow hover:shadow-lg p-5 transition">
-            <span class="mi xl text-amber-500">paid</span>
-            <p class="font-semibold mt-2">{{ 'coins.title' | translate }}</p>
-            <p class="text-xs text-slate-500">{{ 'home.coinsDesc' | translate }}</p>
-          </a>
-          <a routerLink="/codes" class="block bg-white dark:bg-slate-800 rounded-xl shadow hover:shadow-lg p-5 transition">
-            <span class="mi xl text-rose-500">history</span>
-            <p class="font-semibold mt-2">{{ 'nav.codes' | translate }}</p>
-            <p class="text-xs text-slate-500">{{ 'home.codesDesc' | translate }}</p>
-          </a>
+        <div class="stats-strip">
+          <div class="stat">
+            <span class="stat-label">BALANCE</span>
+            <span class="stat-value">{{ (coins.balance$ | async) ?? '—' }} <span class="mi fill">paid</span></span>
+            <span class="delta up">+{{ recentGain || 0 }} / 7d</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">CART</span>
+            <span class="stat-value">{{ basket.count }} <span class="mi">shopping_cart</span></span>
+            <span class="delta flat">items</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">LINKED</span>
+            <span class="stat-value">{{ me.linked ? 'YES' : 'NO' }} <span class="mi">link</span></span>
+            <span class="delta flat">{{ me.linked ? 'steam ' + (me.steam_id | slice:0:8) : '—' }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">ROLE</span>
+            <span class="stat-value">{{ me.is_admin ? 'ADMIN' : 'PLAYER' }} <span class="mi">badge</span></span>
+            <span class="delta flat">discord</span>
+          </div>
         </div>
+      </section>
 
-        <div *ngIf="me.is_admin" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <a routerLink="/admin/market" class="block bg-rose-50 dark:bg-rose-900/20 rounded-xl shadow hover:shadow-lg p-5 transition border border-rose-200 dark:border-rose-900">
-            <span class="mi xl text-rose-500">build</span>
-            <p class="font-semibold mt-2 text-rose-700 dark:text-rose-300">{{ 'nav.adminMarket' | translate }}</p>
-            <p class="text-xs text-rose-600/70 dark:text-rose-300/70">{{ 'home.adminMarketDesc' | translate }}</p>
-          </a>
-          <a routerLink="/admin/coins" class="block bg-rose-50 dark:bg-rose-900/20 rounded-xl shadow hover:shadow-lg p-5 transition border border-rose-200 dark:border-rose-900">
-            <span class="mi xl text-amber-500">account_balance_wallet</span>
-            <p class="font-semibold mt-2 text-rose-700 dark:text-rose-300">{{ 'nav.adminCoins' | translate }}</p>
-            <p class="text-xs text-rose-600/70 dark:text-rose-300/70">{{ 'home.adminCoinsDesc' | translate }}</p>
-          </a>
+      <section *ngIf="!me.linked" class="welcome-alert">
+        <div class="alert-icon"><span class="mi">redeem</span></div>
+        <div class="grow">
+          <h3 style="margin-bottom:4px;">{{ 'welcome.title' | translate }}</h3>
+          <p class="muted text-sm">{{ 'welcome.descPrefix' | translate }}
+            <code class="mono" style="background:var(--surface-2); padding:1px 5px; border-radius:4px;">/link &lt;code&gt;</code>
+            {{ 'welcome.descSuffix' | translate }}</p>
+          <ng-container *ngIf="!code; else codeBox">
+            <button class="btn primary mt-3" (click)="generate()" [disabled]="loading">
+              <span class="mi" *ngIf="!loading">card_giftcard</span>
+              <span class="spinner sm" *ngIf="loading"></span>
+              {{ (loading ? 'welcome.generating' : 'welcome.generate') | translate }}
+            </button>
+            <p *ngIf="error" class="text-rose text-sm mt-2">{{ error }}</p>
+          </ng-container>
+          <ng-template #codeBox>
+            <div class="code-display">
+              <code>{{ code }}</code>
+              <button class="btn secondary sm" (click)="copy()">
+                <span class="mi">{{ copied ? 'check' : 'content_copy' }}</span>
+                {{ (copied ? 'welcome.copied' : 'welcome.copy') | translate }}
+              </button>
+            </div>
+            <p class="muted text-sm mt-2">{{ 'welcome.useInGame' | translate }}
+              <code class="mono" style="background:var(--surface-2); padding:1px 6px; border-radius:4px;">/link {{ code }}</code>
+            </p>
+          </ng-template>
         </div>
+      </section>
 
-        <div class="mt-6 text-center">
-          <a routerLink="/help" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600">
-            <span class="mi">help</span> {{ 'home.helpLink' | translate }}
-          </a>
+      <div class="tile-grid">
+        <a routerLink="/shop" class="tile amber">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">shopping_bag</span></div>
+          <div class="tile-title">{{ 'nav.shop' | translate }}</div>
+          <div class="tile-desc">{{ 'home.shopDesc' | translate }}</div>
+        </a>
+        <a routerLink="/bills" class="tile emerald">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">payments</span></div>
+          <div class="tile-title">{{ 'nav.bills' | translate }}</div>
+          <div class="tile-desc">{{ 'home.billsDesc' | translate }}</div>
+        </a>
+        <a routerLink="/coins" class="tile amber">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">paid</span></div>
+          <div class="tile-title">{{ 'coins.title' | translate }}</div>
+          <div class="tile-desc">{{ 'home.coinsDesc' | translate }}</div>
+        </a>
+        <a routerLink="/codes" class="tile violet">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">qr_code_2</span></div>
+          <div class="tile-title">{{ 'nav.codes' | translate }}</div>
+          <div class="tile-desc">{{ 'home.codesDesc' | translate }}</div>
+        </a>
+        <a routerLink="/quests" class="tile indigo">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">flag</span></div>
+          <div class="tile-title">{{ 'nav.quests' | translate }}</div>
+          <div class="tile-desc">Active &amp; rewards</div>
+        </a>
+        <a routerLink="/help" class="tile rose">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">help</span></div>
+          <div class="tile-title">{{ 'nav.help' | translate }}</div>
+          <div class="tile-desc">{{ 'home.helpLink' | translate }}</div>
+        </a>
+      </div>
+
+      <div *ngIf="topItems.length > 0" class="mt-6">
+        <h2 class="mb-3 row gap-2"><span class="mi" style="color:var(--accent)">local_fire_department</span>Top items</h2>
+        <div class="item-grid">
+          <app-item-card *ngFor="let it of topItems" [item]="it"></app-item-card>
         </div>
-      </ng-container>
+      </div>
     </div>
   `,
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   loading = false;
   error: string | null = null;
   code: string | null = null;
   copied = false;
+  recentGain = 0;
+  topItems: MarketItem[] = [];
 
-  constructor(public auth: AuthService, private link: LinkService, private t: TranslateService) {}
+  constructor(
+    public auth: AuthService,
+    public coins: CoinsService,
+    public basket: BasketService,
+    private link: LinkService,
+    private market: MarketService,
+    private t: TranslateService,
+  ) {}
+
+  ngOnInit() {
+    this.market.list('normal', null).subscribe({
+      next: items => { this.topItems = [...items].sort((a, b) => b.price - a.price).slice(0, 4); },
+      error: () => this.topItems = [],
+    });
+  }
 
   generate() {
     this.loading = true; this.error = null;
@@ -127,8 +169,7 @@ export class HomeComponent {
   copy() {
     if (!this.code) return;
     navigator.clipboard.writeText(this.code).then(() => {
-      this.copied = true;
-      setTimeout(() => this.copied = false, 2000);
+      this.copied = true; setTimeout(() => this.copied = false, 2000);
     });
   }
 }

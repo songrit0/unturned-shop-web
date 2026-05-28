@@ -3,6 +3,7 @@
     "title": "SellVault Shop"
   },
   "nav": {
+    "home": "Home",
     "shop": "Shop",
     "bills": "Bills",
     "coins": "Coin",
@@ -17,7 +18,15 @@
     "adminItems": "Manage Items",
     "marketHistory": "Market History",
     "quests": "Quests",
-    "basket": "Basket"
+    "basket": "Basket",
+    "section": {
+      "main": "MAIN",
+      "account": "ACCOUNT",
+      "admin": "ADMIN"
+    }
+  },
+  "header": {
+    "search": "Search items..."
   },
   "login": {
     "title": "SellVault Shop",
@@ -139,20 +148,20 @@
     "sellNote": "Only items in the Shop can be sold — anything else is returned",
     "economy": "Economy",
     "earnTitle": "How to earn Coin",
-    "earn1": "🎁 Welcome Pack (one-time)",
-    "earn2": "⏱ Online in-game +10 per 5 min (must not be AFK + alive)",
-    "earn3": "🧟 Kill zombie +1, Mega +5",
-    "earn4": "🦌 Kill animal +2",
-    "earn5": "⚔️ Kill player (PvP) +5 (120s cooldown per victim)",
-    "earn6": "🔨 Build barricade/structure +2",
-    "earn7": "🌳 Harvest resource +1",
-    "earn8": "💰 Sell on the market (60% of price)",
-    "earn9": "💵 Sell Bills (100% full price, no fee)",
+    "earn1": "Welcome Pack (one-time)",
+    "earn2": "Online in-game +10 per 5 min (must not be AFK + alive)",
+    "earn3": "Kill zombie +1, Mega +5",
+    "earn4": "Kill animal +2",
+    "earn5": "Kill player (PvP) +5 (120s cooldown per victim)",
+    "earn6": "Build barricade/structure +2",
+    "earn7": "Harvest resource +1",
+    "earn8": "Sell on the market (60% of price)",
+    "earn9": "Sell Bills (100% full price, no fee)",
     "loseTitle": "How you lose Coin",
-    "lose1": "🛒 Buy from the shop (full price)",
-    "lose2": "📉 40% commission on sale (sell price = price × 0.6)",
-    "lose3": "🏛 Wealth Tax 2% daily at 03:00 (only if > 10,000)",
-    "exampleTitle": "📐 Example:",
+    "lose1": "Buy from the shop (full price)",
+    "lose2": "40% commission on sale (sell price = price × 0.6)",
+    "lose3": "Wealth Tax 2% daily at 03:00 (only if > 10,000)",
+    "exampleTitle": "Example:",
     "exampleDesc": "Sentinel at 50 → buy 1 = −50 coin, sell 1 = +30 coin (50 × 60%)",
     "billsTitle": "Bills",
     "billsDesc": "Bills are like a Cash item — sold at full price, no commission",

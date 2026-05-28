@@ -29,6 +29,7 @@ import { ItemCardComponent } from './components/item-card/item-card.component';
 import { BasketDrawerComponent } from './components/basket-drawer/basket-drawer.component';
 import { PagerComponent } from './components/pager/pager.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -67,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BasketDrawerComponent,
     PagerComponent,
     FooterComponent,
+    SidebarComponent,
   ],
   imports: [
     BrowserModule,
