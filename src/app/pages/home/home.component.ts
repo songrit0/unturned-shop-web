@@ -30,7 +30,7 @@ import { MarketItem, MarketService } from '../../services/market.service';
           <div class="stat">
             <span class="stat-label">BALANCE</span>
             <span class="stat-value">{{ (coins.balance$ | async) ?? '—' }} <span class="mi fill">paid</span></span>
-            <span class="delta up">+{{ recentGain || 0 }} / 7d</span>
+            <span class="delta" [class.up]="recentGain >= 0" [class.down]="recentGain < 0">{{ recentGain >= 0 ? '+' : '' }}{{ recentGain | number }} / 7d</span>
           </div>
           <div class="stat">
             <span class="stat-label">CART</span>
@@ -149,6 +149,10 @@ export class HomeComponent implements OnInit {
     this.market.list('normal', null, 1, 4).subscribe({
       next: p => { this.topItems = [...p.items].sort((a, b) => b.price - a.price).slice(0, 4); },
       error: () => this.topItems = [],
+    });
+    this.coins.stats().subscribe({
+      next: s => { this.recentGain = s.net_change; },
+      error: () => { this.recentGain = 0; },
     });
   }
 

@@ -11,6 +11,7 @@ export { Paginated };
 export interface CoinsMe { steam_id: string | null; linked: boolean; balance: number; }
 export interface MarketLog { id: number; item_id: number; amount: number; coins: number; kind: string; at: string; name?: string; }
 export interface ActivityLog { id: number; kind: string; coins: number; at: string; }
+export interface CoinStats { window_days: number; net_change: number; credits: number; debits: number; }
 
 @Injectable({ providedIn: 'root' })
 export class CoinsService {
@@ -23,6 +24,10 @@ export class CoinsService {
     return this.http.get<CoinsMe>(`${this.apiUrl.get()}/coins/me`).pipe(
       tap(me => this._balance$.next(me.balance)),
     );
+  }
+
+  stats(): Observable<CoinStats> {
+    return this.http.get<CoinStats>(`${this.apiUrl.get()}/coins/stats`);
   }
 
   marketHistory(page = 1, limit = 20): Observable<Paginated<MarketLog>> {
