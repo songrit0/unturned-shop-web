@@ -130,6 +130,35 @@
       "disabled": "ปิด"
     }
   },
+  "inventory": {
+    "title": "ของที่ซื้อ",
+    "empty": "ยังไม่มีของที่ซื้อ",
+    "claim": "รับของ",
+    "showCode": "ดูโค้ด",
+    "copyCode": "คัดลอกโค้ด",
+    "codeCopied": "คัดลอกแล้ว",
+    "tab": {
+      "unclaimed": "ยังไม่ได้รับ",
+      "claimed": "รับแล้ว",
+      "all": "ทั้งหมด"
+    },
+    "col": {
+      "item": "ไอเทม",
+      "amount": "จำนวน",
+      "quality": "คุณภาพ",
+      "status": "สถานะ",
+      "purchased": "ซื้อเมื่อ",
+      "action": "การจัดการ"
+    },
+    "status": {
+      "claimed": "รับแล้ว",
+      "unclaimed": "ยังไม่ได้รับ"
+    },
+    "codeReady": {
+      "title": "โค้ดของคุณพร้อมใช้",
+      "instruction": "เข้าเกม Unturned แล้วพิมพ์: /code {{code}}"
+    }
+  },
   "help": {
     "title": "วิธีใช้งานระบบ",
     "subtitle": "เว็บนี้ทำงานคู่กับ Discord bot + ปลั๊กอินในเกม Unturned",
@@ -293,10 +322,10 @@
     "nothing_to_submit": "กรอกอย่างน้อย 1 ช่องเพื่อเสนอแก้ไข",
     "item_not_found": "ไม่พบไอเทม",
     "submission_not_found": "ไม่พบคำขอ",
-    "already_claimed": "[TR] This purchase has already been claimed.",
-    "not_buyer": "[TR] Only the buyer can claim this item.",
-    "code_collision_retry_exhausted": "[TR] Couldn't generate a unique code right now — try again.",
-    "purchase_not_found": "[TR] Purchase not found.",
+    "already_claimed": "รายการนี้ถูกรับไปแล้ว",
+    "not_buyer": "เฉพาะผู้ซื้อเท่านั้นที่รับของได้",
+    "code_collision_retry_exhausted": "สร้างโค้ดไม่สำเร็จ ลองใหม่อีกครั้ง",
+    "purchase_not_found": "ไม่พบรายการที่ซื้อ",
     "steam_not_linked": "กรุณาผูกบัญชี Steam ก่อน",
     "vault_not_found": "ไม่พบคลัง",
     "listing_not_found": "ไม่พบประกาศ",
@@ -481,35 +510,6 @@
       "adminNote": "หมายเหตุแอดมิน"
     }
   },
-  "inventory": {
-    "title": "[TR] My Inventory",
-    "empty": "[TR] No items in your inventory yet.",
-    "claim": "[TR] Claim",
-    "showCode": "[TR] Show code",
-    "copyCode": "[TR] Copy code",
-    "codeCopied": "[TR] Copied",
-    "tab": {
-      "all": "[TR] All",
-      "unclaimed": "[TR] Unclaimed",
-      "claimed": "[TR] Claimed"
-    },
-    "col": {
-      "item": "[TR] Item",
-      "amount": "[TR] Amount",
-      "quality": "[TR] Quality",
-      "status": "[TR] Status",
-      "purchased": "[TR] Purchased",
-      "action": "[TR] Action"
-    },
-    "status": {
-      "unclaimed": "[TR] Unclaimed",
-      "claimed": "[TR] Claimed"
-    },
-    "codeReady": {
-      "title": "[TR] Your redeem code",
-      "instruction": "[TR] Use /code {{code}} in-game to receive the item."
-    }
-  },
   "adminSubmissions": {
     "title": "คำขอแก้ไขไอเทม",
     "all": "ทั้งหมด",
@@ -534,7 +534,7 @@
     "price": "ราคา",
     "buy": "ซื้อ",
     "buying": "กำลังซื้อ...",
-    "buySuccessGoTo": "[TR] Purchase successful — view in My Inventory",
+    "buySuccessGoTo": "ซื้อสำเร็จ — ดูในของที่ซื้อ",
     "status": {
       "active": "กำลังขาย",
       "sold": "ขายแล้ว",
