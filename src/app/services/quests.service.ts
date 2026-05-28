@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -62,7 +63,8 @@ export class QuestsService {
   // ---- Admin ----
   adminList(page = 1, limit = 20): Observable<Paginated<AdminQuest>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<AdminQuest>>(`${this.apiUrl.get()}/admin/quests`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/quests`, { params })
+      .pipe(map(r => normalizePaginated<AdminQuest>(r, limit)));
   }
   adminCreate(p: AdminQuestPayload): Observable<AdminQuest> {
     return this.http.post<AdminQuest>(`${this.apiUrl.get()}/admin/quests`, p);
@@ -76,14 +78,16 @@ export class QuestsService {
 
   // ---- Player ----
   list(): Observable<PlayerQuest[]> {
-    return this.http.get<PlayerQuest[]>(`${this.apiUrl.get()}/quests`);
+    return this.http.get<PlayerQuest[]>(`${this.apiUrl.get()}/quests`)
+      .pipe(map(r => Array.isArray(r) ? r : []));
   }
   get(id: number): Observable<PlayerQuest> {
     return this.http.get<PlayerQuest>(`${this.apiUrl.get()}/quests/${id}`);
   }
   history(page = 1, limit = 20): Observable<Paginated<PlayerQuest>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<PlayerQuest>>(`${this.apiUrl.get()}/quests/history`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/quests/history`, { params })
+      .pipe(map(r => normalizePaginated<PlayerQuest>(r, limit)));
   }
   claim(questId: number): Observable<{ ok: boolean; coins_claimed?: number; new_balance?: number; reason?: string }> {
     return this.http.post<{ ok: boolean; coins_claimed?: number; new_balance?: number; reason?: string }>(

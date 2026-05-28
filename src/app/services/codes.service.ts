@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -26,6 +27,7 @@ export class CodesService {
 
   listMine(page = 1, limit = 20): Observable<Paginated<MyCode>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<MyCode>>(`${this.apiUrl.get()}/codes`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/codes`, { params })
+      .pipe(map(r => normalizePaginated<MyCode>(r, limit)));
   }
 }

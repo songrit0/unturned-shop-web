@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -23,7 +24,8 @@ export class AdminCoinsService {
 
   listUsers(page = 1, limit = 20, q = ''): Observable<Paginated<CoinUserRow>> {
     const params = buildPagedParams(page, limit, { q });
-    return this.http.get<Paginated<CoinUserRow>>(`${this.apiUrl.get()}/admin/coins/users`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/coins/users`, { params })
+      .pipe(map(r => normalizePaginated<CoinUserRow>(r, limit)));
   }
 
   adjust(steamId: string, delta: number, reason?: string): Observable<AdjustResult> {
@@ -32,6 +34,7 @@ export class AdminCoinsService {
 
   history(steamId: string, page = 1, limit = 20): Observable<Paginated<ActivityRow>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<ActivityRow>>(`${this.apiUrl.get()}/admin/coins/${steamId}/history`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/coins/${steamId}/history`, { params })
+      .pipe(map(r => normalizePaginated<ActivityRow>(r, limit)));
   }
 }

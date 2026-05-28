@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -24,7 +25,8 @@ export class ItemTypesService {
 
   list(page = 1, limit = 20): Observable<Paginated<ItemType>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<ItemType>>(`${this.apiUrl.get()}/admin/item-types`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/item-types`, { params })
+      .pipe(map(r => normalizePaginated<ItemType>(r, limit)));
   }
   create(p: ItemTypePayload): Observable<ItemType> {
     return this.http.post<ItemType>(`${this.apiUrl.get()}/admin/item-types`, p);

@@ -1,9 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -63,11 +64,13 @@ export class MarketHistoryService {
 
   itemTxns(itemId: number, page = 1, limit = 50): Observable<Paginated<MarketTxn>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<MarketTxn>>(`${this.apiUrl.get()}/market/${itemId}/transactions`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/market/${itemId}/transactions`, { params })
+      .pipe(map(r => normalizePaginated<MarketTxn>(r, limit)));
   }
 
   globalTxns(page = 1, limit = 50, kind: 'buy' | 'sell' | 'all' = 'all'): Observable<Paginated<MarketTxn>> {
     const params = buildPagedParams(page, limit, { kind });
-    return this.http.get<Paginated<MarketTxn>>(`${this.apiUrl.get()}/market/transactions`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/market/transactions`, { params })
+      .pipe(map(r => normalizePaginated<MarketTxn>(r, limit)));
   }
 }

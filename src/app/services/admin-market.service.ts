@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -36,7 +37,8 @@ export class AdminMarketService {
 
   list(page = 1, limit = 20): Observable<Paginated<AdminMarketItem>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<AdminMarketItem>>(`${this.apiUrl.get()}/admin/market`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/market`, { params })
+      .pipe(map(r => normalizePaginated<AdminMarketItem>(r, limit)));
   }
   upsert(p: UpsertPayload): Observable<AdminMarketItem> {
     return this.http.post<AdminMarketItem>(`${this.apiUrl.get()}/admin/market`, p);

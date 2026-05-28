@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -31,7 +32,8 @@ export class ItemsService {
   // ---- Admin ----
   adminList(q = '', typeId: number | null = null, page = 1, limit = 20): Observable<Paginated<Item>> {
     const params = buildPagedParams(page, limit, { q, type_id: typeId });
-    return this.http.get<Paginated<Item>>(`${this.apiUrl.get()}/admin/items`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/items`, { params })
+      .pipe(map(r => normalizePaginated<Item>(r, limit)));
   }
   adminGet(id: number): Observable<Item> {
     return this.http.get<Item>(`${this.apiUrl.get()}/admin/items/${id}`);
@@ -49,6 +51,7 @@ export class ItemsService {
   // ---- Public ----
   list(q = '', typeId: number | null = null, page = 1, limit = 20): Observable<Paginated<Item>> {
     const params = buildPagedParams(page, limit, { q, type_id: typeId });
-    return this.http.get<Paginated<Item>>(`${this.apiUrl.get()}/items`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/items`, { params })
+      .pipe(map(r => normalizePaginated<Item>(r, limit)));
   }
 }

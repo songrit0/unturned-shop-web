@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { buildPagedParams } from './paged-http';
+import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
@@ -27,11 +27,13 @@ export class CoinsService {
 
   marketHistory(page = 1, limit = 20): Observable<Paginated<MarketLog>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<MarketLog>>(`${this.apiUrl.get()}/coins/history/market`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/coins/history/market`, { params })
+      .pipe(map(r => normalizePaginated<MarketLog>(r, limit)));
   }
 
   activityHistory(page = 1, limit = 20): Observable<Paginated<ActivityLog>> {
     const params = buildPagedParams(page, limit);
-    return this.http.get<Paginated<ActivityLog>>(`${this.apiUrl.get()}/coins/history/activity`, { params });
+    return this.http.get<unknown>(`${this.apiUrl.get()}/coins/history/activity`, { params })
+      .pipe(map(r => normalizePaginated<ActivityLog>(r, limit)));
   }
 }
