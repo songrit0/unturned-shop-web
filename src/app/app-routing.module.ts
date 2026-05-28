@@ -17,6 +17,10 @@ import { AdminItemsComponent } from './pages/admin-items/admin-items.component';
 import { QuestsComponent } from './pages/quests/quests.component';
 import { MarketDetailComponent } from './pages/market-detail/market-detail.component';
 import { MarketHistoryComponent } from './pages/market-history/market-history.component';
+import { VaultsComponent } from './pages/vaults/vaults.component';
+import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
+import { MyListingsComponent } from './pages/my-listings/my-listings.component';
+import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -36,6 +40,10 @@ const routes: Routes = [
   { path: 'admin/items', component: AdminItemsComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
+  { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },
+  { path: 'p2p-market', component: P2pMarketComponent, canActivate: [authGuard] },
+  { path: 'my-listings', component: MyListingsComponent, canActivate: [authGuard] },
+  { path: 'admin/vaults', component: AdminVaultsComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '' },
 ];
 

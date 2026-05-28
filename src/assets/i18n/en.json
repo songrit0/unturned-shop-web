@@ -16,7 +16,11 @@
     "adminQuests": "Manage Quests",
     "adminItemTypes": "Manage Item Types",
     "adminItems": "Manage Items",
+    "adminVaults": "Manage Vaults",
     "marketHistory": "Market History",
+    "p2pMarket": "P2P Market",
+    "vaults": "My Vaults",
+    "myListings": "My Listings",
     "quests": "Quests",
     "basket": "Basket",
     "section": {
@@ -270,7 +274,23 @@
     "save": "Save",
     "cancel": "Cancel",
     "loading": "Loading...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "discard": "Discard"
+  },
+  "errors": {
+    "vault_locked_in_game": "This vault is open in-game. Close it and try again.",
+    "listing_no_longer_active": "This listing is no longer available — someone may have already bought it.",
+    "cannot_buy_own_listing": "You can't buy your own listing.",
+    "insufficient_funds": "You don't have enough coins.",
+    "not_listing_owner": "Only the seller can change this listing.",
+    "vault_full": "The destination vault is full.",
+    "steam_not_linked": "Link your Steam account first.",
+    "vault_not_found": "Vault not found.",
+    "listing_not_found": "Listing not found.",
+    "unauthorized": "Please sign in.",
+    "forbidden": "You don't have permission to do that.",
+    "not_found": "Not found.",
+    "unknown": "Something went wrong. Try again."
   },
   "adminItems": {
     "title": "Master Items",
@@ -394,6 +414,89 @@
       "reset": "Reset",
       "reward": "Reward",
       "completedAt": "Completed"
+    }
+  },
+  "vaults": {
+    "title": "My Vaults"
+  },
+  "vaultGrid": {
+    "banner": "Layout in the web view is representational only — it does not match the in-game grid 1:1.",
+    "hint": {
+      "rotate": "rotate",
+      "delete": "delete",
+      "list": "list on market"
+    },
+    "ctx": {
+      "rotate": "Rotate",
+      "list": "List on market",
+      "delete": "Delete"
+    }
+  },
+  "p2p": {
+    "title": "P2P Market",
+    "search": "Search items...",
+    "allTypes": "All types",
+    "empty": "No active listings",
+    "seller": "Seller",
+    "quality": "Quality",
+    "price": "Price",
+    "buy": "Buy",
+    "buying": "Buying...",
+    "status": {
+      "active": "Active",
+      "sold": "Sold",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "list": {
+      "title": "List on market",
+      "price": "Price (coins)",
+      "commission": "Commission",
+      "youReceive": "You receive",
+      "confirm": "List"
+    }
+  },
+  "adminVaults": {
+    "title": "Manage Vaults",
+    "search": "Search by Steam ID...",
+    "mode": {
+      "steam_id": "Steam ID",
+      "discord_id": "Discord ID",
+      "q": "Name / partial"
+    },
+    "searchPlaceholder": {
+      "steam_id": "Search by Steam ID...",
+      "discord_id": "Search by Discord ID...",
+      "q": "Name (substring) or Steam ID (prefix)..."
+    },
+    "empty": "No vaults match.",
+    "pickHint": "Pick a vault from the list to edit.",
+    "stuckListings": {
+      "title": "Active listings by this seller",
+      "empty": "This seller has no active listings.",
+      "forceClose": "Force close",
+      "confirm": "Force close this listing? The item will be returned to the seller's default vault."
+    }
+  },
+  "myListings": {
+    "title": "My Listings",
+    "tab": {
+      "active": "Active",
+      "sold": "Sold",
+      "cancelled": "Cancelled / Expired"
+    },
+    "col": {
+      "item": "Item",
+      "quality": "Quality",
+      "price": "Price",
+      "buyer": "Buyer",
+      "created": "Created"
+    },
+    "cancel": "Cancel",
+    "empty": {
+      "active": "You have no active listings.",
+      "sold": "No completed sales yet.",
+      "cancelled": "No cancelled or expired listings."
     }
   }
 }

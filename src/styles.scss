@@ -2277,3 +2277,10 @@ table.tbl tbody tr.clickable {
     font-size: 24px;
   }
 }
+
+/* Actor label whose Discord account has been deleted (sentinel "<deleted>"). */
+.deleted-actor {
+  font-style: italic;
+  color: var(--muted);
+  opacity: 0.7;
+}

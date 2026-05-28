@@ -16,7 +16,11 @@
     "adminQuests": "จัดการเควส",
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
+    "adminVaults": "[TR] Manage Vaults",
     "marketHistory": "ประวัติตลาด",
+    "p2pMarket": "[TR] P2P Market",
+    "vaults": "[TR] My Vaults",
+    "myListings": "[TR] My Listings",
     "quests": "เควส",
     "basket": "ตะกร้า",
     "section": {
@@ -270,7 +274,23 @@
     "save": "บันทึก",
     "cancel": "ยกเลิก",
     "loading": "กำลังโหลด...",
-    "saving": "กำลังบันทึก..."
+    "saving": "กำลังบันทึก...",
+    "discard": "[TR] Discard"
+  },
+  "errors": {
+    "vault_locked_in_game": "[TR] This vault is open in-game. Close it and try again.",
+    "listing_no_longer_active": "[TR] This listing is no longer available — someone may have already bought it.",
+    "cannot_buy_own_listing": "[TR] You can't buy your own listing.",
+    "insufficient_funds": "[TR] You don't have enough coins.",
+    "not_listing_owner": "[TR] Only the seller can change this listing.",
+    "vault_full": "[TR] The destination vault is full.",
+    "steam_not_linked": "[TR] Link your Steam account first.",
+    "vault_not_found": "[TR] Vault not found.",
+    "listing_not_found": "[TR] Listing not found.",
+    "unauthorized": "[TR] Please sign in.",
+    "forbidden": "[TR] You don't have permission to do that.",
+    "not_found": "[TR] Not found.",
+    "unknown": "[TR] Something went wrong. Try again."
   },
   "adminItems": {
     "title": "Master Items",
@@ -396,5 +416,88 @@
       "completedAt": "เสร็จเมื่อ"
     }
   },
-  "adminMarketTypeLabel": "ประเภทไอเทม"
+  "adminMarketTypeLabel": "ประเภทไอเทม",
+  "vaults": {
+    "title": "[TR] My Vaults"
+  },
+  "vaultGrid": {
+    "banner": "[TR] Layout in the web view is representational only — it does not match the in-game grid 1:1.",
+    "hint": {
+      "rotate": "[TR] rotate",
+      "delete": "[TR] delete",
+      "list": "[TR] list on market"
+    },
+    "ctx": {
+      "rotate": "[TR] Rotate",
+      "list": "[TR] List on market",
+      "delete": "[TR] Delete"
+    }
+  },
+  "p2p": {
+    "title": "[TR] P2P Market",
+    "search": "[TR] Search items...",
+    "allTypes": "[TR] All types",
+    "empty": "[TR] No active listings",
+    "seller": "[TR] Seller",
+    "quality": "[TR] Quality",
+    "price": "[TR] Price",
+    "buy": "[TR] Buy",
+    "buying": "[TR] Buying...",
+    "status": {
+      "active": "[TR] Active",
+      "sold": "[TR] Sold",
+      "cancelled": "[TR] Cancelled",
+      "expired": "[TR] Expired"
+    },
+    "list": {
+      "title": "[TR] List on market",
+      "price": "[TR] Price (coins)",
+      "commission": "[TR] Commission",
+      "youReceive": "[TR] You receive",
+      "confirm": "[TR] List"
+    }
+  },
+  "adminVaults": {
+    "title": "[TR] Manage Vaults",
+    "search": "[TR] Search by Steam ID...",
+    "mode": {
+      "steam_id": "[TR] Steam ID",
+      "discord_id": "[TR] Discord ID",
+      "q": "[TR] Name / partial"
+    },
+    "searchPlaceholder": {
+      "steam_id": "[TR] Search by Steam ID...",
+      "discord_id": "[TR] Search by Discord ID...",
+      "q": "[TR] Name (substring) or Steam ID (prefix)..."
+    },
+    "empty": "[TR] No vaults match.",
+    "pickHint": "[TR] Pick a vault from the list to edit.",
+    "stuckListings": {
+      "title": "[TR] Active listings by this seller",
+      "empty": "[TR] This seller has no active listings.",
+      "forceClose": "[TR] Force close",
+      "confirm": "[TR] Force close this listing? The item will be returned to the seller's default vault."
+    }
+  },
+  "myListings": {
+    "title": "[TR] My Listings",
+    "tab": {
+      "active": "[TR] Active",
+      "sold": "[TR] Sold",
+      "cancelled": "[TR] Cancelled / Expired"
+    },
+    "col": {
+      "item": "[TR] Item",
+      "quality": "[TR] Quality",
+      "price": "[TR] Price",
+      "buyer": "[TR] Buyer",
+      "created": "[TR] Created"
+    },
+    "cancel": "[TR] Cancel",
+    "empty": {
+      "active": "[TR] You have no active listings.",
+      "sold": "[TR] No completed sales yet.",
+      "cancelled": "[TR] No cancelled or expired listings."
+    }
+  }
 }

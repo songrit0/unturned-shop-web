@@ -28,11 +28,20 @@ import { VersionService } from '../../services/version.service';
       <a routerLink="/market/history" routerLinkActive="active" class="nav-item">
         <span class="mi">receipt_long</span>{{ 'nav.marketHistory' | translate }}
       </a>
+      <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
+        <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
+      </a>
 
       <ng-container *ngIf="auth.me$ | async as me">
         <div class="nav-section-label">{{ 'nav.section.account' | translate }}</div>
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
+        </a>
+        <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
+          <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
+        </a>
+        <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
+          <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
         </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
           <span class="mi">qr_code_2</span>{{ 'nav.codes' | translate }}
@@ -60,6 +69,9 @@ import { VersionService } from '../../services/version.service';
           </a>
           <a routerLink="/admin/quests" routerLinkActive="active" class="nav-item admin">
             <span class="mi">flag</span>Quests
+          </a>
+          <a routerLink="/admin/vaults" routerLinkActive="active" class="nav-item admin">
+            <span class="mi">inventory</span>{{ 'nav.adminVaults' | translate }}
           </a>
         </ng-container>
       </ng-container>
