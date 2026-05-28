@@ -21,6 +21,8 @@ import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
 import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
+import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
+import { AdminItemSubmissionsComponent } from './pages/admin-item-submissions/admin-item-submissions.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -44,6 +46,8 @@ const routes: Routes = [
   { path: 'p2p-market', component: P2pMarketComponent, canActivate: [authGuard] },
   { path: 'my-listings', component: MyListingsComponent, canActivate: [authGuard] },
   { path: 'admin/vaults', component: AdminVaultsComponent, canActivate: [adminGuard] },
+  { path: 'my-submissions', component: MySubmissionsComponent, canActivate: [authGuard] },
+  { path: 'admin/submissions', component: AdminItemSubmissionsComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '' },
 ];
 

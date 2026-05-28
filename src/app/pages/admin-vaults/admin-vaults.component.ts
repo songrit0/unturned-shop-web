@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { formatActorLabel, isDeletedActor, P2pListing, VaultDetail, VaultSummary } from '../../models/vault';
+import { EnrichedVaultItem, formatActorLabel, isDeletedActor, P2pListing, VaultDetail, VaultSummary } from '../../models/vault';
+import { effectiveDisplayName, resolveVerifyStatus, VerifyStatus } from '../../models/verify-status';
 import { Paginated } from '../../models/paginated';
 import { AdminVaultSearchMode, VaultsService } from '../../services/vaults.service';
 import { P2pService } from '../../services/p2p.service';
@@ -72,7 +73,16 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                         <ng-template #noImg><span class="mi faint">inventory_2</span></ng-template>
                       </div>
                     </td>
-                    <td><div style="font-weight:600">{{ it.name || ('#' + it.Id) }}</div></td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <span style="font-weight:600">{{ displayName(it) }}</span>
+                        <ng-container *ngIf="verifyStatus(it) as vs">
+                          <span *ngIf="vs.kind !== 'verified'" class="verify-icon" [title]="(vs.tooltipKey | translate:vs.tooltipParams)">
+                            <span class="mi sm">info</span>
+                          </span>
+                        </ng-container>
+                      </div>
+                    </td>
                     <td class="mono">×{{ it.Amount }}</td>
                     <td>
                       <div class="qbar"><div class="qfill" [style.width.%]="it.Quality" [class.q-hi]="it.Quality >= 80" [class.q-mid]="it.Quality >= 40 && it.Quality < 80" [class.q-lo]="it.Quality < 40"></div></div>
@@ -178,6 +188,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
     .qfill.q-hi { background: var(--emerald); }
     .qfill.q-mid { background: var(--amber); }
     .qfill.q-lo { background: var(--rose); }
+    .verify-icon { display: inline-flex; align-items: center; color: var(--rose); }
   `],
 })
 export class AdminVaultsComponent implements OnInit, OnDestroy {
@@ -246,6 +257,17 @@ export class AdminVaultsComponent implements OnInit, OnDestroy {
       item_count: this.active.items.length,
       last_update: this.active.last_update,
     });
+  }
+
+  // Admins don't have a per-user submission stream tied to the seller they're viewing — so we
+  // pass `null` and the helper only flags `unverified` (sv_items.name null). No clickable suggest-edit
+  // for admins; the icon is info-only.
+  verifyStatus(it: EnrichedVaultItem): VerifyStatus {
+    return resolveVerifyStatus({ name: it.name }, null);
+  }
+
+  displayName(it: EnrichedVaultItem): string {
+    return effectiveDisplayName(it.Id, { name: it.name }, null);
   }
 
   onDelete(index: number) {

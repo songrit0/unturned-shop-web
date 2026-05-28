@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { EnrichedVaultItem, VaultDetail, VaultSummary } from '../../models/vault';
+import { ItemSubmission, SubmissionPatch, SubmissionStatus } from '../../models/item-submission';
+import { effectiveDisplayName, effectiveImageUrl, resolveVerifyStatus, VerifyStatus } from '../../models/verify-status';
+import { Router } from '@angular/router';
 import { VaultsService } from '../../services/vaults.service';
 import { P2pService } from '../../services/p2p.service';
+import { ItemSubmissionsService } from '../../services/item-submissions.service';
 import { mapVaultP2pErrorKey } from '../../services/vault-errors';
 
 @Component({
@@ -39,15 +43,25 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let it of active.items; let i = index">
+                  <tr *ngFor="let it of active.items; let i = index" [class.row-dim]="verifyStatus(it).dimmed">
                     <td>
                       <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
-                        <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
+                        <img *ngIf="thumbUrl(it) as url; else noImg" [src]="url" style="width:100%;height:100%;object-fit:contain;padding:2px">
                         <ng-template #noImg><span class="mi faint">inventory_2</span></ng-template>
                       </div>
                     </td>
                     <td>
-                      <div style="font-weight:600">{{ it.name || ('#' + it.Id) }}</div>
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <span style="font-weight:600">{{ displayName(it) }}</span>
+                        <ng-container *ngIf="verifyStatus(it) as vs">
+                          <span *ngIf="vs.kind !== 'verified'"
+                                class="verify-icon clickable"
+                                [title]="(vs.tooltipKey | translate:vs.tooltipParams)"
+                                (click)="onVerifyClick(i, vs)">
+                            <span class="mi sm">info</span>
+                          </span>
+                        </ng-container>
+                      </div>
                     </td>
                     <td class="mono">×{{ it.Amount }}</td>
                     <td>
@@ -59,6 +73,14 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                         <button class="btn ghost sm" (click)="onRequestList(i)">
                           <span class="mi sm">storefront</span> {{ 'vaults.listOnMarket' | translate }}
                         </button>
+                        <ng-container [ngSwitch]="submissionStatus(it)">
+                          <span *ngSwitchCase="'pending'" class="badge amber" [title]="'suggestEdit.statusPending' | translate"><span class="mi sm">hourglass_empty</span> {{ 'submissions.status.pending' | translate }}</span>
+                          <span *ngSwitchCase="'approved'" class="badge emerald" [title]="'suggestEdit.statusApproved' | translate"><span class="mi sm">check</span> {{ 'submissions.status.approved' | translate }}</span>
+                          <span *ngSwitchCase="'rejected'" class="badge rose" [title]="'suggestEdit.statusRejected' | translate"><span class="mi sm">close</span> {{ 'submissions.status.rejected' | translate }}</span>
+                          <button *ngSwitchDefault class="btn ghost sm" (click)="onRequestSuggest(i)">
+                            <span class="mi sm">edit_note</span> {{ 'vaults.suggestEdit' | translate }}
+                          </button>
+                        </ng-container>
                         <button class="btn ghost sm" style="color:var(--rose)" (click)="onDelete(i)">
                           <span class="mi sm">delete</span> {{ 'vaults.delete' | translate }}
                         </button>
@@ -104,6 +126,15 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
         (confirm)="confirmList($event)"
         (cancel)="cancelList()"
       ></app-list-on-market-modal>
+
+      <app-suggest-edit-modal
+        *ngIf="suggesting"
+        [item]="suggesting"
+        [busy]="suggestBusy"
+        [error]="suggestError"
+        (confirm)="confirmSuggest($event)"
+        (cancel)="cancelSuggest()"
+      ></app-suggest-edit-modal>
     </div>
   `,
   styles: [`
@@ -112,6 +143,10 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
     .qfill.q-hi { background: var(--emerald); }
     .qfill.q-mid { background: var(--amber); }
     .qfill.q-lo { background: var(--rose); }
+    tr.row-dim { opacity: 0.55; }
+    .verify-icon { display: inline-flex; align-items: center; color: var(--rose); }
+    .verify-icon.clickable { cursor: pointer; }
+    .verify-icon.clickable:hover { color: var(--rose-hi, var(--rose)); filter: brightness(1.2); }
   `],
 })
 export class VaultsComponent implements OnInit {
@@ -129,7 +164,25 @@ export class VaultsComponent implements OnInit {
   listingBusy = false;
   listingError: string | null = null;
 
-  constructor(private svc: VaultsService, private p2p: P2pService) {}
+  suggesting: EnrichedVaultItem | null = null;
+  suggestingIndex: number | null = null;
+  suggestBusy = false;
+  suggestError: string | null = null;
+
+  // Map of item_id → user's most recent submission (any status). Used to drive:
+  //  - the action column (badge for pending/approved, button for unverified/rejected)
+  //  - the row's verify-status icon + dimming
+  //  - the display name override when a pending submission proposed a new name
+  // Rejected submissions DON'T block re-submit (api UNIQUE only against pending/approved) — but we
+  // still hold onto the rejected row so the rose-tooltip "Rejected: <admin_note>" can render.
+  private submissionByItemId = new Map<number, ItemSubmission>();
+
+  constructor(
+    private svc: VaultsService,
+    private p2p: P2pService,
+    private submissions: ItemSubmissionsService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.svc.getMine().subscribe({
@@ -140,6 +193,62 @@ export class VaultsComponent implements OnInit {
       },
       error: () => { this.loadingList = false; },
     });
+    this.loadMySubmissions();
+  }
+
+  private loadMySubmissions() {
+    this.submissions.listMine(1, 200).subscribe({
+      next: p => {
+        const map = new Map<number, ItemSubmission>();
+        // api returns rows sorted by submitted_at DESC, so the first row we see per item_id is the newest.
+        // Prefer pending > approved > rejected for action-column semantics (pending button stays a badge
+        // even if an older approved row exists). For the verify-status icon we want the *most recent*
+        // outcome — and a pending entry IS the most recent, so this priority happens to do both jobs.
+        for (const s of p.items) {
+          const prev = map.get(s.item_id);
+          if (!prev) { map.set(s.item_id, s); continue; }
+          const rank = (st: SubmissionStatus) => st === 'pending' ? 3 : st === 'approved' ? 2 : 1;
+          if (rank(s.status) > rank(prev.status)) map.set(s.item_id, s);
+        }
+        this.submissionByItemId = map;
+      },
+      error: () => {},
+    });
+  }
+
+  submissionFor(it: EnrichedVaultItem): ItemSubmission | null {
+    return this.submissionByItemId.get(it.Id) ?? null;
+  }
+
+  submissionStatus(it: EnrichedVaultItem): SubmissionStatus | null {
+    const s = this.submissionFor(it);
+    // Drive the action column the same way as before, but treat rejected as "no badge" so the
+    // Suggest-edit button is offered again (api UNIQUE doesn't block re-submit after rejection).
+    if (!s || s.status === 'rejected') return null;
+    return s.status;
+  }
+
+  verifyStatus(it: EnrichedVaultItem): VerifyStatus {
+    return resolveVerifyStatus(
+      { name: it.name, image_url: it.image_url, type_id: it.type_id },
+      this.submissionFor(it),
+    );
+  }
+
+  displayName(it: EnrichedVaultItem): string {
+    return effectiveDisplayName(it.Id, { name: it.name }, this.submissionFor(it));
+  }
+
+  thumbUrl(it: EnrichedVaultItem): string | null {
+    return effectiveImageUrl({ name: it.name, image_url: it.image_url }, this.submissionFor(it));
+  }
+
+  // Unverified → suggest-edit modal. Pending/Rejected → /my-submissions for full status + admin_note.
+  onVerifyClick(index: number, vs: VerifyStatus) {
+    if (vs.clickable) { this.onRequestSuggest(index); return; }
+    if (vs.kind === 'pending' || vs.kind === 'rejected') {
+      this.router.navigateByUrl('/my-submissions');
+    }
   }
 
   open(v: VaultSummary) {
@@ -214,5 +323,38 @@ export class VaultsComponent implements OnInit {
     this.listingIndex = null;
     this.listingBusy = false;
     this.listingError = null;
+  }
+
+  onRequestSuggest(index: number) {
+    if (!this.active) return;
+    this.suggestingIndex = index;
+    this.suggesting = this.active.items[index];
+    this.suggestBusy = false;
+    this.suggestError = null;
+  }
+
+  confirmSuggest(patch: SubmissionPatch) {
+    if (!this.suggesting) return;
+    const itemId = this.suggesting.Id;
+    this.suggestBusy = true;
+    this.suggestError = null;
+    this.submissions.create(itemId, patch).subscribe({
+      next: sub => {
+        this.submissionByItemId.set(itemId, sub);
+        this.suggestBusy = false;
+        this.cancelSuggest();
+      },
+      error: e => {
+        this.suggestBusy = false;
+        this.suggestError = mapVaultP2pErrorKey(e);
+      },
+    });
+  }
+
+  cancelSuggest() {
+    this.suggesting = null;
+    this.suggestingIndex = null;
+    this.suggestBusy = false;
+    this.suggestError = null;
   }
 }

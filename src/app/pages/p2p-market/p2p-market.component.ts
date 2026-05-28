@@ -36,7 +36,12 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
               <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
             </div>
             <div class="meta">
-              <div class="name">{{ l.item_name }}</div>
+              <div class="name" style="display:flex;align-items:center;gap:6px">
+                <span>{{ l.item_name || ('#' + l.item_id) }}</span>
+                <span *ngIf="!l.item_name" class="verify-icon" [title]="'verifyStatus.unverified' | translate">
+                  <span class="mi sm">info</span>
+                </span>
+              </div>
               <div class="muted" style="font-size:12px">
                 Q{{ l.quality }}<ng-container *ngIf="l.amount > 1"> · ×{{ l.amount }}</ng-container>
               </div>
@@ -62,7 +67,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
       <!-- Buy modal -->
       <div *ngIf="selected" class="modal-backdrop" (click)="selected = null">
         <div class="modal-card tactical" style="max-width:480px" (click)="$event.stopPropagation()">
-          <h3 style="margin:0 0 12px 0;font-size:18px;font-weight:700">{{ selected.item_name }}</h3>
+          <h3 style="margin:0 0 12px 0;font-size:18px;font-weight:700">{{ selected.item_name || ('#' + selected.item_id) }}</h3>
           <div class="row gap-3" style="align-items:center;margin-bottom:12px">
             <div style="width:96px;height:96px;background:var(--surface-2);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden">
               <img *ngIf="selected.image_url" [src]="selected.image_url" style="width:100%;height:100%;object-fit:contain;padding:6px">
@@ -95,6 +100,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
     .thumb img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
     .name { font-weight: 600; }
     .price { margin-top: 4px; font-size: 15px; font-weight: 700; }
+    .verify-icon { display: inline-flex; align-items: center; color: var(--rose); }
   `],
 })
 export class P2pMarketComponent implements OnInit, OnDestroy {

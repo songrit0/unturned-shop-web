@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { filter, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { BasketService } from '../../services/basket.service';
 import { VersionService } from '../../services/version.service';
+import { ItemSubmissionsService } from '../../services/item-submissions.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +12,7 @@ import { VersionService } from '../../services/version.service';
       <a routerLink="/" class="brand">
         <div class="brand-mark"><span class="mi fill">storefront</span></div>
         <div>
-          <div class="brand-name">SellVault</div>
+          <div class="brand-name">meowpow</div>
           <div class="brand-tag">SHOP · UNTURNED</div>
         </div>
       </a>
@@ -43,6 +45,9 @@ import { VersionService } from '../../services/version.service';
         <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
           <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
         </a>
+        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
+          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
+        </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
           <span class="mi">qr_code_2</span>{{ 'nav.codes' | translate }}
         </a>
@@ -73,6 +78,10 @@ import { VersionService } from '../../services/version.service';
           <a routerLink="/admin/vaults" routerLinkActive="active" class="nav-item admin">
             <span class="mi">inventory</span>{{ 'nav.adminVaults' | translate }}
           </a>
+          <a routerLink="/admin/submissions" routerLinkActive="active" class="nav-item admin">
+            <span class="mi">edit_note</span>{{ 'nav.adminSubmissions' | translate }}
+            <span *ngIf="pendingSubmissions > 0" class="badge rose" style="margin-left:auto;font-size:10px">{{ pendingSubmissions }}</span>
+          </a>
         </ng-container>
       </ng-container>
 
@@ -88,10 +97,27 @@ import { VersionService } from '../../services/version.service';
 })
 export class SidebarComponent implements OnInit {
   apiStatus = 'online';
-  constructor(public auth: AuthService, public basket: BasketService, public version: VersionService) {}
+  pendingSubmissions = 0;
+
+  constructor(
+    public auth: AuthService,
+    public basket: BasketService,
+    public version: VersionService,
+    private submissions: ItemSubmissionsService,
+  ) { }
+
   ngOnInit() {
     this.version.fetchApi().subscribe(v => {
       this.apiStatus = v ? `api v${v.version} · online` : 'api · offline';
+    });
+    // Fetch pending submissions count whenever an admin logs in. Single page=1&limit=1 hit
+    // gives us `total` from the paginator envelope.
+    this.auth.me$.pipe(
+      filter(me => !!me?.is_admin),
+      switchMap(() => this.submissions.adminList('pending', null, 1, 1)),
+    ).subscribe({
+      next: p => { this.pendingSubmissions = p.total; },
+      error: () => { },
     });
   }
 }

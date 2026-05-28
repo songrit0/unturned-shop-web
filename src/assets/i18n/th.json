@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "SellVault Shop"
+    "title": "meowpow Shop"
   },
   "nav": {
     "home": "หน้าแรก",
@@ -17,10 +17,12 @@
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
     "adminVaults": "[TR] Manage Vaults",
+    "adminSubmissions": "[TR] Item Submissions",
     "marketHistory": "ประวัติตลาด",
     "p2pMarket": "[TR] P2P Market",
     "vaults": "[TR] My Vaults",
     "myListings": "[TR] My Listings",
+    "mySubmissions": "[TR] My Submissions",
     "quests": "เควส",
     "basket": "ตะกร้า",
     "section": {
@@ -33,7 +35,7 @@
     "search": "ค้นหาไอเทม..."
   },
   "login": {
-    "title": "SellVault Shop",
+    "title": "meowpow Shop",
     "subtitle": "เข้าสู่ระบบเพื่อซื้อ-ขายของ จัดการ coin",
     "button": "เข้าสู่ระบบด้วย Discord",
     "hint": "ใช้ Discord เดียวกับที่ใช้กับบอท"
@@ -284,6 +286,11 @@
     "insufficient_funds": "[TR] You don't have enough coins.",
     "not_listing_owner": "[TR] Only the seller can change this listing.",
     "vault_full": "[TR] The destination vault is full.",
+    "already_submitted": "[TR] You already have a pending submission for this item.",
+    "submission_not_pending": "[TR] This submission has already been reviewed.",
+    "nothing_to_submit": "[TR] Fill in at least one field to suggest an edit.",
+    "item_not_found": "[TR] Item not found.",
+    "submission_not_found": "[TR] Submission not found.",
     "steam_not_linked": "[TR] Link your Steam account first.",
     "vault_not_found": "[TR] Vault not found.",
     "listing_not_found": "[TR] Listing not found.",
@@ -422,11 +429,64 @@
     "empty": "[TR] This vault is empty.",
     "delete": "[TR] Delete",
     "listOnMarket": "[TR] List",
+    "suggestEdit": "[TR] Suggest edit",
     "col": {
       "item": "[TR] Item",
       "amount": "[TR] Amount",
       "quality": "[TR] Quality",
       "actions": "[TR] Actions"
+    }
+  },
+  "suggestEdit": {
+    "title": "[TR] Suggest edit",
+    "hint": "[TR] Leave fields blank to keep the current value. At least one field is required.",
+    "submit": "[TR] Submit",
+    "noChange": "[TR] No change",
+    "statusPending": "[TR] Submission pending review",
+    "statusApproved": "[TR] Submission approved",
+    "statusRejected": "[TR] Submission was rejected — submit again?",
+    "field": {
+      "name": "[TR] Name",
+      "description": "[TR] Description",
+      "imageUrl": "[TR] Image URL",
+      "type": "[TR] Type"
+    }
+  },
+  "submissions": {
+    "status": {
+      "pending": "[TR] Pending",
+      "approved": "[TR] Approved",
+      "rejected": "[TR] Rejected"
+    }
+  },
+  "verifyStatus": {
+    "pending": "[TR] Pending admin review",
+    "rejected": "[TR] Rejected: {{note}}",
+    "unverified": "[TR] Not verified — click to suggest"
+  },
+  "mySubmissions": {
+    "title": "[TR] My Submissions",
+    "empty": "[TR] You haven't submitted any edits yet.",
+    "col": {
+      "item": "[TR] Item",
+      "proposed": "[TR] Proposed changes",
+      "status": "[TR] Status",
+      "submittedAt": "[TR] Submitted",
+      "adminNote": "[TR] Admin note"
+    }
+  },
+  "adminSubmissions": {
+    "title": "[TR] Item Submissions",
+    "all": "[TR] All",
+    "empty": "[TR] No submissions match.",
+    "approve": "[TR] Approve",
+    "reject": "[TR] Reject",
+    "rejectTitle": "[TR] Reject submission",
+    "adminNote": "[TR] Note (optional)",
+    "diff": {
+      "field": "[TR] Field",
+      "current": "[TR] Current",
+      "proposed": "[TR] Proposed"
     }
   },
   "p2p": {

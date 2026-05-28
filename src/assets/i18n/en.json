@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "SellVault Shop"
+    "title": "meowpow Shop"
   },
   "nav": {
     "home": "Home",
@@ -17,10 +17,12 @@
     "adminItemTypes": "Manage Item Types",
     "adminItems": "Manage Items",
     "adminVaults": "Manage Vaults",
+    "adminSubmissions": "Item Submissions",
     "marketHistory": "Market History",
     "p2pMarket": "P2P Market",
     "vaults": "My Vaults",
     "myListings": "My Listings",
+    "mySubmissions": "My Submissions",
     "quests": "Quests",
     "basket": "Basket",
     "section": {
@@ -33,7 +35,7 @@
     "search": "Search items..."
   },
   "login": {
-    "title": "SellVault Shop",
+    "title": "meowpow Shop",
     "subtitle": "Sign in to buy/sell items and manage coins",
     "button": "Sign in with Discord",
     "hint": "Use the same Discord account as the bot"
@@ -284,6 +286,11 @@
     "insufficient_funds": "You don't have enough coins.",
     "not_listing_owner": "Only the seller can change this listing.",
     "vault_full": "The destination vault is full.",
+    "already_submitted": "You already have a pending submission for this item.",
+    "submission_not_pending": "This submission has already been reviewed.",
+    "nothing_to_submit": "Fill in at least one field to suggest an edit.",
+    "item_not_found": "Item not found.",
+    "submission_not_found": "Submission not found.",
     "steam_not_linked": "Link your Steam account first.",
     "vault_not_found": "Vault not found.",
     "listing_not_found": "Listing not found.",
@@ -421,11 +428,64 @@
     "empty": "This vault is empty.",
     "delete": "Delete",
     "listOnMarket": "List",
+    "suggestEdit": "Suggest edit",
     "col": {
       "item": "Item",
       "amount": "Amount",
       "quality": "Quality",
       "actions": "Actions"
+    }
+  },
+  "suggestEdit": {
+    "title": "Suggest edit",
+    "hint": "Leave fields blank to keep the current value. At least one field is required.",
+    "submit": "Submit",
+    "noChange": "No change",
+    "statusPending": "Submission pending review",
+    "statusApproved": "Submission approved",
+    "statusRejected": "Submission was rejected — submit again?",
+    "field": {
+      "name": "Name",
+      "description": "Description",
+      "imageUrl": "Image URL",
+      "type": "Type"
+    }
+  },
+  "submissions": {
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "verifyStatus": {
+    "pending": "Pending admin review",
+    "rejected": "Rejected: {{note}}",
+    "unverified": "Not verified — click to suggest"
+  },
+  "mySubmissions": {
+    "title": "My Submissions",
+    "empty": "You haven't submitted any edits yet.",
+    "col": {
+      "item": "Item",
+      "proposed": "Proposed changes",
+      "status": "Status",
+      "submittedAt": "Submitted",
+      "adminNote": "Admin note"
+    }
+  },
+  "adminSubmissions": {
+    "title": "Item Submissions",
+    "all": "All",
+    "empty": "No submissions match.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectTitle": "Reject submission",
+    "adminNote": "Note (optional)",
+    "diff": {
+      "field": "Field",
+      "current": "Current",
+      "proposed": "Proposed"
     }
   },
   "p2p": {
