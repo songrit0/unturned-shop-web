@@ -30,8 +30,6 @@ import { BasketDrawerComponent } from './components/basket-drawer/basket-drawer.
 import { PagerComponent } from './components/pager/pager.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { VaultGridComponent } from './components/vault-grid/vault-grid.component';
-import { VaultItemTileComponent } from './components/vault-item-tile/vault-item-tile.component';
 import { ListOnMarketModalComponent } from './components/list-on-market-modal/list-on-market-modal.component';
 import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
@@ -76,8 +74,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     PagerComponent,
     FooterComponent,
     SidebarComponent,
-    VaultGridComponent,
-    VaultItemTileComponent,
     ListOnMarketModalComponent,
     VaultsComponent,
     P2pMarketComponent,

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { EnrichedVaultItem, formatActorLabel, isDeletedActor, P2pListing, VaultDetail, VaultSummary } from '../../models/vault';
+import { formatActorLabel, isDeletedActor, P2pListing, VaultDetail, VaultSummary } from '../../models/vault';
 import { Paginated } from '../../models/paginated';
 import { AdminVaultSearchMode, VaultsService } from '../../services/vaults.service';
 import { P2pService } from '../../services/p2p.service';
@@ -53,11 +53,48 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
 
         <div class="detail">
           <ng-container *ngIf="active && !loadingDetail; else detailEmpty">
-            <app-vault-grid
-              [items]="active!.items"
-              [grid]="active!.grid"
-              (itemsChange)="onItemsChange($event)"
-            ></app-vault-grid>
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th style="width:56px"></th>
+                    <th>{{ 'vaults.col.item' | translate }}</th>
+                    <th style="width:80px">{{ 'vaults.col.amount' | translate }}</th>
+                    <th style="width:160px">{{ 'vaults.col.quality' | translate }}</th>
+                    <th style="width:120px">{{ 'vaults.col.actions' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let it of active!.items; let i = index">
+                    <td>
+                      <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                        <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
+                        <ng-template #noImg><span class="mi faint">inventory_2</span></ng-template>
+                      </div>
+                    </td>
+                    <td><div style="font-weight:600">{{ it.name || ('#' + it.Id) }}</div></td>
+                    <td class="mono">×{{ it.Amount }}</td>
+                    <td>
+                      <div class="qbar"><div class="qfill" [style.width.%]="it.Quality" [class.q-hi]="it.Quality >= 80" [class.q-mid]="it.Quality >= 40 && it.Quality < 80" [class.q-lo]="it.Quality < 40"></div></div>
+                      <div class="muted mono" style="font-size:11px;margin-top:2px">Q{{ it.Quality }}</div>
+                    </td>
+                    <td>
+                      <button class="btn ghost sm" style="color:var(--rose)" (click)="onDelete(i)">
+                        <span class="mi sm">delete</span> {{ 'vaults.delete' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="active!.items.length === 0">
+                    <td colspan="5">
+                      <div class="empty">
+                        <span class="mi xxl">inventory_2</span>
+                        <div class="empty-title">{{ 'vaults.empty' | translate }}</div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div class="row gap-2" style="margin-top:16px;justify-content:flex-end">
               <button class="btn secondary" [disabled]="!dirty || saving" (click)="reloadDetail()">
                 {{ 'common.discard' | translate }}
@@ -136,6 +173,11 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
     .stuck { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
     .stuck-title { display: flex; align-items: center; gap: 6px; margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: var(--rose); }
     .stuck-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--surface-2); border-radius: 6px; margin-bottom: 6px; }
+    .qbar { width: 100%; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+    .qfill { height: 100%; transition: width .2s ease; }
+    .qfill.q-hi { background: var(--emerald); }
+    .qfill.q-mid { background: var(--amber); }
+    .qfill.q-lo { background: var(--rose); }
   `],
 })
 export class AdminVaultsComponent implements OnInit, OnDestroy {
@@ -206,8 +248,9 @@ export class AdminVaultsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onItemsChange(items: EnrichedVaultItem[]) {
+  onDelete(index: number) {
     if (!this.active) return;
+    const items = this.active.items.filter((_, i) => i !== index);
     this.active = { ...this.active, items };
     this.dirty = true;
   }

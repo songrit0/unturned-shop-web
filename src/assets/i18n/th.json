@@ -418,19 +418,15 @@
   },
   "adminMarketTypeLabel": "ประเภทไอเทม",
   "vaults": {
-    "title": "[TR] My Vaults"
-  },
-  "vaultGrid": {
-    "banner": "[TR] Layout in the web view is representational only — it does not match the in-game grid 1:1.",
-    "hint": {
-      "rotate": "[TR] rotate",
-      "delete": "[TR] delete",
-      "list": "[TR] list on market"
-    },
-    "ctx": {
-      "rotate": "[TR] Rotate",
-      "list": "[TR] List on market",
-      "delete": "[TR] Delete"
+    "title": "[TR] My Vaults",
+    "empty": "[TR] This vault is empty.",
+    "delete": "[TR] Delete",
+    "listOnMarket": "[TR] List",
+    "col": {
+      "item": "[TR] Item",
+      "amount": "[TR] Amount",
+      "quality": "[TR] Quality",
+      "actions": "[TR] Actions"
     }
   },
   "p2p": {

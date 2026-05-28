@@ -417,19 +417,15 @@
     }
   },
   "vaults": {
-    "title": "My Vaults"
-  },
-  "vaultGrid": {
-    "banner": "Layout in the web view is representational only — it does not match the in-game grid 1:1.",
-    "hint": {
-      "rotate": "rotate",
-      "delete": "delete",
-      "list": "list on market"
-    },
-    "ctx": {
-      "rotate": "Rotate",
-      "list": "List on market",
-      "delete": "Delete"
+    "title": "My Vaults",
+    "empty": "This vault is empty.",
+    "delete": "Delete",
+    "listOnMarket": "List",
+    "col": {
+      "item": "Item",
+      "amount": "Amount",
+      "quality": "Quality",
+      "actions": "Actions"
     }
   },
   "p2p": {
