@@ -55,6 +55,35 @@ import { Component } from '@angular/core';
       </div>
 
       <section class="card mb-4">
+        <div class="card-title"><span class="mi" style="color:var(--violet, #a78bfa);">storefront</span>{{ 'help.p2pTitle' | translate }}</div>
+        <p class="muted text-sm" style="margin:-4px 0 16px 0;">{{ 'help.p2pDesc' | translate }}</p>
+        <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+          <div>
+            <h3 class="row gap-2 mb-2"><span class="mi" style="color:var(--emerald);">sell</span>{{ 'help.p2pSellTitle' | translate }}</h3>
+            <ol class="col gap-2 text-sm" style="padding-left:18px;">
+              <li>{{ 'help.p2pSell1' | translate }}</li>
+              <li>{{ 'help.p2pSell2' | translate }}</li>
+              <li>{{ 'help.p2pSell3' | translate }}</li>
+              <li>{{ 'help.p2pSell4' | translate }}</li>
+            </ol>
+          </div>
+          <div>
+            <h3 class="row gap-2 mb-2"><span class="mi" style="color:var(--accent-hi);">shopping_cart</span>{{ 'help.p2pBuyTitle' | translate }}</h3>
+            <ol class="col gap-2 text-sm" style="padding-left:18px;">
+              <li>{{ 'help.p2pBuy1' | translate }}</li>
+              <li>{{ 'help.p2pBuy2' | translate }}</li>
+              <li>{{ 'help.p2pBuy3' | translate }}</li>
+            </ol>
+          </div>
+        </div>
+        <ul class="col gap-2 text-sm muted mt-4" style="padding-left:0; list-style:none;">
+          <li class="row gap-2" style="align-items:flex-start;"><span class="mi sm" style="color:var(--rose); flex-shrink:0; margin-top:2px;">percent</span><span>{{ 'help.p2pNoteCommission' | translate }}</span></li>
+          <li class="row gap-2" style="align-items:flex-start;"><span class="mi sm" style="flex-shrink:0; margin-top:2px;">schedule</span><span>{{ 'help.p2pNoteTtl' | translate }}</span></li>
+          <li class="row gap-2" style="align-items:flex-start;"><span class="mi sm" style="flex-shrink:0; margin-top:2px;">cancel</span><span>{{ 'help.p2pNoteCancel' | translate }}</span></li>
+        </ul>
+      </section>
+
+      <section class="card mb-4">
         <div class="card-title"><span class="mi fill">paid</span>{{ 'help.economy' | translate }}</div>
         <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
           <div>
