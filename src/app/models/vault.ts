@@ -66,6 +66,13 @@ export interface P2pListing {
   buyer_discord_name: string | null;
   created_at: string;
   closed_at: string | null;
+  // Populated by GET /p2p/listings/me on a closed listing that minted a refund redeem code
+  // (P2P rework / A5) — in practice the 'expired' case. `redeem_code` is the code the seller
+  // redeems in-game to get the item back; `code_expires_at` is that code's own expiry (ISO).
+  // Both null/absent on listings that didn't mint a code. This row field is the source of truth
+  // for the my-listings "Show code" button (more robust than the notification, which can be read).
+  redeem_code?: string | null;
+  code_expires_at?: string | null;
 }
 
 export interface P2pCreatePayload {

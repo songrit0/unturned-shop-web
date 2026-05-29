@@ -123,11 +123,47 @@
     "desc": "All codes you've purchased — copy to use in-game",
     "empty": "No codes purchased yet",
     "useInGame": "In-game, type:",
+    "expiresIn": "Expires in {{days}} day(s)",
+    "expiresToday": "Expires today",
+    "expiredOn": "Expired {{date}}",
+    "noExpiry": "No expiry",
     "status": {
       "available": "Available",
       "used": "Used",
       "expired": "Expired",
       "disabled": "Disabled"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all read",
+    "viewAll": "View all",
+    "expiresIn": "Code expires in {{days}} day(s)",
+    "expiresToday": "Code expires today",
+    "kind": {
+      "p2pExpired": {
+        "title": "Listing expired",
+        "body": "{{item}} didn't sell — here's a code to redeem it back."
+      },
+      "p2pCancelled": {
+        "title": "Listing cancelled",
+        "body": "{{item}} was removed from the market — here's a code to redeem it back."
+      },
+      "p2pForceClosed": {
+        "title": "Listing closed by admin",
+        "body": "{{item}} was closed by an admin — here's a code to redeem it back."
+      },
+      "generic": {
+        "title": "Notification"
+      }
+    },
+    "showCode": "Show code",
+    "code": {
+      "title": "Your redeem code",
+      "instruction": "Use /code {{code}} in-game to receive the item.",
+      "copy": "Copy code",
+      "copied": "Copied"
     }
   },
   "help": {
@@ -592,7 +628,8 @@
     "tab": {
       "active": "Active",
       "sold": "Sold",
-      "cancelled": "Cancelled / Expired"
+      "expired": "Expired",
+      "cancelled": "Cancelled"
     },
     "col": {
       "item": "Item",
@@ -602,10 +639,14 @@
       "created": "Created"
     },
     "cancel": "Cancel",
+    "showCode": "Show code",
+    "codeExpiresIn": "Code expires in {{days}} day(s)",
+    "codeExpiresToday": "Code expires today",
     "empty": {
       "active": "You have no active listings.",
       "sold": "No completed sales yet.",
-      "cancelled": "No cancelled or expired listings."
+      "expired": "No expired listings.",
+      "cancelled": "No cancelled listings."
     }
   }
 }

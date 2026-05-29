@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CodesService, MyCode, Paginated } from '../../services/codes.service';
+import { daysUntil } from '../../services/expiry';
 
 @Component({
   selector: 'app-codes',
@@ -36,6 +37,11 @@ import { CodesService, MyCode, Paginated } from '../../services/codes.service';
                       [class.slate]="c.status === 'used'"
                       [class.rose]="c.status === 'expired' || c.status === 'disabled'">{{ statusText(c.status) }}</span>
                     <span class="mono faint text-xs">{{ c.created_at | date:'short' }}</span>
+                    <span *ngIf="expiryText(c) as ex"
+                      class="mono text-xs row gap-1"
+                      [style.color]="isExpiringSoon(c) ? 'var(--accent-hi)' : 'var(--text-faint)'">
+                      <span class="mi sm">schedule</span>{{ ex }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -99,4 +105,30 @@ export class CodesComponent implements OnInit {
   }
 
   statusText(s: MyCode['status']): string { return this.t.instant('codes.status.' + s); }
+
+  /** Days until this code expires (null if no expiry / unparseable). */
+  private days(c: MyCode): number | null { return daysUntil(c.expires_at); }
+
+  /** Highlight when an available code expires within 2 days. */
+  isExpiringSoon(c: MyCode): boolean {
+    if (c.status !== 'available') return false;
+    const d = this.days(c);
+    return d !== null && d >= 0 && d <= 2;
+  }
+
+  /**
+   * Human expiry label. Available codes show a countdown ("expires in N days" / "today");
+   * already-expired codes show the date; no expiry / used / disabled show nothing here
+   * (status badge already conveys it).
+   */
+  expiryText(c: MyCode): string | null {
+    if (!c.expires_at) return null;
+    if (c.status === 'expired') {
+      return this.t.instant('codes.expiredOn', { date: new Date(c.expires_at).toLocaleDateString() });
+    }
+    if (c.status !== 'available') return null;
+    const d = this.days(c);
+    if (d === null || d < 0) return null;
+    return d === 0 ? this.t.instant('codes.expiresToday') : this.t.instant('codes.expiresIn', { days: d });
+  }
 }
