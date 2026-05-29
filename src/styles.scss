@@ -504,12 +504,19 @@ app-header {
 }
 
 .nav-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-faint);
   padding: 14px 14px 6px;
+}
+
+.nav-section-label .mi {
+  font-size: 14px;
 }
 
 .nav-item {

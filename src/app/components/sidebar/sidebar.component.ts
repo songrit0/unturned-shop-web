@@ -22,8 +22,8 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <span class="mi">home</span>{{ 'nav.home' | translate }}
       </a>
 
-      <!-- 🛒 SHOP — public (visible logged-out) -->
-      <div class="nav-section-label">🛒 {{ 'nav.section.shop' | translate }}</div>
+      <!-- SHOP — public (visible logged-out) -->
+      <div class="nav-section-label"><span class="mi">shopping_cart</span>{{ 'nav.section.shop' | translate }}</div>
       <a routerLink="/shop" routerLinkActive="active" class="nav-item">
         <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
       </a>
@@ -34,9 +34,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <span class="mi">receipt_long</span>{{ 'nav.marketHistory' | translate }}
       </a>
 
-      <!-- 👤 ACCOUNT — auth only -->
+      <!-- ACCOUNT — auth only -->
       <ng-container *ngIf="auth.me$ | async as me">
-        <div class="nav-section-label">👤 {{ 'nav.section.account' | translate }}</div>
+        <div class="nav-section-label"><span class="mi">person</span>{{ 'nav.section.account' | translate }}</div>
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
         </a>
@@ -54,8 +54,8 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         </a>
       </ng-container>
 
-      <!-- 🤝 P2P — P2P Market is public; the personal items are auth only -->
-      <div class="nav-section-label">🤝 {{ 'nav.section.p2p' | translate }}</div>
+      <!-- P2P — P2P Market is public; the personal items are auth only -->
+      <div class="nav-section-label"><span class="mi">handshake</span>{{ 'nav.section.p2p' | translate }}</div>
       <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
         <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
       </a>
@@ -68,9 +68,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         </a>
       </ng-container>
 
-      <!-- 🛠️ ADMIN — admins only -->
+      <!-- ADMIN — admins only -->
       <ng-container *ngIf="(auth.me$ | async)?.is_admin">
-        <div class="nav-section-label">🛠️ {{ 'nav.section.admin' | translate }}</div>
+        <div class="nav-section-label"><span class="mi">admin_panel_settings</span>{{ 'nav.section.admin' | translate }}</div>
         <a routerLink="/admin/market" routerLinkActive="active" class="nav-item admin">
           <span class="mi">build</span>{{ 'nav.adminMarket' | translate }}
         </a>
