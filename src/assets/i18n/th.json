@@ -113,7 +113,7 @@
   "coins": {
     "title": "Coins",
     "balance": "ยอดคงเหลือ",
-    "needLink": "ยังไม่ผูก Steam — เข้าเกมแล้วพิมพ์ /link <code> ก่อน",
+    "needLink": "ยังไม่ผูก Steam",
     "marketHistory": "ประวัติตลาด",
     "rewardLog": "Reward Log",
     "empty": "ยังไม่มีรายการ"

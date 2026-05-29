@@ -113,7 +113,7 @@
   "coins": {
     "title": "Coins",
     "balance": "Balance",
-    "needLink": "Steam not linked — in-game, type /link <code> first",
+    "needLink": "Steam not linked",
     "marketHistory": "Market history",
     "rewardLog": "Reward Log",
     "empty": "No items"
