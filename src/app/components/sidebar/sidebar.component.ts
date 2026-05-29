@@ -17,10 +17,13 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         </div>
       </a>
 
-      <div class="nav-section-label">{{ 'nav.section.main' | translate }}</div>
+      <!-- Home — ungrouped, sits above the groups -->
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
         <span class="mi">home</span>{{ 'nav.home' | translate }}
       </a>
+
+      <!-- 🛒 SHOP — public (visible logged-out) -->
+      <div class="nav-section-label">🛒 {{ 'nav.section.shop' | translate }}</div>
       <a routerLink="/shop" routerLinkActive="active" class="nav-item">
         <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
       </a>
@@ -30,63 +33,72 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
       <a routerLink="/market/history" routerLinkActive="active" class="nav-item">
         <span class="mi">receipt_long</span>{{ 'nav.marketHistory' | translate }}
       </a>
-      <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
-        <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
-      </a>
 
+      <!-- 👤 ACCOUNT — auth only -->
       <ng-container *ngIf="auth.me$ | async as me">
-        <div class="nav-section-label">{{ 'nav.section.account' | translate }}</div>
+        <div class="nav-section-label">👤 {{ 'nav.section.account' | translate }}</div>
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
-        </a>
-        <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
-          <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
-        </a>
-        <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
-          <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
-        </a>
-        <a routerLink="/inventory" routerLinkActive="active" class="nav-item">
-          <span class="mi">redeem</span>{{ 'nav.inventory' | translate }}
-        </a>
-        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
-          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
         </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
           <span class="mi">qr_code_2</span>{{ 'nav.codes' | translate }}
         </a>
+        <a routerLink="/inventory" routerLinkActive="active" class="nav-item">
+          <span class="mi">redeem</span>{{ 'nav.inventory' | translate }}
+        </a>
         <a routerLink="/quests" routerLinkActive="active" class="nav-item">
           <span class="mi">flag</span>{{ 'nav.quests' | translate }}
         </a>
-        <a routerLink="/help" routerLinkActive="active" class="nav-item">
-          <span class="mi">help</span>{{ 'nav.help' | translate }}
+        <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
+          <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
         </a>
-
-        <ng-container *ngIf="me.is_admin">
-          <div class="nav-section-label">{{ 'nav.section.admin' | translate }}</div>
-          <a routerLink="/admin/market" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">build</span>{{ 'nav.adminMarket' | translate }}
-          </a>
-          <a routerLink="/admin/items" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">inventory_2</span>Items
-          </a>
-          <a routerLink="/admin/item-types" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">category</span>Types
-          </a>
-          <a routerLink="/admin/coins" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">account_balance_wallet</span>{{ 'nav.adminCoins' | translate }}
-          </a>
-          <a routerLink="/admin/quests" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">flag</span>Quests
-          </a>
-          <a routerLink="/admin/vaults" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">inventory</span>{{ 'nav.adminVaults' | translate }}
-          </a>
-          <a routerLink="/admin/submissions" routerLinkActive="active" class="nav-item admin">
-            <span class="mi">edit_note</span>{{ 'nav.adminSubmissions' | translate }}
-            <span *ngIf="pendingSubmissions > 0" class="badge rose" style="margin-left:auto;font-size:10px">{{ pendingSubmissions }}</span>
-          </a>
-        </ng-container>
       </ng-container>
+
+      <!-- 🤝 P2P — P2P Market is public; the personal items are auth only -->
+      <div class="nav-section-label">🤝 {{ 'nav.section.p2p' | translate }}</div>
+      <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
+        <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
+      </a>
+      <ng-container *ngIf="auth.me$ | async as me">
+        <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
+          <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
+        </a>
+        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
+          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
+        </a>
+      </ng-container>
+
+      <!-- 🛠️ ADMIN — admins only -->
+      <ng-container *ngIf="(auth.me$ | async)?.is_admin">
+        <div class="nav-section-label">🛠️ {{ 'nav.section.admin' | translate }}</div>
+        <a routerLink="/admin/market" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">build</span>{{ 'nav.adminMarket' | translate }}
+        </a>
+        <a routerLink="/admin/items" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">inventory_2</span>{{ 'nav.adminItems' | translate }}
+        </a>
+        <a routerLink="/admin/item-types" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">category</span>{{ 'nav.adminItemTypes' | translate }}
+        </a>
+        <a routerLink="/admin/coins" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">account_balance_wallet</span>{{ 'nav.adminCoins' | translate }}
+        </a>
+        <a routerLink="/admin/quests" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">flag</span>{{ 'nav.adminQuests' | translate }}
+        </a>
+        <a routerLink="/admin/vaults" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">inventory</span>{{ 'nav.adminVaults' | translate }}
+        </a>
+        <a routerLink="/admin/submissions" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">edit_note</span>{{ 'nav.adminSubmissions' | translate }}
+          <span *ngIf="pendingSubmissions > 0" class="badge rose" style="margin-left:auto;font-size:10px">{{ pendingSubmissions }}</span>
+        </a>
+      </ng-container>
+
+      <!-- Help — ungrouped, near footer -->
+      <a routerLink="/help" routerLinkActive="active" class="nav-item">
+        <span class="mi">help</span>{{ 'nav.help' | translate }}
+      </a>
 
       <div class="sidebar-footer">
         <div class="status-row">

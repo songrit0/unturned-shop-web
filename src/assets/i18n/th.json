@@ -28,7 +28,9 @@
     "basket": "ตะกร้า",
     "section": {
       "main": "MAIN",
+      "shop": "SHOP",
       "account": "ACCOUNT",
+      "p2p": "P2P",
       "admin": "ADMIN"
     }
   },

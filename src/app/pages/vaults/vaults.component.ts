@@ -77,7 +77,10 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                           <span *ngSwitchCase="'pending'" class="badge amber" [title]="'suggestEdit.statusPending' | translate"><span class="mi sm">hourglass_empty</span> {{ 'submissions.status.pending' | translate }}</span>
                           <span *ngSwitchCase="'approved'" class="badge emerald" [title]="'suggestEdit.statusApproved' | translate"><span class="mi sm">check</span> {{ 'submissions.status.approved' | translate }}</span>
                           <span *ngSwitchCase="'rejected'" class="badge rose" [title]="'suggestEdit.statusRejected' | translate"><span class="mi sm">close</span> {{ 'submissions.status.rejected' | translate }}</span>
-                          <button *ngSwitchDefault class="btn ghost sm" (click)="onRequestSuggest(i)">
+                          <button *ngSwitchDefault
+                                  class="btn ghost sm"
+                                  [hidden]="verifyStatus(it).kind === 'verified'"
+                                  (click)="onRequestSuggest(i)">
                             <span class="mi sm">edit_note</span> {{ 'vaults.suggestEdit' | translate }}
                           </button>
                         </ng-container>
