@@ -70,6 +70,10 @@ interface InfoCard {
               [disabled]="pinBusy || lockSeconds > 0"
               autofocus>
 
+            <p class="pin-hint faint text-xs">
+              <span class="mi sm">sports_esports</span>{{ 'pinLogin.noPinHint' | translate }}
+            </p>
+
             <button class="btn primary full" type="submit"
               style="margin-top:14px;"
               [disabled]="!canSubmit">
@@ -163,6 +167,9 @@ interface InfoCard {
     .pin-label { display: block; margin-bottom: 6px; letter-spacing: 0.04em; }
     .pin-input { width: 100%; text-align: center; font-size: 28px; font-weight: 700;
       letter-spacing: 0.4em; padding: 12px; }
+    .pin-hint { display: flex; align-items: center; justify-content: center; gap: 5px;
+      margin: 8px 0 0; text-align: center; }
+    .pin-hint .mi { font-size: 14px; }
     .cmdref-section { width: 100%; max-width: 900px; margin: 40px auto 0; }
     .cmdref-head { text-align: center; margin-bottom: 20px; }
     .cmdref-head h2 { font-size: 20px; font-weight: 700; }

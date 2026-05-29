@@ -50,8 +50,9 @@
     "submit": "Sign in",
     "submitting": "Signing in...",
     "useDiscord": "Use Discord instead",
+    "noPinHint": "No PIN yet? Type /shoppin <6 digits> in-game",
     "errors": {
-      "invalid": "Incorrect PIN. Get a fresh PIN in-game and try again.",
+      "invalid": "Incorrect PIN, or no PIN set yet — type /shoppin <6 digits> in-game to set one, then try again",
       "locked": "Too many attempts. Try again in {{seconds}}s.",
       "lockedGeneric": "Too many attempts. Please try again later.",
       "generic": "Couldn't sign in. Please try again."
