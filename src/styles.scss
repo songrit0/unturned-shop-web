@@ -208,6 +208,13 @@ button {
   position: relative;
 }
 
+/* Host elements are display:contents so the inner .sidebar / .app-header
+   become the real grid items and their grid-area placement applies. */
+app-sidebar,
+app-header {
+  display: contents;
+}
+
 .sidebar {
   grid-area: sidebar;
 }
