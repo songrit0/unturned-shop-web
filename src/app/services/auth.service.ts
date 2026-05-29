@@ -31,6 +31,17 @@ export class AuthService {
     window.location.href = `${this.apiUrl.get()}/auth/discord`;
   }
 
+  /**
+   * Steam ID + PIN login (second auth path). POSTs {steam_id, pin} to /auth/steam-pin.
+   * On 200 the backend returns a JWT identical in shape to the Discord one — caller stores it
+   * via setToken() + refreshMe(), same tail as the Discord callback.
+   * Errors are NOT swallowed here: the caller needs the HTTP status to distinguish
+   * 401 {error:'invalid'} (wrong/no pin) from 429 {error:'too_many_attempts', retry_after} (locked).
+   */
+  loginWithPin(steam_id: string, pin: string): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.apiUrl.get()}/auth/steam-pin`, { steam_id, pin });
+  }
+
   /** Fetch /auth/me with current token; updates the cached observable. */
   refreshMe(): Observable<Me | null> {
     if (!this.token) { this._me$.next(null); return of(null); }

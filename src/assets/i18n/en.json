@@ -43,6 +43,78 @@
     "button": "Sign in with Discord",
     "hint": "Use the same Discord account as the bot"
   },
+  "pinLogin": {
+    "title": "Enter your PIN",
+    "subtitle": "Signing in as Steam",
+    "pinLabel": "6-digit PIN",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "useDiscord": "Use Discord instead",
+    "errors": {
+      "invalid": "Incorrect PIN. Get a fresh PIN in-game and try again.",
+      "locked": "Too many attempts. Try again in {{seconds}}s.",
+      "lockedGeneric": "Too many attempts. Please try again later.",
+      "generic": "Couldn't sign in. Please try again."
+    }
+  },
+  "commandRef": {
+    "title": "In-game commands",
+    "subtitle": "Player commands for the Unturned server plugins",
+    "aliasLabel": "alias",
+    "plugin": {
+      "garage": "VirtualGarage",
+      "sellvault": "SellVault",
+      "toolcupboard": "ToolCupboard",
+      "redeemcode": "RedeemCode",
+      "morehomes": "MoreHomes",
+      "kits": "Kits",
+      "vault": "Vault"
+    },
+    "desc": {
+      "garage": "List all vehicles in your garage",
+      "gadd": "Store the vehicle you're looking at into your garage",
+      "gretrieve": "Take a vehicle out of your garage",
+      "garagedelete": "Delete a vehicle from your garage without spawning it",
+      "sell": "Open the sell vault (safe zone only)",
+      "coins": "Check your coin balance",
+      "link": "Link your Discord account with a code from Discord",
+      "decay": "Check whether your current position is protected from decay",
+      "code": "Redeem a code for items",
+      "home": "Teleport to your home (first one, or a named home)",
+      "homes": "List all your homes",
+      "renamehome": "Rename a home",
+      "destroyhome": "Delete a home",
+      "kits": "List available kits",
+      "kit": "Claim a kit",
+      "vault": "Open your vault (default/last used, or a named one e.g. /vault vip)",
+      "vaults": "List all your vaults",
+      "trash": "Open a temporary trash (items vanish on close)",
+      "fixvault": "Remove corrupted items (after a mod is removed)"
+    },
+    "note": {
+      "morehomes": "Place a bed to set a home (max 2) · 10s warm-up before teleport (cancels if you move) · 20s cooldown",
+      "kits": "Some kits have a cooldown or price"
+    }
+  },
+  "autoCleanup": {
+    "title": "Auto item cleanup",
+    "points": {
+      "playerItems": "Player-dropped items are auto-removed after 10 minutes",
+      "zombieLoot": "Zombie-dropped loot is removed after 2 minutes",
+      "interval": "Cleanup runs every 15 seconds",
+      "mapLoot": "Map-spawned items are never removed"
+    }
+  },
+  "knockdown": {
+    "title": "Downed & revive",
+    "points": {
+      "downed": "When you would die, you're knocked down instead of dying (sit & crawl)",
+      "bleedout": "You bleed out from 100 HP — you die after 15 seconds if not revived",
+      "immunity": "3-second immunity right after going down",
+      "revive": "A teammate revives you by holding Crouch nearby (~1 m) for 8 seconds",
+      "revived": "Revived with 25 HP — bleeding pauses while you're being revived"
+    }
+  },
   "callback": {
     "loading": "Signing in..."
   },
@@ -108,6 +180,7 @@
       "noItem": "Some items were removed from the market",
       "outOfStock": "{{name}} out of stock",
       "insufficient": "Not enough Coin (have {{balance}}, need {{total}})",
+      "discordRequired": "Link your Discord account to check out from the shop.",
       "generic": "Something went wrong",
       "itemFallback": "Some item"
     }

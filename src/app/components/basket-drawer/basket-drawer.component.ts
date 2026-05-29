@@ -107,7 +107,16 @@ export class BasketDrawerComponent implements OnInit {
           this.error = this.reasonText(r.reason, r.detail);
         }
       },
-      error: e => { this.loading = false; this.error = e?.error?.message || this.t.instant('basket.errors.generic'); },
+      error: e => {
+        this.loading = false;
+        // A Steam-PIN-only user (no linked Discord) gets 403 {error:'discord_required'} from the
+        // discord-keyed checkout — show a friendly "link your Discord" message instead of generic.
+        if (e?.status === 403 && e?.error?.error === 'discord_required') {
+          this.error = this.t.instant('basket.errors.discordRequired');
+        } else {
+          this.error = e?.error?.message || this.t.instant('basket.errors.generic');
+        }
+      },
     });
   }
 
