@@ -102,7 +102,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
   `,
   styles: [`
     .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .listing-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; transition: border-color .12s ease, transform .12s ease; }
+    .listing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; transition: border-color .12s ease, transform .12s ease; }
     .listing-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .thumb { aspect-ratio: 1; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px; }
     .thumb img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }

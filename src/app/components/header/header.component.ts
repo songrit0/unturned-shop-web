@@ -140,7 +140,7 @@ import { daysUntil } from '../../services/expiry';
     .notif-dropdown {
       position: absolute; top: calc(100% + 8px); right: 0; z-index: 50;
       width: 340px; max-height: 420px; overflow-y: auto;
-      background: var(--surface-1); border: 1px solid var(--border);
+      background: var(--surface); border: 1px solid var(--border);
       border-radius: 10px; box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
     }
     .notif-head { display: flex; align-items: center; justify-content: space-between;

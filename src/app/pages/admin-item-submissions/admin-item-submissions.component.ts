@@ -118,7 +118,7 @@ interface DiffRow { field: string; current: string | null; proposed: string | nu
     </div>
   `,
   styles: [`
-    .sub-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+    .sub-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
     .sub-head { display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; }
     .sub-head:hover { background: var(--surface-2); }
     .sub-body { padding: 12px; border-top: 1px solid var(--border); }

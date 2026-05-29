@@ -176,10 +176,10 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
   styles: [`
     .layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
     .list { display: flex; flex-direction: column; gap: 6px; }
-    .vault-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; text-align: left; cursor: pointer; color: var(--text); }
+    .vault-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; text-align: left; cursor: pointer; color: var(--text); }
     .vault-row:hover { border-color: var(--accent); }
     .vault-row.active { border-color: var(--rose); background: var(--surface-2); }
-    .detail { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 480px; }
+    .detail { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 480px; }
     .stuck { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
     .stuck-title { display: flex; align-items: center; gap: 6px; margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: var(--rose); }
     .stuck-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--surface-2); border-radius: 6px; margin-bottom: 6px; }
