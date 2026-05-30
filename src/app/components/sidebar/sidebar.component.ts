@@ -83,6 +83,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/admin/coins" routerLinkActive="active" class="nav-item admin">
           <span class="mi">account_balance_wallet</span>{{ 'nav.adminCoins' | translate }}
         </a>
+        <a routerLink="/admin/vip" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">workspace_premium</span>VIP
+        </a>
         <a routerLink="/admin/quests" routerLinkActive="active" class="nav-item admin">
           <span class="mi">flag</span>{{ 'nav.adminQuests' | translate }}
         </a>
