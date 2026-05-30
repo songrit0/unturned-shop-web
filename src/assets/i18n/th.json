@@ -499,6 +499,16 @@
     "delete": "ลบ",
     "deleteConfirm": "ลบไอเทมนี้?",
     "deleteWarn": "ไอเทมอาจถูกอ้างอิงโดย market/quests — อาจลบไม่ได้",
+    "loadMore": "โหลดเพิ่ม",
+    "loadingMore": "กำลังโหลด...",
+    "loadedCount": "แสดง {{shown}} จาก {{total}}",
+    "bulk": {
+      "selected": "เลือก {{n}} รายการ",
+      "setTypeTo": "ตั้งประเภทเป็น",
+      "noType": "— ไม่มีประเภท —",
+      "apply": "ยืนยัน",
+      "clear": "ล้าง"
+    },
     "col": {
       "image": "รูป",
       "name": "ชื่อ",

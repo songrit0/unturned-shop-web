@@ -467,6 +467,16 @@
     "delete": "Delete",
     "deleteConfirm": "Delete this item?",
     "deleteWarn": "Item may be referenced by market/quests — delete may fail.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading...",
+    "loadedCount": "Showing {{shown}} of {{total}}",
+    "bulk": {
+      "selected": "{{n}} selected",
+      "setTypeTo": "Set type to",
+      "noType": "— No type —",
+      "apply": "Apply",
+      "clear": "Clear"
+    },
     "col": {
       "image": "Image",
       "name": "Name",

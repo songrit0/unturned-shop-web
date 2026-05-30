@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { forkJoin, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Item, ItemPayload, ItemsService, Paginated } from '../../services/items.service';
 import { ItemType, ItemTypesService } from '../../services/item-types.service';
@@ -27,12 +27,31 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
         </div>
       </div>
 
+      <!-- Bulk action bar -->
+      <div *ngIf="selected.size > 0" class="card flush" style="padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="badge violet"><span class="mi sm">check_box</span>{{ 'adminItems.bulk.selected' | translate:{ n: selected.size } }}</span>
+        <span class="muted" style="font-size:13px">{{ 'adminItems.bulk.setTypeTo' | translate }}</span>
+        <select class="select" [(ngModel)]="bulkTypeId" style="min-width:160px">
+          <option [ngValue]="null">{{ 'adminItems.bulk.noType' | translate }}</option>
+          <option *ngFor="let t of types" [ngValue]="t.id">{{ t.name }}</option>
+        </select>
+        <button (click)="applyBulkType()" [disabled]="bulkBusy" class="btn primary sm">
+          <span class="mi sm">{{ bulkBusy ? 'hourglass_empty' : 'done_all' }}</span>
+          {{ (bulkBusy ? 'common.saving' : 'adminItems.bulk.apply') | translate }}
+        </button>
+        <button (click)="clearSelection()" class="btn ghost sm">{{ 'adminItems.bulk.clear' | translate }}</button>
+        <span *ngIf="bulkError" style="color:var(--rose);font-size:13px">{{ bulkError }}</span>
+      </div>
+
       <ng-container *ngIf="!loading; else loadingTpl">
         <div class="card flush">
           <div class="table-wrap">
             <table class="tbl">
               <thead>
                 <tr>
+                  <th style="width:40px;text-align:center">
+                    <input type="checkbox" [checked]="allSelected" [indeterminate]="someSelected && !allSelected" (change)="toggleSelectAll($event)">
+                  </th>
                   <th style="width:64px">{{ 'adminItems.col.image' | translate }}</th>
                   <th style="width:80px">ID</th>
                   <th>{{ 'adminItems.col.name' | translate }}</th>
@@ -41,7 +60,10 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let it of items">
+                <tr *ngFor="let it of items" [class.row-selected]="selected.has(it.id)">
+                  <td style="text-align:center">
+                    <input type="checkbox" [checked]="selected.has(it.id)" (change)="toggleSelect(it.id)">
+                  </td>
                   <td>
                     <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
                       <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
@@ -65,7 +87,7 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
                   </td>
                 </tr>
                 <tr *ngIf="items.length === 0">
-                  <td colspan="5">
+                  <td colspan="6">
                     <div class="empty">
                       <span class="mi xxl">inventory_2</span>
                       <div class="empty-title">{{ 'adminItems.empty' | translate }}</div>
@@ -77,11 +99,13 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
           </div>
         </div>
 
-        <app-pager *ngIf="page"
-          [page]="page.page" [pages]="page.pages"
-          [total]="page.total" [limit]="page.limit"
-          (pageChange)="goPage($event, page.limit)"
-          (limitChange)="goPage(1, $event)"></app-pager>
+        <div *ngIf="page" class="row" style="justify-content:center;align-items:center;gap:12px;margin-top:16px">
+          <button *ngIf="hasMore" (click)="loadMore()" [disabled]="loadingMore" class="btn secondary">
+            <span class="mi sm">{{ loadingMore ? 'hourglass_empty' : 'expand_more' }}</span>
+            {{ (loadingMore ? 'adminItems.loadingMore' : 'adminItems.loadMore') | translate }}
+          </button>
+          <span class="muted" style="font-size:13px">{{ 'adminItems.loadedCount' | translate:{ shown: items.length, total: page.total } }}</span>
+        </div>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -154,9 +178,14 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
       </div>
     </div>
   `,
+  styles: [`
+    tr.row-selected td { background: color-mix(in srgb, var(--violet) 12%, transparent); }
+    input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color: var(--violet); }
+  `],
 })
 export class AdminItemsComponent implements OnInit, OnDestroy {
   loading = true;
+  loadingMore = false;
   saving = false;
   error: string | null = null;
   items: Item[] = [];
@@ -166,6 +195,12 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
   types: ItemType[] = [];
   q = '';
   typeFilter: number | null = null;
+
+  // Bulk selection
+  selected = new Set<number>();
+  bulkTypeId: number | null = null;
+  bulkBusy = false;
+  bulkError: string | null = null;
 
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -198,18 +233,84 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
 
   reload() {
     this.loading = true;
+    this.pageNum = 1;
+    this.clearSelection();
     this.svc.adminList(this.q.trim(), this.typeFilter, this.pageNum, this.pageLimit).subscribe({
       next: p => { this.page = p; this.items = p.items; this.loading = false; },
       error: () => { this.loading = false; },
     });
   }
 
+  /** True while there is a next page to fetch. */
+  get hasMore(): boolean {
+    return !!this.page && this.items.length < this.page.total;
+  }
+
+  /** Fetch the next page and append it to the current list (stops when no more data). */
+  loadMore() {
+    if (!this.hasMore || this.loadingMore) return;
+    this.loadingMore = true;
+    const next = this.pageNum + 1;
+    this.svc.adminList(this.q.trim(), this.typeFilter, next, this.pageLimit).subscribe({
+      next: p => {
+        this.pageNum = next;
+        this.page = p;
+        this.items = [...this.items, ...p.items];
+        this.loadingMore = false;
+      },
+      error: () => { this.loadingMore = false; },
+    });
+  }
+
   onSearch(v: string) { this.search$.next(v ?? ''); }
-  onTypeChange() { this.pageNum = 1; this.reload(); }
-  goPage(page: number, limit: number) {
-    this.pageNum = page;
-    this.pageLimit = limit;
-    this.reload();
+  onTypeChange() { this.reload(); }
+
+  // ---- Selection ----
+  get allSelected(): boolean {
+    return this.items.length > 0 && this.items.every(it => this.selected.has(it.id));
+  }
+  get someSelected(): boolean {
+    return this.items.some(it => this.selected.has(it.id));
+  }
+  toggleSelect(id: number) {
+    if (this.selected.has(id)) this.selected.delete(id);
+    else this.selected.add(id);
+  }
+  toggleSelectAll(ev: Event) {
+    const checked = (ev.target as HTMLInputElement).checked;
+    if (checked) this.items.forEach(it => this.selected.add(it.id));
+    else this.items.forEach(it => this.selected.delete(it.id));
+  }
+  clearSelection() {
+    this.selected.clear();
+    this.bulkError = null;
+  }
+
+  /** Apply the chosen type to every selected item in one batch. */
+  applyBulkType() {
+    const targets = this.items.filter(it => this.selected.has(it.id));
+    if (targets.length === 0) return;
+    this.bulkBusy = true;
+    this.bulkError = null;
+    const typeId = this.bulkTypeId ?? null;
+    const typeName = typeId == null ? null : (this.types.find(t => t.id === typeId)?.name ?? null);
+    const calls = targets.map(it => this.svc.adminUpdate(it.id, {
+      name: it.name,
+      description: it.description ?? null,
+      image_url: it.image_url ?? null,
+      type_id: typeId,
+    }));
+    forkJoin(calls).subscribe({
+      next: () => {
+        targets.forEach(it => { it.type_id = typeId; it.type_name = typeName; });
+        this.bulkBusy = false;
+        this.clearSelection();
+      },
+      error: e => {
+        this.bulkBusy = false;
+        this.bulkError = e?.error?.message || 'Bulk update failed';
+      },
+    });
   }
 
   emptyForm() {
