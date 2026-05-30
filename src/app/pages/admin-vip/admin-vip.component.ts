@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AdminVipService, VipGrant, VipPackage, VipPackageInput } from '../../services/admin-vip.service';
+import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } from '../../services/admin-vip.service';
 
 @Component({
   selector: 'app-admin-vip',
@@ -54,9 +54,55 @@ import { AdminVipService, VipGrant, VipPackage, VipPackageInput } from '../../se
         </div>
       </div>
 
-      <!-- ===== Player grants ===== -->
+      <!-- ===== All VIP holders ===== -->
+      <div class="card flush" style="margin-bottom:24px">
+        <div class="row" style="justify-content:space-between;align-items:center;padding:12px 16px;gap:12px;flex-wrap:wrap">
+          <h3 style="margin:0;font-size:16px;font-weight:700">ผู้มี VIP ทั้งหมด</h3>
+          <div class="row gap-2" style="align-items:center">
+            <label class="row gap-1" style="align-items:center;font-size:13px"><input type="checkbox" [(ngModel)]="activeOnly" (ngModelChange)="loadAll(1, all?.limit || 20)"> เฉพาะที่ยังไม่หมดอายุ</label>
+            <div class="input-wrap" style="width:240px">
+              <span class="mi lead">search</span>
+              <input class="input" [(ngModel)]="gq" (ngModelChange)="onSearchAll()" placeholder="ค้นหา steam id / discord / group">
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>ผู้เล่น</th><th>group_id</th><th>หมดอายุ (UTC)</th><th>สถานะ</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let g of all?.items">
+                <td>
+                  <div style="display:flex;flex-direction:column">
+                    <span class="mono" style="font-size:12px">{{ g.steam_id }}</span>
+                    <span class="muted" style="font-size:11px">{{ g.discord_username || g.discord_id || '—' }}</span>
+                  </div>
+                </td>
+                <td class="mono">{{ g.group_id }}</td>
+                <td class="mono" style="font-size:12px">{{ g.expires_at | date:'medium':'UTC' }}</td>
+                <td><span class="badge" [class.emerald]="isActive(g)" [class.rose]="!isActive(g)">{{ isActive(g) ? 'ACTIVE' : 'EXPIRED' }}</span></td>
+                <td>
+                  <div class="row gap-1" style="justify-content:flex-end">
+                    <button (click)="openSet(g)" class="btn ghost sm"><span class="mi sm">edit_calendar</span> ตั้งวัน</button>
+                    <button (click)="doRevoke(g)" class="btn danger sm"><span class="mi sm">block</span> ถอน</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="all && all.items.length === 0">
+                <td colspan="5"><div class="empty"><span class="mi xxl">person_off</span><div class="empty-title">ไม่มีผู้มี VIP</div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-pager *ngIf="all"
+          [page]="all.page" [pages]="all.pages" [total]="all.total" [limit]="all.limit"
+          (pageChange)="loadAll($event, all.limit)" (limitChange)="loadAll(1, $event)"></app-pager>
+      </div>
+
+      <!-- ===== Player lookup / grant ===== -->
       <div class="card" style="margin-bottom:16px">
-        <h3 style="margin:0 0 12px 0;font-size:16px;font-weight:700">VIP รายผู้เล่น</h3>
+        <h3 style="margin:0 0 12px 0;font-size:16px;font-weight:700">ค้นหา / ให้ VIP รายคน</h3>
         <div class="row gap-2">
           <div class="input-wrap" style="flex:1;max-width:340px">
             <span class="mi lead">person_search</span>
@@ -157,6 +203,12 @@ export class AdminVipComponent implements OnInit {
   error: string | null = null;
   saving = false;
 
+  // all VIP holders
+  all: Paginated<VipGrant> | null = null;
+  gq = '';
+  activeOnly = true;
+  private qDebounce: any;
+
   // packages modal
   editingPkg: VipPackage | { id: 0 } | null = null;
   pkgForm: VipPackageInput = {};
@@ -174,10 +226,27 @@ export class AdminVipComponent implements OnInit {
 
   constructor(private svc: AdminVipService) {}
 
-  ngOnInit() { this.loadPackages(); }
+  ngOnInit() { this.loadPackages(); this.loadAll(1, 20); }
 
   get groupSuggestions(): string[] {
     return Array.from(new Set(this.packages.map(p => p.group_id)));
+  }
+
+  loadAll(page: number, limit: number) {
+    this.svc.listGrants(page, limit, this.gq, this.activeOnly).subscribe({
+      next: p => this.all = p,
+      error: e => this.error = e?.error?.message || 'โหลดรายชื่อ VIP ไม่สำเร็จ',
+    });
+  }
+
+  onSearchAll() {
+    clearTimeout(this.qDebounce);
+    this.qDebounce = setTimeout(() => this.loadAll(1, this.all?.limit || 20), 300);
+  }
+
+  private refresh() {
+    this.loadAll(this.all?.page || 1, this.all?.limit || 20);
+    if (this.grantsLoaded && this.steamId.trim()) this.loadGrants();
   }
 
   isActive(g: VipGrant): boolean {
@@ -245,7 +314,7 @@ export class AdminVipComponent implements OnInit {
     if (!sid || !this.grantForm.group_id.trim() || !(this.grantForm.days > 0)) { this.error = 'กรอกข้อมูลให้ครบ'; return; }
     this.saving = true;
     this.svc.extend(sid, this.grantForm.group_id.trim(), Number(this.grantForm.days)).subscribe({
-      next: () => { this.saving = false; this.granting = false; this.loadGrants(); },
+      next: () => { this.saving = false; this.granting = false; this.refresh(); },
       error: e => { this.saving = false; this.error = e?.error?.message || 'ไม่สำเร็จ'; },
     });
   }
@@ -264,7 +333,7 @@ export class AdminVipComponent implements OnInit {
     const iso = new Date(this.expiryLocal).toISOString(); // local -> UTC ISO
     this.saving = true;
     this.svc.setExpiry(this.settingExpiry.steam_id, this.settingExpiry.group_id, iso).subscribe({
-      next: () => { this.saving = false; this.settingExpiry = null; this.loadGrants(); },
+      next: () => { this.saving = false; this.settingExpiry = null; this.refresh(); },
       error: e => { this.saving = false; this.error = e?.error?.message || 'ไม่สำเร็จ'; },
     });
   }
@@ -272,7 +341,7 @@ export class AdminVipComponent implements OnInit {
   doRevoke(g: VipGrant) {
     if (!confirm(`ถอน ${g.group_id} จาก ${g.steam_id} ?`)) return;
     this.svc.revoke(g.steam_id, g.group_id).subscribe({
-      next: () => this.loadGrants(),
+      next: () => this.refresh(),
       error: e => this.error = e?.error?.message || 'ไม่สำเร็จ',
     });
   }

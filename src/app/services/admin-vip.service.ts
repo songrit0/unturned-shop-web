@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
+import { Paginated } from '../models/paginated';
+import { buildPagedParams, normalizePaginated } from './paged-http';
+
+export { Paginated };
 
 export interface VipPackage {
   id: number;
@@ -21,6 +26,8 @@ export interface VipGrant {
   expires_at: string;
   active: number;
   updated_at: string;
+  discord_id?: string | null;
+  discord_username?: string | null;
 }
 
 export type VipPackageInput = Partial<Omit<VipPackage, 'id' | 'enabled'>> & { enabled?: boolean };
@@ -46,6 +53,14 @@ export class AdminVipService {
   }
 
   // grants
+  listGrants(page = 1, limit = 20, q = '', activeOnly = false): Observable<Paginated<VipGrant>> {
+    const extra: Record<string, string> = { q };
+    if (activeOnly) extra['active'] = '1';
+    const params = buildPagedParams(page, limit, extra);
+    return this.http.get<unknown>(`${this.base()}/grants`, { params })
+      .pipe(map(r => normalizePaginated<VipGrant>(r, limit)));
+  }
+
   grantsForUser(steamId: string): Observable<VipGrant[]> {
     return this.http.get<VipGrant[]>(`${this.base()}/grants/${steamId}`);
   }
