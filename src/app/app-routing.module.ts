@@ -12,6 +12,7 @@ import { HelpComponent } from './pages/help/help.component';
 import { AdminMarketComponent } from './pages/admin-market/admin-market.component';
 import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
+import { VipComponent } from './pages/vip/vip.component';
 import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
 import { AdminItemTypesComponent } from './pages/admin-item-types/admin-item-types.component';
 import { AdminItemsComponent } from './pages/admin-items/admin-items.component';
@@ -35,6 +36,7 @@ const routes: Routes = [
   { path: 'bills', component: BillsComponent, canActivate: [authGuard] },
   { path: 'coins', component: CoinsComponent, canActivate: [authGuard] },
   { path: 'codes', component: CodesComponent, canActivate: [authGuard] },
+  { path: 'vip', component: VipComponent, canActivate: [authGuard] },
   { path: 'help', component: HelpComponent },
   { path: 'quests', component: QuestsComponent, canActivate: [authGuard] },
   { path: 'admin/market', component: AdminMarketComponent, canActivate: [adminGuard] },

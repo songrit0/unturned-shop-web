@@ -49,6 +49,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/quests" routerLinkActive="active" class="nav-item">
           <span class="mi">flag</span>{{ 'nav.quests' | translate }}
         </a>
+        <a routerLink="/vip" routerLinkActive="active" class="nav-item">
+          <span class="mi">workspace_premium</span>VIP
+        </a>
         <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
           <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
         </a>

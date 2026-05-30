@@ -62,6 +62,7 @@
     "title": "In-game commands",
     "subtitle": "Player commands for the Unturned server plugins",
     "aliasLabel": "alias",
+    "exampleLabel": "e.g.",
     "plugin": {
       "garage": "VirtualGarage",
       "sellvault": "SellVault",

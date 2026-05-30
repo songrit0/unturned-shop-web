@@ -62,6 +62,7 @@
     "title": "คำสั่งในเกม",
     "subtitle": "คำสั่งสำหรับผู้เล่นของปลั๊กอินบนเซิร์ฟเวอร์ Unturned",
     "aliasLabel": "ตัวย่อ",
+    "exampleLabel": "เช่น",
     "plugin": {
       "garage": "VirtualGarage (โรงรถเสมือน)",
       "sellvault": "SellVault (ขายของ + ผูก Discord)",

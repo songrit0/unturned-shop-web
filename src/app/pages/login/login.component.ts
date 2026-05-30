@@ -13,6 +13,8 @@ interface PluginCommand {
   alias?: string;
   args?: string;
   descKey: string;
+  /** Verbatim example usage shown under the description (not translated), e.g. "/home bed1 · /home bed2". */
+  example?: string;
 }
 
 /** A plugin grouping. `icon` is the emoji shown beside the group; `titleKey` -> commandRef.plugin.*.
@@ -130,6 +132,9 @@ interface InfoCard {
                 </span>
               </div>
               <div class="cmdref-desc muted text-sm">{{ ('commandRef.desc.' + c.descKey) | translate }}</div>
+              <div *ngIf="c.example" class="cmdref-example mono text-xs">
+                <span class="muted">{{ 'commandRef.exampleLabel' | translate }}</span> <code>{{ c.example }}</code>
+              </div>
             </div>
 
             <p *ngIf="g.noteKey" class="cmdref-note">
@@ -187,6 +192,8 @@ interface InfoCard {
     .cmdref-alias { font-size: 12px; color: var(--text-faint); }
     .cmdref-alias code { background: var(--surface-2); border-radius: 4px; padding: 1px 6px; }
     .cmdref-desc { margin-top: 6px; }
+    .cmdref-example { margin-top: 5px; color: var(--text-faint); }
+    .cmdref-example code { background: var(--surface-2); border-radius: 4px; padding: 1px 6px; color: var(--accent); }
     .cmdref-note { display: flex; align-items: flex-start; gap: 6px; margin: 12px 0 0;
       padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-faint); }
     .cmdref-note .mi { margin-top: 1px; }
@@ -239,7 +246,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       icon: '🏠',
       titleKey: 'morehomes',
       commands: [
-        { name: '/home', args: '[name]', descKey: 'home' },
+        { name: '/home', args: '[name]', descKey: 'home', example: '/home bed1 · /home bed2' },
         { name: '/homes', descKey: 'homes' },
         { name: '/renamehome', args: '<name> <new_name>', descKey: 'renamehome' },
         { name: '/destroyhome', args: '<name>', descKey: 'destroyhome' },

@@ -1,0 +1,100 @@
+import { Component, OnInit } from '@angular/core';
+import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vip.service';
+
+@Component({
+  selector: 'app-vip',
+  template: `
+    <div class="page">
+      <div class="page-header">
+        <div class="h-icon amber"><span class="mi lg">workspace_premium</span></div>
+        <h1>VIP</h1>
+      </div>
+
+      <!-- not linked -->
+      <div *ngIf="mine && !mine.linked" class="welcome-alert" style="margin-bottom:16px">
+        <span class="alert-icon mi">link_off</span>
+        <div>ยังไม่ได้เชื่อมบัญชี Steam ↔ Discord — เชื่อมก่อนถึงจะซื้อ VIP ได้</div>
+      </div>
+
+      <!-- my current VIP -->
+      <div *ngIf="mine?.grants?.length" class="card" style="margin-bottom:16px">
+        <h3 style="margin:0 0 8px 0;font-size:15px;font-weight:700">⭐ VIP ของคุณ</h3>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">
+          <li *ngFor="let g of mine?.grants" class="row" style="justify-content:space-between;font-size:13px">
+            <span class="badge amber">{{ g.group_id }}</span>
+            <span class="mono muted">หมดอายุ {{ g.expires_at | date:'medium' }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <ng-container *ngIf="!loading; else loadingTpl">
+        <div *ngIf="packages.length === 0" class="empty">
+          <span class="mi xxl">inventory_2</span>
+          <div class="empty-title">ยังไม่มีแพ็กเกจ VIP เปิดขาย</div>
+        </div>
+
+        <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+          <div *ngFor="let p of packages" class="card" style="display:flex;flex-direction:column;gap:8px">
+            <div class="row" style="justify-content:space-between;align-items:center">
+              <span class="badge amber"><span class="mi sm">workspace_premium</span>{{ p.tier }}</span>
+              <span class="mono muted" style="font-size:12px">{{ p.days }} วัน</span>
+            </div>
+            <div style="font-weight:700;font-size:15px">{{ p.label || (p.tier + ' ' + p.days + ' วัน') }}</div>
+            <div class="coin-amt lg" style="color:var(--accent-hi)"><span class="mi">paid</span>{{ p.price_coins | number }}</div>
+            <button (click)="buy(p)" [disabled]="!mine?.linked || buyingId === p.id"
+                    class="btn emerald" style="margin-top:auto">
+              <span class="mi sm">shopping_cart</span>
+              {{ buyingId === p.id ? 'กำลังซื้อ…' : 'ซื้อด้วย Coin' }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #loadingTpl>
+        <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
+      </ng-template>
+
+      <p *ngIf="error" style="color:var(--rose);margin-top:16px">{{ error }}</p>
+      <div *ngIf="okMsg" class="welcome-alert" style="margin-top:16px;border-color:var(--emerald)">
+        <span class="alert-icon mi" style="color:var(--emerald)">check_circle</span>
+        <div>{{ okMsg }}</div>
+      </div>
+    </div>
+  `,
+})
+export class VipComponent implements OnInit {
+  loading = true;
+  packages: VipPackage[] = [];
+  mine: VipMine | null = null;
+  buyingId: number | null = null;
+  error: string | null = null;
+  okMsg: string | null = null;
+
+  constructor(private vip: VipService) {}
+
+  ngOnInit() {
+    this.vip.packages().subscribe({
+      next: p => { this.packages = p; this.loading = false; },
+      error: e => { this.loading = false; this.error = e?.error?.message || 'โหลดแพ็กเกจไม่สำเร็จ'; },
+    });
+    this.loadMine();
+  }
+
+  loadMine() {
+    this.vip.mine().subscribe({ next: m => this.mine = m, error: () => {} });
+  }
+
+  buy(p: VipPackage) {
+    if (!this.mine?.linked) return;
+    if (!confirm(`ซื้อ ${p.label || p.tier} (${p.days} วัน) ราคา ${p.price_coins} Coin ?`)) return;
+    this.error = null; this.okMsg = null; this.buyingId = p.id;
+    this.vip.buy(p.id).subscribe({
+      next: (r: VipBuyResult) => {
+        this.buyingId = null;
+        this.okMsg = `ซื้อ ${r.tier} สำเร็จ (+${r.days} วัน) · คงเหลือ ${r.balance} Coin · สิทธิ์เข้าเกมภายใน ~1 นาที`;
+        this.loadMine();
+      },
+      error: e => { this.buyingId = null; this.error = e?.error?.message || 'ซื้อไม่สำเร็จ'; },
+    });
+  }
+}
