@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrlFallback: 'https://gramophonic-robbie-sustainingly.ngrok-free.dev',
+  apiUrlFallback: 'https://meowpow.ngrok.dev',
   firebase: {
     apiKey: '',
     authDomain: '',
