@@ -22,6 +22,16 @@ import { Component } from '@angular/core';
         </div>
       </section>
 
+      <section class="card mb-4">
+        <div class="card-title"><span class="mi">apps</span>{{ 'help.systemsTitle' | translate }}</div>
+        <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
+          <div *ngFor="let s of systems" class="row gap-2" style="align-items:flex-start; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px;">
+            <span style="font-size:18px; line-height:1.2; flex-shrink:0;">{{ s.icon }}</span>
+            <span class="text-sm">{{ s.key | translate }}</span>
+          </div>
+        </div>
+      </section>
+
       <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom: 16px;">
         <section class="card">
           <div class="card-title"><span class="mi">shopping_bag</span>{{ 'help.howToBuy' | translate }}</div>
@@ -161,13 +171,44 @@ export class HelpComponent {
     { icon: 'percent', key: 'help.lose2' },
     { icon: 'account_balance', key: 'help.lose3' },
   ];
+  // Reuses the bilingual command descriptions already written for the /login cards
+  // (commandRef.desc.*) so copy stays in one place; account commands keep their help.cmd* keys.
   commands = [
     { cmd: '/link <code>', descKey: 'help.cmdLinkDesc' },
     { cmd: '/code <code>', descKey: 'help.cmdCodeDesc' },
     { cmd: '/sell', descKey: 'help.cmdSellDesc' },
     { cmd: '/coins', descKey: 'help.cmdCoinsDesc' },
-    // { cmd: '/itemid', descKey: 'help.cmdItemIdDesc' },
-    // { cmd: '/decay', descKey: 'help.cmdDecayDesc' },
+    { cmd: '/shop', descKey: 'help.cmdShopDesc' },
+    { cmd: '/discord', descKey: 'help.cmdDiscordDesc' },
+    { cmd: '/shoppin <6 digits>', descKey: 'help.cmdShoppinDesc' },
+    { cmd: '/kits', descKey: 'commandRef.desc.kits' },
+    { cmd: '/kit <name>', descKey: 'commandRef.desc.kit' },
+    { cmd: '/vault [name]', descKey: 'commandRef.desc.vault' },
+    { cmd: '/vaults', descKey: 'commandRef.desc.vaults' },
+    { cmd: '/trash', descKey: 'commandRef.desc.trash' },
+    { cmd: '/garage', descKey: 'commandRef.desc.garage' },
+    { cmd: '/gadd <name>', descKey: 'commandRef.desc.gadd' },
+    { cmd: '/gretrieve <name>', descKey: 'commandRef.desc.gretrieve' },
+    { cmd: '/home [name]', descKey: 'commandRef.desc.home' },
+    { cmd: '/homes', descKey: 'commandRef.desc.homes' },
+    { cmd: '/tpa <player>', descKey: 'commandRef.desc.tpa' },
+    { cmd: '/tpa a / d / c', descKey: 'help.cmdTpaReplyDesc' },
+    { cmd: '/decay', descKey: 'commandRef.desc.decay' },
+  ];
+  // Systems overview — one short blurb per server system so a new player gets the whole picture.
+  systems = [
+    { icon: '🛒', key: 'help.sys.shop' },
+    { icon: '🤝', key: 'help.sys.p2p' },
+    { icon: '🎒', key: 'help.sys.kits' },
+    { icon: '🧰', key: 'help.sys.vault' },
+    { icon: '🚗', key: 'help.sys.garage' },
+    { icon: '🏠', key: 'help.sys.homes' },
+    { icon: '🧭', key: 'help.sys.tpa' },
+    { icon: '🩹', key: 'help.sys.knockdown' },
+    { icon: '🛡️', key: 'help.sys.decay' },
+    { icon: '🧹', key: 'help.sys.cleanup' },
+    { icon: '💬', key: 'help.sys.discord' },
+    { icon: '🔑', key: 'help.sys.weblogin' },
   ];
   faqs = [
     { q: 'help.faq1Q', a: 'help.faq1A' },

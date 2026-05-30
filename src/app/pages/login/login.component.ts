@@ -265,6 +265,17 @@ export class LoginComponent implements OnInit, OnDestroy {
         { name: '/fixvault', descKey: 'fixvault' },
       ],
     },
+    {
+      icon: '🧭',
+      titleKey: 'tpa',
+      commands: [
+        { name: '/tpa', args: '<player>', descKey: 'tpa' },
+        { name: '/tpa a', descKey: 'tpaAccept' },
+        { name: '/tpa d', descKey: 'tpaDeny' },
+        { name: '/tpa c', descKey: 'tpaCancel' },
+      ],
+      noteKey: 'tpa',
+    },
   ];
 
   /** Server-behavior notices (no player command), rendered as INFO cards below the command grid. */

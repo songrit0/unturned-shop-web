@@ -69,7 +69,8 @@
       "redeemcode": "RedeemCode",
       "morehomes": "MoreHomes",
       "kits": "Kits",
-      "vault": "Vault"
+      "vault": "Vault",
+      "tpa": "Teleport"
     },
     "desc": {
       "garage": "List all vehicles in your garage",
@@ -90,11 +91,16 @@
       "vault": "Open your vault (default/last used, or a named one e.g. /vault vip)",
       "vaults": "List all your vaults",
       "trash": "Open a temporary trash (items vanish on close)",
-      "fixvault": "Remove corrupted items (after a mod is removed)"
+      "fixvault": "Remove corrupted items (after a mod is removed)",
+      "tpa": "Request to teleport to a player",
+      "tpaAccept": "Accept a request",
+      "tpaDeny": "Deny a request",
+      "tpaCancel": "Cancel your request"
     },
     "note": {
       "morehomes": "Place a bed to set a home (max 2) · 10s warm-up before teleport (cancels if you move) · 20s cooldown",
-      "kits": "Some kits have a cooldown or price"
+      "kits": "Some kits have a cooldown or price",
+      "tpa": "/tpa autoaccept = toggle auto-accept"
     }
   },
   "autoCleanup": {
@@ -268,17 +274,17 @@
     "p2pTitle": "P2P Marketplace",
     "p2pDesc": "Trade items directly with other players for Coin. Anything in your Vault can be listed, and you set your own price.",
     "p2pSellTitle": "Listing an item for sale",
-    "p2pSell1": "Open Vaults → pick a vault → select the item you want to sell",
-    "p2pSell2": "Set a price in Coin → confirm to list it (the item is held while listed)",
-    "p2pSell3": "Your listing shows up in the P2P Market for everyone to see",
-    "p2pSell4": "When it sells, Coin lands in your balance (minus commission). Track everything under My Listings",
+    "p2pSell1": "Open My Vaults → pick a vault → choose the item, set a price in Coin → List on market (the item is held while listed)",
+    "p2pSell2": "Your listing appears on the P2P Market for everyone, and shows under My Listings",
+    "p2pSell3": "When it sells, Coin lands in your balance (minus commission)",
+    "p2pSell4": "If it does NOT sell (you cancel, it expires, or an admin closes it) you get a redeem code instead of the item back — see the note below",
     "p2pBuyTitle": "Buying from the market",
-    "p2pBuy1": "Open P2P Market → filter by item type or price range",
-    "p2pBuy2": "Click a listing to review the seller, quality and price → Buy",
-    "p2pBuy3": "Coin is deducted and the item drops straight into your Inventory",
+    "p2pBuy1": "Open P2P Market → filter by item type or price range → click a listing to review seller, quality and price → Buy",
+    "p2pBuy2": "Coin is deducted; the purchase lands in My Inventory as unclaimed",
+    "p2pBuy3": "Open My Inventory → Claim (or Claim all) to get a redeem code → use /code <code> in-game. (Buying via the Discord Buy button gives you the code instantly.)",
     "p2pNoteCommission": "A commission is taken from the seller's proceeds on each sale (the buyer pays the listed price).",
-    "p2pNoteTtl": "Listings expire after a set number of days — unsold items are returned to your Vault.",
-    "p2pNoteCancel": "You can cancel any active listing anytime from My Listings to get the item back.",
+    "p2pNoteTtl": "If a listing is cancelled, expires, or is closed by an admin, the item is NOT returned to your vault — instead a redeem code is minted (7-day expiry). Redeem it in-game with /code; if unused within 7 days the item is lost.",
+    "p2pNoteCancel": "You find that refund code on My Listings (Show code) and it's also sent to you via Discord DM and the in-app notification bell.",
     "economy": "Economy",
     "earnTitle": "How to earn Coin",
     "earn1": "Welcome Pack (one-time)",
@@ -307,6 +313,25 @@
     "cmdCoinsDesc": "Check Coin balance",
     "cmdItemIdDesc": "Show item id of held item",
     "cmdDecayDesc": "Check base protection (ToolCupboard)",
+    "cmdShopDesc": "Open the web shop link",
+    "cmdDiscordDesc": "Get the Discord server invite",
+    "cmdShoppinDesc": "Set a 6-digit PIN to log in to the web shop with your Steam ID",
+    "cmdTpaReplyDesc": "Accept / deny / cancel a teleport request",
+    "systemsTitle": "Server systems at a glance",
+    "sys": {
+      "shop": "Shop & Coins — buy items with Coin; sell in-game via /sell. Check balance with /coins.",
+      "p2p": "P2P Market — list your own vault items for sale to other players and buy theirs.",
+      "kits": "Kits — claim item kits with /kit (some have a cooldown or price); list them with /kits.",
+      "vault": "Vault — personal item storage (/vault, /vaults); /trash discards items.",
+      "garage": "Garage — store and retrieve vehicles (/garage, /gadd, /gretrieve).",
+      "homes": "Homes — place a bed to set a home, then /home to teleport back (max 2 homes).",
+      "tpa": "Teleport (TPA) — /tpa <player> to request a teleport to someone; they accept with /tpa a.",
+      "knockdown": "Knockdown & revive — instead of dying you go down; a teammate holds Crouch next to you (~1m) for 8s to revive (15s bleed-out).",
+      "decay": "Decay protection — a generator/Tool Cupboard keeps your base from decaying; check coverage with /decay.",
+      "cleanup": "Auto-cleanup — dropped items vanish over time (player drops after 10 min, zombie loot after 2 min).",
+      "discord": "Discord — link your account for web login and notifications; get the invite in-game with /discord.",
+      "weblogin": "Web shop login — sign in with Discord, or with your Steam ID + a PIN you set in-game via /shoppin."
+    },
     "faqTitle": "FAQ",
     "faq1Q": "Forgot a purchased code, what now?",
     "faq1A": "Open Code history — all codes you've purchased are listed with status (Available / Used / Expired)",
