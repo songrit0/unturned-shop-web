@@ -12,6 +12,10 @@ interface FormState {
   elasticity: number;
   amount: number;
   enabled: boolean;
+  // "create new (buy-only)" path when the item isn't in Master Items
+  createNew: boolean;
+  name: string;
+  image_url: string;
 }
 
 @Component({
@@ -154,7 +158,39 @@ interface FormState {
             {{ (isNew ? 'adminMarket.addTitle' : 'adminMarket.editTitle') | translate }}
           </h3>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div *ngIf="isNew">
+            <!-- mode toggle: pick existing catalog item, or create a buy-only stub -->
+            <div *ngIf="isNew" class="row gap-2">
+              <button type="button" class="btn sm" [class.primary]="!form.createNew" [class.ghost]="form.createNew" (click)="setCreateNew(false)">
+                <span class="mi sm">search</span> {{ 'adminMarket.form.fromCatalog' | translate }}
+              </button>
+              <button type="button" class="btn sm" [class.primary]="form.createNew" [class.ghost]="!form.createNew" (click)="setCreateNew(true)">
+                <span class="mi sm">add_circle</span> {{ 'adminMarket.form.createNew' | translate }}
+              </button>
+            </div>
+
+            <!-- create-new (buy-only) inputs -->
+            <div *ngIf="isNew && form.createNew" style="display:flex;flex-direction:column;gap:12px">
+              <div class="welcome-alert" style="font-size:12px">
+                <span class="alert-icon mi">info</span>
+                <div>{{ 'adminMarket.form.createNewHint' | translate }}</div>
+              </div>
+              <div class="row gap-3" style="align-items:stretch">
+                <label style="flex:1;display:block">
+                  <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemId' | translate }}</span>
+                  <input type="number" min="1" class="input mono" [(ngModel)]="form.item_id" style="margin-top:4px">
+                </label>
+                <label style="flex:2;display:block">
+                  <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemName' | translate }}</span>
+                  <input type="text" maxlength="128" class="input" [(ngModel)]="form.name" style="margin-top:4px">
+                </label>
+              </div>
+              <label style="display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemImage' | translate }}</span>
+                <input type="url" maxlength="512" class="input" [(ngModel)]="form.image_url" style="margin-top:4px">
+              </label>
+            </div>
+
+            <div *ngIf="isNew && !form.createNew">
               <label class="muted" style="font-size:12px;display:block;margin-bottom:4px">{{ 'adminMarket.form.pickItem' | translate }}</label>
               <div style="position:relative">
                 <input type="search" class="input" [(ngModel)]="pickerQ" (ngModelChange)="onPickerSearch()"
@@ -450,7 +486,8 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   }
 
   emptyForm(): FormState {
-    return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10, enabled: true };
+    return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10, enabled: true,
+             createNew: false, name: '', image_url: '' };
   }
 
   openNew() {
@@ -470,6 +507,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       item_id: it.item_id,
       base_price: it.base_price, target_stock: it.target_stock, elasticity: it.elasticity,
       amount: it.amount, enabled: !!it.enabled,
+      createNew: false, name: it.name ?? '', image_url: it.image_url ?? '',
     };
     this.selectedItem = {
       id: it.item_id, name: it.name, description: null,
@@ -506,6 +544,21 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
     this.pickerResults = [];
   }
 
+  /** Switch the Add modal between "pick from catalog" and "create new (buy-only)". */
+  setCreateNew(v: boolean) {
+    this.form.createNew = v;
+    this.error = null;
+    this.clearPick();
+    if (v) {
+      // A buy-only entry: the shop purchases it but doesn't list it for sale.
+      this.form.enabled = false;
+      this.form.name = '';
+      this.form.image_url = '';
+    } else {
+      this.form.enabled = true;
+    }
+  }
+
   /** Local preview of the supply/demand formula (matches backend PricingService.compute). */
   preview(): number {
     const base = Number(this.form.base_price) || 0;
@@ -518,7 +571,16 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    if (!this.form.item_id) {
+    if (this.form.createNew) {
+      if (!this.form.item_id || Number(this.form.item_id) <= 0) {
+        this.error = this.t.instant('adminMarket.errors.missingId');
+        return;
+      }
+      if (!this.form.name.trim()) {
+        this.error = this.t.instant('adminMarket.errors.missingName');
+        return;
+      }
+    } else if (!this.form.item_id) {
       this.error = this.t.instant('adminMarket.errors.missing');
       return;
     }
@@ -531,6 +593,12 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       amount: Number(this.form.amount) || 0,
       enabled: this.form.enabled !== false,
     };
+    if (this.form.createNew) {
+      payload.create_if_missing = true;
+      payload.name = this.form.name.trim();
+      const img = this.form.image_url.trim();
+      if (img) payload.image_url = img;
+    }
     this.svc.upsert(payload).subscribe({
       next: () => { this.saving = false; this.editing = null; this.reload(); },
       error: e => { this.saving = false; this.error = e?.error?.message?.join?.(', ') || e?.error?.message || this.t.instant('adminMarket.errors.saveFail'); },

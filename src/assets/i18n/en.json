@@ -363,6 +363,8 @@
     "intro": "Sell your items to the shop and get coins. You receive the market price minus a {{commission}} commission. Prices move with supply & demand.",
     "boardTitle": "Sell Prices",
     "boardFoot": "You receive market price − {{commission}}% commission. Prices update with supply & demand.",
+    "buyOnly": "buy-only",
+    "buyOnlyHint": "The shop buys this item but doesn't sell it.",
     "empty": "No items available to sell.",
     "col": {
       "image": "Image",
@@ -434,10 +436,18 @@
       "enabled": "Enabled",
       "type": "Item type",
       "pickItem": "Pick an item",
-      "pickItemSearch": "Search items by name or id..."
+      "pickItemSearch": "Search items by name or id...",
+      "fromCatalog": "From Master Items",
+      "createNew": "Create new (buy-only)",
+      "createNewHint": "This item isn't in Master Items. A minimal catalog entry will be created so the shop can buy it. Leave it disabled to buy-only (not for sale).",
+      "newItemId": "Item ID",
+      "newItemName": "Item name",
+      "newItemImage": "Image URL (optional)"
     },
     "errors": {
       "missing": "Pick an item first",
+      "missingId": "Enter a valid item ID",
+      "missingName": "Enter an item name",
       "saveFail": "Save failed"
     },
     "deleteConfirm": "Delete this item?",

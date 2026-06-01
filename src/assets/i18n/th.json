@@ -395,6 +395,8 @@
     "intro": "ขายไอเทมให้ร้านเพื่อรับ coins — คุณจะได้ราคาตลาดหักค่าคอมมิชชั่น {{commission}} ราคาขึ้นลงตาม supply & demand",
     "boardTitle": "ราคารับซื้อ",
     "boardFoot": "ผู้เล่นได้รับ = ราคาตลาด − ค่าคอมฯ {{commission}}% · ราคาปรับตาม supply & demand",
+    "buyOnly": "รับซื้ออย่างเดียว",
+    "buyOnlyHint": "ร้านรับซื้อไอเทมนี้ แต่ไม่ได้ขาย",
     "empty": "ยังไม่มีไอเทมให้ขาย",
     "col": {
       "image": "รูป",
@@ -466,10 +468,18 @@
       "enabled": "เปิดขาย",
       "type": "ประเภทไอเทม",
       "pickItem": "เลือกไอเทม",
-      "pickItemSearch": "ค้นหาด้วยชื่อหรือ id..."
+      "pickItemSearch": "ค้นหาด้วยชื่อหรือ id...",
+      "fromCatalog": "จาก Master Items",
+      "createNew": "สร้างใหม่ (รับซื้อ)",
+      "createNewHint": "ไอเทมนี้ยังไม่มีใน Master Items ระบบจะสร้างรายการ catalog แบบย่อให้เพื่อให้ร้านรับซื้อได้ — ปล่อยเป็นปิดขายไว้เพื่อรับซื้ออย่างเดียว (ไม่ขาย)",
+      "newItemId": "Item ID",
+      "newItemName": "ชื่อไอเทม",
+      "newItemImage": "URL รูป (ไม่บังคับ)"
     },
     "errors": {
       "missing": "เลือกไอเทมก่อน",
+      "missingId": "กรอก Item ID ที่ถูกต้อง",
+      "missingName": "กรอกชื่อไอเทม",
       "saveFail": "บันทึกไม่สำเร็จ"
     },
     "deleteConfirm": "ลบสินค้านี้?",

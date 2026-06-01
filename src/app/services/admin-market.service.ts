@@ -29,6 +29,10 @@ export interface UpsertPayload {
   elasticity: number;
   amount: number;
   enabled?: boolean;
+  // Create a buy-only catalog stub when the item isn't in Master Items.
+  create_if_missing?: boolean;
+  name?: string;
+  image_url?: string;
 }
 
 export interface MarketExportRow {
