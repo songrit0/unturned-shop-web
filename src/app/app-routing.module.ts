@@ -5,6 +5,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AuthCallbackComponent } from './pages/auth-callback/auth-callback.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ShopComponent } from './pages/shop/shop.component';
+import { SellPricesComponent } from './pages/sell-prices/sell-prices.component';
 import { BillsComponent } from './pages/bills/bills.component';
 import { CoinsComponent } from './pages/coins/coins.component';
 import { CodesComponent } from './pages/codes/codes.component';
@@ -35,6 +36,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'p2p-market', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'shop', component: ShopComponent, canActivate: [authGuard] },
+  { path: 'sell-prices', component: SellPricesComponent, canActivate: [authGuard] },
   { path: 'bills', component: BillsComponent, canActivate: [authGuard] },
   { path: 'coins', component: CoinsComponent, canActivate: [authGuard] },
   { path: 'codes', component: CodesComponent, canActivate: [authGuard] },

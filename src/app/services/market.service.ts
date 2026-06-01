@@ -27,6 +27,23 @@ export interface MarketTypeOption {
 
 export type MarketKind = 'normal' | 'bills' | 'all';
 
+export interface SellPriceItem {
+  item_id: number;
+  name: string;
+  image_url: string | null;
+  type_id: number | null;
+  type_name: string | null;
+  buy_price: number;
+  base_price: number;
+  sell_price: number;
+  trend: number; // -1 down, 0 flat, 1 up (vs anchor)
+}
+
+export interface SellPriceBoard {
+  commission_percent: number;
+  items: SellPriceItem[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class MarketService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -44,5 +61,10 @@ export class MarketService {
   types(): Observable<MarketTypeOption[]> {
     return this.http.get<MarketTypeOption[]>(`${this.apiUrl.get()}/market/types`)
       .pipe(map(r => Array.isArray(r) ? r : []));
+  }
+
+  sellPrices(typeId: number | null = null): Observable<SellPriceBoard> {
+    const url = `${this.apiUrl.get()}/market/sell-prices${typeId != null ? `?type_id=${typeId}` : ''}`;
+    return this.http.get<SellPriceBoard>(url);
   }
 }

@@ -17,6 +17,7 @@ import { CoinsComponent } from './pages/coins/coins.component';
 import { CodesComponent } from './pages/codes/codes.component';
 import { HelpComponent } from './pages/help/help.component';
 import { AdminMarketComponent } from './pages/admin-market/admin-market.component';
+import { SellPricesComponent } from './pages/sell-prices/sell-prices.component';
 import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
 import { VipComponent } from './pages/vip/vip.component';
@@ -63,6 +64,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AuthCallbackComponent,
     HomeComponent,
     ShopComponent,
+    SellPricesComponent,
     BillsComponent,
     CoinsComponent,
     CodesComponent,

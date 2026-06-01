@@ -4,7 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { LinkService, WelcomeResult } from '../../services/link.service';
 import { CoinsService } from '../../services/coins.service';
 import { BasketService } from '../../services/basket.service';
-import { MarketItem, MarketService } from '../../services/market.service';
+import { P2pService } from '../../services/p2p.service';
+import { P2pListing } from '../../models/vault';
 
 @Component({
   selector: 'app-home',
@@ -21,8 +22,8 @@ import { MarketItem, MarketService } from '../../services/market.service';
             </p>
           </div>
           <div class="row gap-2">
-            <a routerLink="/shop" class="btn primary lg"><span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}</a>
-            <a routerLink="/quests" class="btn secondary lg"><span class="mi">flag</span>{{ 'nav.quests' | translate }}</a>
+            <a routerLink="/p2p-market" class="btn primary lg"><span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}</a>
+            <a routerLink="/sell-prices" class="btn secondary lg"><span class="mi">sell</span>{{ 'nav.sellPrices' | translate }}</a>
           </div>
         </div>
 
@@ -81,17 +82,35 @@ import { MarketItem, MarketService } from '../../services/market.service';
       </section>
 
       <div class="tile-grid">
+        <a routerLink="/p2p-market" class="tile violet">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">handshake</span></div>
+          <div class="tile-title">{{ 'nav.p2pMarket' | translate }}</div>
+          <div class="tile-desc">{{ 'home.p2pDesc' | translate }}</div>
+        </a>
+        <a routerLink="/my-listings" class="tile violet">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">sell</span></div>
+          <div class="tile-title">{{ 'nav.myListings' | translate }}</div>
+          <div class="tile-desc">{{ 'home.myListingsDesc' | translate }}</div>
+        </a>
+        <a routerLink="/vaults" class="tile emerald">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">inventory</span></div>
+          <div class="tile-title">{{ 'nav.vaults' | translate }}</div>
+          <div class="tile-desc">{{ 'home.vaultsDesc' | translate }}</div>
+        </a>
+        <a routerLink="/sell-prices" class="tile emerald">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">sell</span></div>
+          <div class="tile-title">{{ 'nav.sellPrices' | translate }}</div>
+          <div class="tile-desc">{{ 'home.sellPricesDesc' | translate }}</div>
+        </a>
         <a routerLink="/shop" class="tile amber">
           <span class="mi arrow">arrow_outward</span>
           <div class="tile-icon"><span class="mi fill">shopping_bag</span></div>
           <div class="tile-title">{{ 'nav.shop' | translate }}</div>
           <div class="tile-desc">{{ 'home.shopDesc' | translate }}</div>
-        </a>
-        <a routerLink="/bills" class="tile emerald">
-          <span class="mi arrow">arrow_outward</span>
-          <div class="tile-icon"><span class="mi fill">payments</span></div>
-          <div class="tile-title">{{ 'nav.bills' | translate }}</div>
-          <div class="tile-desc">{{ 'home.billsDesc' | translate }}</div>
         </a>
         <a routerLink="/coins" class="tile amber">
           <span class="mi arrow">arrow_outward</span>
@@ -105,11 +124,29 @@ import { MarketItem, MarketService } from '../../services/market.service';
           <div class="tile-title">{{ 'nav.codes' | translate }}</div>
           <div class="tile-desc">{{ 'home.codesDesc' | translate }}</div>
         </a>
+        <a routerLink="/inventory" class="tile emerald">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">redeem</span></div>
+          <div class="tile-title">{{ 'nav.inventory' | translate }}</div>
+          <div class="tile-desc">{{ 'home.inventoryDesc' | translate }}</div>
+        </a>
         <a routerLink="/quests" class="tile indigo">
           <span class="mi arrow">arrow_outward</span>
           <div class="tile-icon"><span class="mi fill">flag</span></div>
           <div class="tile-title">{{ 'nav.quests' | translate }}</div>
           <div class="tile-desc">Active &amp; rewards</div>
+        </a>
+        <a routerLink="/vip" class="tile amber">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">workspace_premium</span></div>
+          <div class="tile-title">VIP</div>
+          <div class="tile-desc">{{ 'home.vipDesc' | translate }}</div>
+        </a>
+        <a routerLink="/bills" class="tile emerald">
+          <span class="mi arrow">arrow_outward</span>
+          <div class="tile-icon"><span class="mi fill">payments</span></div>
+          <div class="tile-title">{{ 'nav.bills' | translate }}</div>
+          <div class="tile-desc">{{ 'home.billsDesc' | translate }}</div>
         </a>
         <a routerLink="/help" class="tile rose">
           <span class="mi arrow">arrow_outward</span>
@@ -119,14 +156,35 @@ import { MarketItem, MarketService } from '../../services/market.service';
         </a>
       </div>
 
-      <div *ngIf="topItems.length > 0" class="mt-6">
-        <h2 class="mb-3 row gap-2"><span class="mi" style="color:var(--accent)">local_fire_department</span>Top items</h2>
-        <div class="item-grid">
-          <app-item-card *ngFor="let it of topItems" [item]="it"></app-item-card>
+      <div *ngIf="p2pListings.length > 0" class="mt-6">
+        <h2 class="mb-3 row gap-2" style="justify-content:space-between">
+          <span class="row gap-2"><span class="mi" style="color:var(--accent)">storefront</span>{{ 'home.p2pLatest' | translate }}</span>
+          <a routerLink="/p2p-market" class="btn ghost sm">{{ 'home.viewAll' | translate }} <span class="mi sm">arrow_forward</span></a>
+        </h2>
+        <div class="p2p-strip">
+          <a routerLink="/p2p-market" class="p2p-mini" *ngFor="let l of p2pListings">
+            <div class="p2p-thumb">
+              <img *ngIf="l.image_url; else noImg" [src]="l.image_url">
+              <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+            </div>
+            <div class="p2p-name">{{ l.item_name || ('#' + l.item_id) }}</div>
+            <div class="p2p-price mono">{{ l.price | number }} <span class="muted">coins</span></div>
+          </a>
         </div>
       </div>
     </div>
   `,
+  styles: [`
+    .p2p-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .p2p-mini { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+                text-decoration: none; color: var(--text); transition: border-color .12s ease, transform .12s ease; }
+    .p2p-mini:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .p2p-thumb { aspect-ratio: 1; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center;
+                 justify-content: center; overflow: hidden; margin-bottom: 8px; }
+    .p2p-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+    .p2p-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p2p-price { font-weight: 700; margin-top: 2px; }
+  `],
 })
 export class HomeComponent implements OnInit {
   loading = false;
@@ -134,21 +192,21 @@ export class HomeComponent implements OnInit {
   code: string | null = null;
   copied = false;
   recentGain = 0;
-  topItems: MarketItem[] = [];
+  p2pListings: P2pListing[] = [];
 
   constructor(
     public auth: AuthService,
     public coins: CoinsService,
     public basket: BasketService,
     private link: LinkService,
-    private market: MarketService,
+    private p2p: P2pService,
     private t: TranslateService,
   ) {}
 
   ngOnInit() {
-    this.market.list('normal', null, 1, 4).subscribe({
-      next: p => { this.topItems = [...p.items].sort((a, b) => b.price - a.price).slice(0, 4); },
-      error: () => this.topItems = [],
+    this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
+      next: p => { this.p2pListings = p.items.slice(0, 6); },
+      error: () => this.p2pListings = [],
     });
     this.coins.stats().subscribe({
       next: s => { this.recentGain = s.net_change; },

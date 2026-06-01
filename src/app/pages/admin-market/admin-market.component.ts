@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { forkJoin, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AdminMarketItem, AdminMarketService, ImportResult, MarketExportRow, Paginated, UpsertPayload } from '../../services/admin-market.service';
@@ -45,12 +45,34 @@ interface FormState {
         <div>{{ 'adminMarket.supplyDemand' | translate }}</div>
       </div>
 
+      <!-- Bulk action bar -->
+      <div *ngIf="selected.size > 0" class="card flush" style="padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="badge violet"><span class="mi sm">check_box</span>{{ 'adminMarket.bulk.selected' | translate:{ n: selected.size } }}</span>
+        <button (click)="bulkSetEnabled(true)" [disabled]="bulkBusy" class="btn ghost sm">
+          <span class="mi sm">toggle_on</span> {{ 'adminMarket.bulk.enable' | translate }}
+        </button>
+        <button (click)="bulkSetEnabled(false)" [disabled]="bulkBusy" class="btn ghost sm">
+          <span class="mi sm">toggle_off</span> {{ 'adminMarket.bulk.disable' | translate }}
+        </button>
+        <button (click)="bulkDeleting = true" [disabled]="bulkBusy" class="btn ghost sm" style="color:var(--rose)">
+          <span class="mi sm">delete</span> {{ 'adminMarket.bulk.delete' | translate }}
+        </button>
+        <button (click)="exportSelected()" [disabled]="bulkBusy" class="btn ghost sm">
+          <span class="mi sm">download</span> {{ 'adminMarket.bulk.export' | translate }}
+        </button>
+        <button (click)="clearSelection()" class="btn ghost sm" style="margin-left:auto">{{ 'adminMarket.bulk.clear' | translate }}</button>
+        <span *ngIf="bulkError" style="color:var(--rose);font-size:13px">{{ bulkError }}</span>
+      </div>
+
       <ng-container *ngIf="!loading; else loadingTpl">
         <div class="card flush">
           <div class="table-wrap">
             <table class="tbl">
               <thead>
                 <tr>
+                  <th style="width:40px;text-align:center">
+                    <input type="checkbox" [checked]="allSelected" [indeterminate]="someSelected && !allSelected" (change)="toggleSelectAll($event)">
+                  </th>
                   <th style="width:64px">{{ 'adminMarket.col.image' | translate }}</th>
                   <th>{{ 'adminMarket.col.id' | translate }}</th>
                   <th>{{ 'adminMarket.col.name' | translate }}</th>
@@ -64,7 +86,10 @@ interface FormState {
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let it of items">
+                <tr *ngFor="let it of items" [class.row-selected]="selected.has(it.item_id)">
+                  <td style="text-align:center">
+                    <input type="checkbox" [checked]="selected.has(it.item_id)" (change)="toggleSelect(it.item_id)">
+                  </td>
                   <td>
                     <div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden">
                       <img *ngIf="it.image_url; else noImg" [src]="it.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
@@ -99,7 +124,7 @@ interface FormState {
                   </td>
                 </tr>
                 <tr *ngIf="items.length === 0">
-                  <td colspan="10">
+                  <td colspan="11">
                     <div class="empty">
                       <span class="mi xxl">inventory_2</span>
                       <div class="empty-title">{{ 'adminMarket.empty' | translate }}</div>
@@ -221,6 +246,18 @@ interface FormState {
         </div>
       </div>
 
+      <!-- Bulk delete confirm -->
+      <div *ngIf="bulkDeleting" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:380px;text-align:center">
+          <span class="mi xl" style="color:var(--rose)">warning</span>
+          <h3 style="margin:8px 0 0 0;font-size:16px;font-weight:700">{{ 'adminMarket.bulk.deleteConfirm' | translate:{ n: selected.size } }}</h3>
+          <div class="row gap-2" style="margin-top:20px">
+            <button (click)="bulkDeleting = false" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            <button (click)="bulkDelete()" [disabled]="bulkBusy" class="btn danger" style="flex:1">{{ 'adminMarket.delete' | translate }}</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Import confirm / result -->
       <div *ngIf="importOpen" class="modal-backdrop">
         <div class="modal-card tactical" style="max-width:480px">
@@ -263,6 +300,10 @@ interface FormState {
       </div>
     </div>
   `,
+  styles: [`
+    tr.row-selected td { background: color-mix(in srgb, var(--violet) 12%, transparent); }
+    input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color: var(--violet); }
+  `],
 })
 export class AdminMarketComponent implements OnInit, OnDestroy {
   loading = true;
@@ -286,6 +327,12 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   pickerResults: Item[] = [];
   selectedItem: Item | null = null;
   private pickerTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Bulk selection (keyed by item_id, like Master Items)
+  selected = new Set<number>();
+  bulkBusy = false;
+  bulkError: string | null = null;
+  bulkDeleting = false;
 
   // Export / Import
   exporting = false;
@@ -313,10 +360,80 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
 
   reload() {
     this.loading = true;
+    this.clearSelection();
     this.svc.list(this.pageNum, this.pageLimit).subscribe({
       next: p => { this.page = p; this.items = this.applyClientFilter(p.items); this.loading = false; },
       error: () => { this.loading = false; },
     });
+  }
+
+  // ---- Bulk selection -----------------------------------------------------
+  get allSelected(): boolean {
+    return this.items.length > 0 && this.items.every(it => this.selected.has(it.item_id));
+  }
+  get someSelected(): boolean {
+    return this.items.some(it => this.selected.has(it.item_id));
+  }
+  toggleSelect(id: number) {
+    if (this.selected.has(id)) this.selected.delete(id);
+    else this.selected.add(id);
+  }
+  toggleSelectAll(ev: Event) {
+    const checked = (ev.target as HTMLInputElement).checked;
+    if (checked) this.items.forEach(it => this.selected.add(it.item_id));
+    else this.items.forEach(it => this.selected.delete(it.item_id));
+  }
+  clearSelection() {
+    this.selected.clear();
+    this.bulkError = null;
+    this.bulkDeleting = false;
+  }
+
+  private selectedItems(): AdminMarketItem[] {
+    return this.items.filter(it => this.selected.has(it.item_id));
+  }
+
+  /** Enable/disable every selected row in one batch (reuses the per-row toggle endpoint). */
+  bulkSetEnabled(enabled: boolean) {
+    const targets = this.selectedItems().filter(it => !!it.enabled !== enabled);
+    if (targets.length === 0) { this.clearSelection(); return; }
+    this.bulkBusy = true;
+    this.bulkError = null;
+    forkJoin(targets.map(it => this.svc.toggle(it.item_id, enabled))).subscribe({
+      next: () => { this.bulkBusy = false; this.reload(); },
+      error: e => { this.bulkBusy = false; this.bulkError = e?.error?.message || 'Bulk update failed'; },
+    });
+  }
+
+  bulkDelete() {
+    const targets = this.selectedItems();
+    if (targets.length === 0) { this.bulkDeleting = false; return; }
+    this.bulkBusy = true;
+    this.bulkError = null;
+    forkJoin(targets.map(it => this.svc.remove(it.item_id))).subscribe({
+      next: () => { this.bulkBusy = false; this.bulkDeleting = false; this.reload(); },
+      error: e => { this.bulkBusy = false; this.bulkDeleting = false; this.bulkError = e?.error?.message || 'Bulk delete failed'; },
+    });
+  }
+
+  /** Download just the selected rows as JSON (subset of the full Export). */
+  exportSelected() {
+    const rows = this.selectedItems().map(it => ({
+      item_id: it.item_id,
+      base_price: it.base_price,
+      target_stock: it.target_stock,
+      elasticity: it.elasticity,
+      amount: it.amount,
+      enabled: !!it.enabled,
+    }));
+    if (rows.length === 0) return;
+    const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `market-selected-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   private applyClientFilter(arr: AdminMarketItem[]): AdminMarketItem[] {

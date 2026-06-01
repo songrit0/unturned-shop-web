@@ -27,8 +27,8 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
           <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
         </a>
-        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
-          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
+        <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
+          <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
         </a>
       </ng-container>
 
@@ -53,15 +53,15 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/vip" routerLinkActive="active" class="nav-item">
           <span class="mi">workspace_premium</span>VIP
         </a>
-        <a routerLink="/vaults" routerLinkActive="active" class="nav-item">
-          <span class="mi">inventory</span>{{ 'nav.vaults' | translate }}
-        </a>
       </ng-container>
 
       <!-- SHOP — demoted below P2P + Account; still public (visible logged-out) -->
       <div class="nav-section-label"><span class="mi">shopping_cart</span>{{ 'nav.section.shop' | translate }}</div>
       <a routerLink="/shop" routerLinkActive="active" class="nav-item">
         <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
+      </a>
+      <a routerLink="/sell-prices" routerLinkActive="active" class="nav-item">
+        <span class="mi">sell</span>{{ 'nav.sellPrices' | translate }}
       </a>
       <a routerLink="/bills" routerLinkActive="active" class="nav-item">
         <span class="mi">payments</span>{{ 'nav.bills' | translate }}

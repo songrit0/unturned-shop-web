@@ -6,6 +6,7 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "shop": "Shop",
+    "sellPrices": "Sell to Shop",
     "bills": "Bills",
     "coins": "Coin",
     "codes": "Codes",
@@ -135,6 +136,14 @@
     "billsDesc": "Cash bills",
     "coinsDesc": "Balance + history",
     "codesDesc": "History + reuse",
+    "p2pDesc": "Buy & sell with players",
+    "myListingsDesc": "Your active listings",
+    "vaultsDesc": "Your stored items",
+    "sellPricesDesc": "What the shop pays",
+    "inventoryDesc": "Claim your items",
+    "vipDesc": "Perks & packages",
+    "p2pLatest": "Latest on P2P Market",
+    "viewAll": "View all",
     "adminMarketDesc": "Admin · Market",
     "adminCoinsDesc": "Admin · Coins",
     "helpLink": "How it works + economy"
@@ -346,6 +355,23 @@
     "faq5Q": "What if the shop runs out of stock?",
     "faq5A": "Stock returns when players /sell items into it — pure supply-demand"
   },
+  "sellPrices": {
+    "title": "Sell to Shop",
+    "search": "Search id/name...",
+    "allTypes": "All types",
+    "exportImage": "Export image",
+    "intro": "Sell your items to the shop and get coins. You receive the market price minus a {{commission}} commission. Prices move with supply & demand.",
+    "boardTitle": "Sell Prices",
+    "boardFoot": "You receive market price − {{commission}}% commission. Prices update with supply & demand.",
+    "empty": "No items available to sell.",
+    "col": {
+      "image": "Image",
+      "name": "Name",
+      "sell": "You get",
+      "market": "Market",
+      "trend": "Trend"
+    }
+  },
   "adminMarket": {
     "title": "Manage Market",
     "add": "Add item",
@@ -383,6 +409,15 @@
     "importFailed": "failed",
     "importEmpty": "No valid rows found in the file.",
     "importBadFile": "Could not read the file — expected a JSON array of market rows.",
+    "bulk": {
+      "selected": "{{n}} selected",
+      "enable": "Enable",
+      "disable": "Disable",
+      "delete": "Delete",
+      "export": "Export selected",
+      "clear": "Clear",
+      "deleteConfirm": "Delete {{n}} selected item(s) from the market?"
+    },
     "form": {
       "itemId": "Item ID",
       "name": "Name",
@@ -713,6 +748,19 @@
     "buy": "Buy",
     "buying": "Buying...",
     "buySuccessGoTo": "Purchase successful — view in My Inventory",
+    "guide": {
+      "btn": "How to",
+      "title": "How the P2P Market works",
+      "buy": "Buy: click any listing, review the seller, quality and price, then confirm — the item lands in My Inventory.",
+      "sell": "Sell: click \"Sell from vault\", pick an item from your vault and set a price — it goes live instantly.",
+      "commission": "A commission is taken from the sale; you see exactly what you'll receive before listing.",
+      "expire": "Listings expire after a few days. On cancel/expire you get a redeem code to recover the item."
+    },
+    "sell": {
+      "btn": "Sell from vault",
+      "title": "Sell from my vault",
+      "noVaults": "You have no vaults yet."
+    },
     "status": {
       "active": "Active",
       "sold": "Sold",
