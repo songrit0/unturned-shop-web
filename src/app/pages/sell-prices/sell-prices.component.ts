@@ -59,7 +59,7 @@ import { MarketService, MarketTypeOption, SellPriceItem } from '../../services/m
                   <td>
                     <span style="font-weight:600">{{ it.name || ('#' + it.item_id) }}</span>
                     <span *ngIf="it.type_name" class="badge violet" style="margin-left:6px">{{ it.type_name }}</span>
-                    <span *ngIf="!it.enabled" class="badge amber" style="margin-left:6px" [title]="'sellPrices.buyOnlyHint' | translate">
+                    <span *ngIf="!it.is_for_sale" class="badge amber" style="margin-left:6px" [title]="'sellPrices.buyOnlyHint' | translate">
                       <span class="mi sm">sell</span>{{ 'sellPrices.buyOnly' | translate }}
                     </span>
                   </td>

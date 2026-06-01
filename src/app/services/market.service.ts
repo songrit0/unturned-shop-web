@@ -37,7 +37,7 @@ export interface SellPriceItem {
   base_price: number;
   sell_price: number;
   trend: number; // -1 down, 0 flat, 1 up (vs anchor)
-  enabled: boolean; // false = shop buys but doesn't sell (buy-only)
+  is_for_sale: boolean; // false = shop buys but doesn't sell (buy-only)
 }
 
 export interface SellPriceBoard {

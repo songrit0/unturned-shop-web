@@ -11,11 +11,8 @@ interface FormState {
   target_stock: number;
   elasticity: number;
   amount: number;
-  enabled: boolean;
-  // "create new (buy-only)" path when the item isn't in Master Items
-  createNew: boolean;
-  name: string;
-  image_url: string;
+  enabled: boolean;          // shop buys it (รับซื้อ)
+  enabledIsForSell: boolean; // shop sells it (ขาย)
 }
 
 @Component({
@@ -52,11 +49,19 @@ interface FormState {
       <!-- Bulk action bar -->
       <div *ngIf="selected.size > 0" class="card flush" style="padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span class="badge violet"><span class="mi sm">check_box</span>{{ 'adminMarket.bulk.selected' | translate:{ n: selected.size } }}</span>
+        <span class="muted" style="font-size:12px">{{ 'adminMarket.bulk.sell' | translate }}:</span>
+        <button (click)="bulkSetForSale(true)" [disabled]="bulkBusy" class="btn ghost sm">
+          <span class="mi sm">storefront</span> {{ 'adminMarket.bulk.sellOn' | translate }}
+        </button>
+        <button (click)="bulkSetForSale(false)" [disabled]="bulkBusy" class="btn ghost sm">
+          <span class="mi sm">block</span> {{ 'adminMarket.bulk.sellOff' | translate }}
+        </button>
+        <span class="muted" style="font-size:12px">{{ 'adminMarket.bulk.buy' | translate }}:</span>
         <button (click)="bulkSetEnabled(true)" [disabled]="bulkBusy" class="btn ghost sm">
-          <span class="mi sm">toggle_on</span> {{ 'adminMarket.bulk.enable' | translate }}
+          <span class="mi sm">sell</span> {{ 'adminMarket.bulk.buyOn' | translate }}
         </button>
         <button (click)="bulkSetEnabled(false)" [disabled]="bulkBusy" class="btn ghost sm">
-          <span class="mi sm">toggle_off</span> {{ 'adminMarket.bulk.disable' | translate }}
+          <span class="mi sm">block</span> {{ 'adminMarket.bulk.buyOff' | translate }}
         </button>
         <button (click)="bulkDeleting = true" [disabled]="bulkBusy" class="btn ghost sm" style="color:var(--rose)">
           <span class="mi sm">delete</span> {{ 'adminMarket.bulk.delete' | translate }}
@@ -85,7 +90,8 @@ interface FormState {
                   <th class="r">{{ 'adminMarket.col.stock' | translate }}</th>
                   <th class="r" [title]="'adminMarket.col.targetTitle' | translate">{{ 'adminMarket.col.target' | translate }}</th>
                   <th class="r" [title]="'adminMarket.col.elasTitle' | translate">{{ 'adminMarket.col.elas' | translate }}</th>
-                  <th>{{ 'adminMarket.col.enabled' | translate }}</th>
+                  <th [title]="'adminMarket.col.sellTitle' | translate">{{ 'adminMarket.col.sell' | translate }}</th>
+                  <th [title]="'adminMarket.col.buyTitle' | translate">{{ 'adminMarket.col.buy' | translate }}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -116,6 +122,11 @@ interface FormState {
                   <td class="r mono muted">{{ it.target_stock | number }}</td>
                   <td class="r mono muted">{{ it.elasticity | number:'1.0-2' }}</td>
                   <td>
+                    <button (click)="toggleSale(it)" class="badge" [class.emerald]="it.enabled_isforsell" [class.slate]="!it.enabled_isforsell" style="cursor:pointer;border:none">
+                      {{ (it.enabled_isforsell ? 'adminMarket.on' : 'adminMarket.off') | translate }}
+                    </button>
+                  </td>
+                  <td>
                     <button (click)="toggle(it)" class="badge" [class.emerald]="it.enabled" [class.slate]="!it.enabled" style="cursor:pointer;border:none">
                       {{ (it.enabled ? 'adminMarket.on' : 'adminMarket.off') | translate }}
                     </button>
@@ -128,7 +139,7 @@ interface FormState {
                   </td>
                 </tr>
                 <tr *ngIf="items.length === 0">
-                  <td colspan="11">
+                  <td colspan="12">
                     <div class="empty">
                       <span class="mi xxl">inventory_2</span>
                       <div class="empty-title">{{ 'adminMarket.empty' | translate }}</div>
@@ -158,39 +169,7 @@ interface FormState {
             {{ (isNew ? 'adminMarket.addTitle' : 'adminMarket.editTitle') | translate }}
           </h3>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <!-- mode toggle: pick existing catalog item, or create a buy-only stub -->
-            <div *ngIf="isNew" class="row gap-2">
-              <button type="button" class="btn sm" [class.primary]="!form.createNew" [class.ghost]="form.createNew" (click)="setCreateNew(false)">
-                <span class="mi sm">search</span> {{ 'adminMarket.form.fromCatalog' | translate }}
-              </button>
-              <button type="button" class="btn sm" [class.primary]="form.createNew" [class.ghost]="!form.createNew" (click)="setCreateNew(true)">
-                <span class="mi sm">add_circle</span> {{ 'adminMarket.form.createNew' | translate }}
-              </button>
-            </div>
-
-            <!-- create-new (buy-only) inputs -->
-            <div *ngIf="isNew && form.createNew" style="display:flex;flex-direction:column;gap:12px">
-              <div class="welcome-alert" style="font-size:12px">
-                <span class="alert-icon mi">info</span>
-                <div>{{ 'adminMarket.form.createNewHint' | translate }}</div>
-              </div>
-              <div class="row gap-3" style="align-items:stretch">
-                <label style="flex:1;display:block">
-                  <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemId' | translate }}</span>
-                  <input type="number" min="1" class="input mono" [(ngModel)]="form.item_id" style="margin-top:4px">
-                </label>
-                <label style="flex:2;display:block">
-                  <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemName' | translate }}</span>
-                  <input type="text" maxlength="128" class="input" [(ngModel)]="form.name" style="margin-top:4px">
-                </label>
-              </div>
-              <label style="display:block">
-                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.newItemImage' | translate }}</span>
-                <input type="url" maxlength="512" class="input" [(ngModel)]="form.image_url" style="margin-top:4px">
-              </label>
-            </div>
-
-            <div *ngIf="isNew && !form.createNew">
+            <div *ngIf="isNew">
               <label class="muted" style="font-size:12px;display:block;margin-bottom:4px">{{ 'adminMarket.form.pickItem' | translate }}</label>
               <div style="position:relative">
                 <input type="search" class="input" [(ngModel)]="pickerQ" (ngModelChange)="onPickerSearch()"
@@ -254,10 +233,17 @@ interface FormState {
               <div class="muted">{{ 'adminMarket.form.previewLine2' | translate:{ target: form.target_stock, base: (form.base_price | number) } }}</div>
             </div>
 
-            <label style="display:flex;align-items:center;gap:8px">
-              <input type="checkbox" [(ngModel)]="form.enabled">
-              <span>{{ 'adminMarket.form.enabled' | translate }}</span>
-            </label>
+            <div class="row gap-3">
+              <label style="flex:1;display:flex;align-items:center;gap:8px">
+                <input type="checkbox" [(ngModel)]="form.enabledIsForSell">
+                <span>{{ 'adminMarket.form.forSale' | translate }}</span>
+              </label>
+              <label style="flex:1;display:flex;align-items:center;gap:8px">
+                <input type="checkbox" [(ngModel)]="form.enabled">
+                <span>{{ 'adminMarket.form.buysIt' | translate }}</span>
+              </label>
+            </div>
+            <div class="muted" style="font-size:11px">{{ 'adminMarket.form.flagsHint' | translate }}</div>
           </div>
           <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:12px 0 0 0">{{ error }}</p>
           <div class="row gap-2" style="margin-top:20px">
@@ -429,13 +415,25 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
     return this.items.filter(it => this.selected.has(it.item_id));
   }
 
-  /** Enable/disable every selected row in one batch (reuses the per-row toggle endpoint). */
+  /** Bulk set "shop buys it" (รับซื้อ / enabled) for every selected row. */
   bulkSetEnabled(enabled: boolean) {
     const targets = this.selectedItems().filter(it => !!it.enabled !== enabled);
     if (targets.length === 0) { this.clearSelection(); return; }
     this.bulkBusy = true;
     this.bulkError = null;
     forkJoin(targets.map(it => this.svc.toggle(it.item_id, enabled))).subscribe({
+      next: () => { this.bulkBusy = false; this.reload(); },
+      error: e => { this.bulkBusy = false; this.bulkError = e?.error?.message || 'Bulk update failed'; },
+    });
+  }
+
+  /** Bulk set "shop sells it" (ขาย / enabled_isforsell) for every selected row. */
+  bulkSetForSale(isForSale: boolean) {
+    const targets = this.selectedItems().filter(it => !!it.enabled_isforsell !== isForSale);
+    if (targets.length === 0) { this.clearSelection(); return; }
+    this.bulkBusy = true;
+    this.bulkError = null;
+    forkJoin(targets.map(it => this.svc.toggleForSale(it.item_id, isForSale))).subscribe({
       next: () => { this.bulkBusy = false; this.reload(); },
       error: e => { this.bulkBusy = false; this.bulkError = e?.error?.message || 'Bulk update failed'; },
     });
@@ -461,6 +459,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       elasticity: it.elasticity,
       amount: it.amount,
       enabled: !!it.enabled,
+      enabled_isforsell: !!it.enabled_isforsell,
     }));
     if (rows.length === 0) return;
     const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
@@ -486,12 +485,12 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   }
 
   emptyForm(): FormState {
-    return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10, enabled: true,
-             createNew: false, name: '', image_url: '' };
+    return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10,
+             enabled: true, enabledIsForSell: true };
   }
 
   openNew() {
-    this.editing = { item_id: 0, name: '', price: 0, amount: 10, base_price: 100, target_stock: 10, elasticity: 0.5, image_url: null, enabled: 1 };
+    this.editing = { item_id: 0, name: '', price: 0, amount: 10, base_price: 100, target_stock: 10, elasticity: 0.5, image_url: null, enabled: 1, enabled_isforsell: 1 };
     this.isNew = true;
     this.form = this.emptyForm();
     this.error = null;
@@ -506,8 +505,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
     this.form = {
       item_id: it.item_id,
       base_price: it.base_price, target_stock: it.target_stock, elasticity: it.elasticity,
-      amount: it.amount, enabled: !!it.enabled,
-      createNew: false, name: it.name ?? '', image_url: it.image_url ?? '',
+      amount: it.amount, enabled: !!it.enabled, enabledIsForSell: !!it.enabled_isforsell,
     };
     this.selectedItem = {
       id: it.item_id, name: it.name, description: null,
@@ -544,21 +542,6 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
     this.pickerResults = [];
   }
 
-  /** Switch the Add modal between "pick from catalog" and "create new (buy-only)". */
-  setCreateNew(v: boolean) {
-    this.form.createNew = v;
-    this.error = null;
-    this.clearPick();
-    if (v) {
-      // A buy-only entry: the shop purchases it but doesn't list it for sale.
-      this.form.enabled = false;
-      this.form.name = '';
-      this.form.image_url = '';
-    } else {
-      this.form.enabled = true;
-    }
-  }
-
   /** Local preview of the supply/demand formula (matches backend PricingService.compute). */
   preview(): number {
     const base = Number(this.form.base_price) || 0;
@@ -571,16 +554,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    if (this.form.createNew) {
-      if (!this.form.item_id || Number(this.form.item_id) <= 0) {
-        this.error = this.t.instant('adminMarket.errors.missingId');
-        return;
-      }
-      if (!this.form.name.trim()) {
-        this.error = this.t.instant('adminMarket.errors.missingName');
-        return;
-      }
-    } else if (!this.form.item_id) {
+    if (!this.form.item_id) {
       this.error = this.t.instant('adminMarket.errors.missing');
       return;
     }
@@ -592,21 +566,25 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       elasticity: Number(this.form.elasticity) || 0,
       amount: Number(this.form.amount) || 0,
       enabled: this.form.enabled !== false,
+      enabled_isforsell: this.form.enabledIsForSell !== false,
     };
-    if (this.form.createNew) {
-      payload.create_if_missing = true;
-      payload.name = this.form.name.trim();
-      const img = this.form.image_url.trim();
-      if (img) payload.image_url = img;
-    }
     this.svc.upsert(payload).subscribe({
       next: () => { this.saving = false; this.editing = null; this.reload(); },
       error: e => { this.saving = false; this.error = e?.error?.message?.join?.(', ') || e?.error?.message || this.t.instant('adminMarket.errors.saveFail'); },
     });
   }
 
+  /** Toggle "shop buys it" (รับซื้อ). */
   toggle(it: AdminMarketItem) {
     this.svc.toggle(it.item_id, !it.enabled).subscribe(updated => {
+      const i = this.items.findIndex(x => x.item_id === it.item_id);
+      if (i >= 0) this.items[i] = updated;
+    });
+  }
+
+  /** Toggle "shop sells it" (ขาย). */
+  toggleSale(it: AdminMarketItem) {
+    this.svc.toggleForSale(it.item_id, !it.enabled_isforsell).subscribe(updated => {
       const i = this.items.findIndex(x => x.item_id === it.item_id);
       if (i >= 0) this.items[i] = updated;
     });

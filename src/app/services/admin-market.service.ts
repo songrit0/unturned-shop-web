@@ -17,7 +17,8 @@ export interface AdminMarketItem {
   target_stock: number;
   elasticity: number;
   image_url: string | null; // from JOIN
-  enabled: number;
+  enabled: number;             // 1 = shop buys it (sell-to-shop)
+  enabled_isforsell: number;   // 1 = shop sells it (Shop page)
   type_id?: number | null;  // from JOIN
   type_name?: string | null;// from JOIN
 }
@@ -28,11 +29,8 @@ export interface UpsertPayload {
   target_stock: number;
   elasticity: number;
   amount: number;
-  enabled?: boolean;
-  // Create a buy-only catalog stub when the item isn't in Master Items.
-  create_if_missing?: boolean;
-  name?: string;
-  image_url?: string;
+  enabled?: boolean;            // shop buys it
+  enabled_isforsell?: boolean;  // shop sells it
 }
 
 export interface MarketExportRow {
@@ -42,6 +40,7 @@ export interface MarketExportRow {
   elasticity: number;
   amount: number;
   enabled: boolean;
+  enabled_isforsell?: boolean;
 }
 
 export interface ImportResult {
@@ -65,6 +64,9 @@ export class AdminMarketService {
   }
   toggle(item_id: number, enabled: boolean): Observable<AdminMarketItem> {
     return this.http.put<AdminMarketItem>(`${this.apiUrl.get()}/admin/market/${item_id}/enabled`, { enabled });
+  }
+  toggleForSale(item_id: number, is_for_sale: boolean): Observable<AdminMarketItem> {
+    return this.http.put<AdminMarketItem>(`${this.apiUrl.get()}/admin/market/${item_id}/forsale`, { is_for_sale });
   }
   remove(item_id: number) {
     return this.http.delete<{ ok: boolean; deleted: number }>(`${this.apiUrl.get()}/admin/market/${item_id}`);
