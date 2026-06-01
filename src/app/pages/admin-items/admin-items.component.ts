@@ -3,6 +3,8 @@ import { forkJoin, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Item, ItemPayload, ItemsService, Paginated } from '../../services/items.service';
 import { ItemType, ItemTypesService } from '../../services/item-types.service';
+import { AdminMarketService } from '../../services/admin-market.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-items',
@@ -39,8 +41,16 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
           <span class="mi sm">{{ bulkBusy ? 'hourglass_empty' : 'done_all' }}</span>
           {{ (bulkBusy ? 'common.saving' : 'adminItems.bulk.apply') | translate }}
         </button>
+        <button (click)="buyOnlyBulk()" [disabled]="bulkBusy" class="btn ghost sm" [title]="'adminItems.buyOnlyHint' | translate">
+          <span class="mi sm">sell</span> {{ 'adminItems.buyOnly' | translate }}
+        </button>
         <button (click)="clearSelection()" class="btn ghost sm">{{ 'adminItems.bulk.clear' | translate }}</button>
         <span *ngIf="bulkError" style="color:var(--rose);font-size:13px">{{ bulkError }}</span>
+      </div>
+
+      <div *ngIf="buyOnlyMsg" class="welcome-alert" style="margin-bottom:12px">
+        <span class="alert-icon mi">sell</span>
+        <div>{{ buyOnlyMsg }}</div>
       </div>
 
       <ng-container *ngIf="!loading; else loadingTpl">
@@ -81,6 +91,9 @@ import { ItemType, ItemTypesService } from '../../services/item-types.service';
                   </td>
                   <td>
                     <div class="row gap-1">
+                      <button (click)="buyOnlyRow(it)" [disabled]="bulkBusy" class="btn ghost sm" [title]="'adminItems.buyOnlyHint' | translate">
+                        <span class="mi sm">sell</span>
+                      </button>
                       <button (click)="openEdit(it)" class="btn ghost sm"><span class="mi sm">edit</span></button>
                       <button (click)="deleting = it" class="btn ghost sm" style="color:var(--rose)"><span class="mi sm">delete</span></button>
                     </div>
@@ -201,6 +214,7 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
   bulkTypeId: number | null = null;
   bulkBusy = false;
   bulkError: string | null = null;
+  buyOnlyMsg: string | null = null;
 
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -218,7 +232,12 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
   deletingBusy = false;
   deleteError: string | null = null;
 
-  constructor(private svc: ItemsService, private typesSvc: ItemTypesService) { }
+  constructor(
+    private svc: ItemsService,
+    private typesSvc: ItemTypesService,
+    private market: AdminMarketService,
+    private t: TranslateService,
+  ) { }
 
   ngOnInit() {
     this.searchSub = this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
@@ -284,6 +303,35 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
   clearSelection() {
     this.selected.clear();
     this.bulkError = null;
+  }
+
+  // ---- Buy-only (add to shop's purchase board without selling) ----
+  /** One-click: make a single catalog item buy-only in the market. */
+  buyOnlyRow(it: Item) {
+    this.runBuyOnly([it.id]);
+  }
+  /** Bulk: make every selected catalog item buy-only. */
+  buyOnlyBulk() {
+    const ids = this.items.filter(i => this.selected.has(i.id)).map(i => i.id);
+    if (ids.length === 0) return;
+    this.runBuyOnly(ids);
+  }
+  private runBuyOnly(ids: number[]) {
+    this.bulkBusy = true;
+    this.bulkError = null;
+    this.buyOnlyMsg = null;
+    this.market.enableBuyOnly(ids).subscribe({
+      next: res => {
+        this.bulkBusy = false;
+        this.buyOnlyMsg = this.t.instant('adminItems.buyOnlyDone', { created: res.created, updated: res.updated });
+        this.clearSelection();
+        setTimeout(() => this.buyOnlyMsg = null, 6000);
+      },
+      error: e => {
+        this.bulkBusy = false;
+        this.bulkError = e?.error?.message || 'Buy-only failed';
+      },
+    });
   }
 
   /** Apply the chosen type to every selected item in one batch. */

@@ -530,6 +530,9 @@
     "loadMore": "Load more",
     "loadingMore": "Loading...",
     "loadedCount": "Showing {{shown}} of {{total}}",
+    "buyOnly": "Buy-only",
+    "buyOnlyHint": "Let the shop buy this item from players (not for sale). Adds it to the market disabled.",
+    "buyOnlyDone": "Buy-only set — {{created}} added, {{updated}} updated. Tune prices in Manage Market.",
     "bulk": {
       "selected": "{{n}} selected",
       "setTypeTo": "Set type to",

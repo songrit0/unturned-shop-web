@@ -79,4 +79,10 @@ export class AdminMarketService {
   import(items: MarketExportRow[]): Observable<ImportResult> {
     return this.http.post<ImportResult>(`${this.apiUrl.get()}/admin/market/import`, { items });
   }
+
+  /** Set items to buy-only (enabled=0); same sv_market table, existing prices kept. */
+  enableBuyOnly(itemIds: number[]): Observable<{ ok: boolean; created: number; updated: number; failed: { item_id: number; error: string }[] }> {
+    return this.http.post<{ ok: boolean; created: number; updated: number; failed: { item_id: number; error: string }[] }>(
+      `${this.apiUrl.get()}/admin/market/buy-only`, { item_ids: itemIds });
+  }
 }
