@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "Home",
+    "dashboard": "Dashboard",
     "shop": "Shop",
     "bills": "Bills",
     "coins": "Coin",
@@ -370,6 +371,18 @@
     "empty": "No items",
     "on": "On",
     "off": "Off",
+    "export": "Export",
+    "exportHint": "Download all market rows as JSON",
+    "import": "Import",
+    "importHint": "Bulk add/update market rows from a JSON file",
+    "importTitle": "Import market items",
+    "importReady": "{{count}} row(s) ready to import.",
+    "importNote": "Existing items are updated, new ones are added. Item IDs must already exist in the catalog.",
+    "importCreated": "added",
+    "importUpdated": "updated",
+    "importFailed": "failed",
+    "importEmpty": "No valid rows found in the file.",
+    "importBadFile": "Could not read the file — expected a JSON array of market rows.",
     "form": {
       "itemId": "Item ID",
       "name": "Name",
@@ -431,7 +444,8 @@
     "loading": "Loading...",
     "saving": "Saving...",
     "discard": "Discard",
-    "ok": "OK"
+    "ok": "OK",
+    "done": "Done"
   },
   "errors": {
     "vault_locked_in_game": "This vault is open in-game. Close it and try again.",

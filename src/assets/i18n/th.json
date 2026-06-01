@@ -4,6 +4,7 @@
   },
   "nav": {
     "home": "หน้าแรก",
+    "dashboard": "แดชบอร์ด",
     "shop": "ร้านค้า",
     "bills": "ธนบัตร",
     "coins": "Coin",
@@ -402,6 +403,18 @@
     "empty": "ไม่พบรายการ",
     "on": "เปิด",
     "off": "ปิด",
+    "export": "Export",
+    "exportHint": "ดาวน์โหลดรายการร้านค้าทั้งหมดเป็นไฟล์ JSON",
+    "import": "Import",
+    "importHint": "เพิ่ม/อัปเดตรายการร้านค้าทีละหลายรายการจากไฟล์ JSON",
+    "importTitle": "นำเข้ารายการร้านค้า",
+    "importReady": "พร้อมนำเข้า {{count}} รายการ",
+    "importNote": "รายการที่มีอยู่จะถูกอัปเดต รายการใหม่จะถูกเพิ่ม — item_id ต้องมีอยู่ใน catalog แล้ว",
+    "importCreated": "เพิ่ม",
+    "importUpdated": "อัปเดต",
+    "importFailed": "ล้มเหลว",
+    "importEmpty": "ไม่พบรายการที่ใช้ได้ในไฟล์",
+    "importBadFile": "อ่านไฟล์ไม่ได้ — ต้องเป็น JSON array ของรายการร้านค้า",
     "form": {
       "itemId": "Item ID",
       "name": "ชื่อ",
@@ -463,7 +476,8 @@
     "loading": "กำลังโหลด...",
     "saving": "กำลังบันทึก...",
     "discard": "ยกเลิก",
-    "ok": "ตกลง"
+    "ok": "ตกลง",
+    "done": "เสร็จสิ้น"
   },
   "errors": {
     "vault_locked_in_game": "คลังนี้กำลังเปิดอยู่ในเกม กรุณาปิดแล้วลองใหม่",

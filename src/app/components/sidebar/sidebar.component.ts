@@ -10,33 +10,34 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
   template: `
     <aside class="sidebar">
       <a routerLink="/" class="brand">
-        <div class="brand-mark"><span class="mi fill">storefront</span></div>
+        <div class="brand-mark"><span class="mi fill">handshake</span></div>
         <div>
           <div class="brand-name">meowpow</div>
-          <div class="brand-tag">SHOP · UNTURNED</div>
+          <div class="brand-tag">MARKETPLACE · UNTURNED</div>
         </div>
       </a>
 
-      <!-- Home — ungrouped, sits above the groups -->
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-        <span class="mi">home</span>{{ 'nav.home' | translate }}
+      <!-- P2P — the headline feature, sits at the very top. Market is public;
+           the personal items are auth only. -->
+      <div class="nav-section-label"><span class="mi">handshake</span>{{ 'nav.section.p2p' | translate }}</div>
+      <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
+        <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
       </a>
-
-      <!-- SHOP — public (visible logged-out) -->
-      <div class="nav-section-label"><span class="mi">shopping_cart</span>{{ 'nav.section.shop' | translate }}</div>
-      <a routerLink="/shop" routerLinkActive="active" class="nav-item">
-        <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
-      </a>
-      <a routerLink="/bills" routerLinkActive="active" class="nav-item">
-        <span class="mi">payments</span>{{ 'nav.bills' | translate }}
-      </a>
-      <a routerLink="/market/history" routerLinkActive="active" class="nav-item">
-        <span class="mi">receipt_long</span>{{ 'nav.marketHistory' | translate }}
-      </a>
+      <ng-container *ngIf="auth.me$ | async as me">
+        <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
+          <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
+        </a>
+        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
+          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
+        </a>
+      </ng-container>
 
       <!-- ACCOUNT — auth only -->
       <ng-container *ngIf="auth.me$ | async as me">
         <div class="nav-section-label"><span class="mi">person</span>{{ 'nav.section.account' | translate }}</div>
+        <a routerLink="/home" routerLinkActive="active" class="nav-item">
+          <span class="mi">dashboard</span>{{ 'nav.dashboard' | translate }}
+        </a>
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
         </a>
@@ -57,19 +58,17 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         </a>
       </ng-container>
 
-      <!-- P2P — P2P Market is public; the personal items are auth only -->
-      <div class="nav-section-label"><span class="mi">handshake</span>{{ 'nav.section.p2p' | translate }}</div>
-      <a routerLink="/p2p-market" routerLinkActive="active" class="nav-item">
-        <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
+      <!-- SHOP — demoted below P2P + Account; still public (visible logged-out) -->
+      <div class="nav-section-label"><span class="mi">shopping_cart</span>{{ 'nav.section.shop' | translate }}</div>
+      <a routerLink="/shop" routerLinkActive="active" class="nav-item">
+        <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
       </a>
-      <ng-container *ngIf="auth.me$ | async as me">
-        <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
-          <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
-        </a>
-        <a routerLink="/my-submissions" routerLinkActive="active" class="nav-item">
-          <span class="mi">edit_note</span>{{ 'nav.mySubmissions' | translate }}
-        </a>
-      </ng-container>
+      <a routerLink="/bills" routerLinkActive="active" class="nav-item">
+        <span class="mi">payments</span>{{ 'nav.bills' | translate }}
+      </a>
+      <a routerLink="/market/history" routerLinkActive="active" class="nav-item">
+        <span class="mi">receipt_long</span>{{ 'nav.marketHistory' | translate }}
+      </a>
 
       <!-- ADMIN — admins only -->
       <ng-container *ngIf="(auth.me$ | async)?.is_admin">

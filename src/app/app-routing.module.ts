@@ -31,7 +31,9 @@ import { adminGuard } from './guards/admin.guard';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'auth/callback', component: AuthCallbackComponent },
-  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  // P2P marketplace is now the landing page; the old dashboard lives at /home.
+  { path: '', redirectTo: 'p2p-market', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'shop', component: ShopComponent, canActivate: [authGuard] },
   { path: 'bills', component: BillsComponent, canActivate: [authGuard] },
   { path: 'coins', component: CoinsComponent, canActivate: [authGuard] },

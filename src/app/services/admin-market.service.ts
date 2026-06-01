@@ -31,6 +31,22 @@ export interface UpsertPayload {
   enabled?: boolean;
 }
 
+export interface MarketExportRow {
+  item_id: number;
+  base_price: number;
+  target_stock: number;
+  elasticity: number;
+  amount: number;
+  enabled: boolean;
+}
+
+export interface ImportResult {
+  total: number;
+  created: number;
+  updated: number;
+  failed: { item_id: number; error: string }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminMarketService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -48,5 +64,15 @@ export class AdminMarketService {
   }
   remove(item_id: number) {
     return this.http.delete<{ ok: boolean; deleted: number }>(`${this.apiUrl.get()}/admin/market/${item_id}`);
+  }
+
+  /** Every market row in import-ready shape (for the Export button). */
+  exportAll(): Observable<MarketExportRow[]> {
+    return this.http.get<MarketExportRow[]>(`${this.apiUrl.get()}/admin/market/export`);
+  }
+
+  /** Bulk upsert from an imported JSON file. */
+  import(items: MarketExportRow[]): Observable<ImportResult> {
+    return this.http.post<ImportResult>(`${this.apiUrl.get()}/admin/market/import`, { items });
   }
 }

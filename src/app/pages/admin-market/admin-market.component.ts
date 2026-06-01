@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { AdminMarketItem, AdminMarketService, Paginated, UpsertPayload } from '../../services/admin-market.service';
+import { AdminMarketItem, AdminMarketService, ImportResult, MarketExportRow, Paginated, UpsertPayload } from '../../services/admin-market.service';
 import { Item, ItemsService } from '../../services/items.service';
 
 interface FormState {
@@ -27,6 +27,13 @@ interface FormState {
             <span class="mi lead">search</span>
             <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" [placeholder]="'adminMarket.search' | translate">
           </div>
+          <button (click)="exportJson()" [disabled]="exporting" class="btn ghost" [title]="'adminMarket.exportHint' | translate">
+            <span class="mi sm">download</span> {{ 'adminMarket.export' | translate }}
+          </button>
+          <button (click)="fileInput.click()" class="btn ghost" [title]="'adminMarket.importHint' | translate">
+            <span class="mi sm">upload</span> {{ 'adminMarket.import' | translate }}
+          </button>
+          <input #fileInput type="file" accept="application/json,.json" hidden (change)="onImportFile($event)">
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminMarket.add' | translate }}
           </button>
@@ -213,6 +220,47 @@ interface FormState {
           </div>
         </div>
       </div>
+
+      <!-- Import confirm / result -->
+      <div *ngIf="importOpen" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:480px">
+          <h3 style="display:flex;align-items:center;gap:8px;margin:0 0 16px 0;font-size:18px;font-weight:700">
+            <span class="mi">upload</span>{{ 'adminMarket.importTitle' | translate }}
+          </h3>
+
+          <!-- stage 1: confirm parsed file -->
+          <ng-container *ngIf="!importResult">
+            <p *ngIf="importError" style="color:var(--rose);font-size:13px;margin:0 0 8px 0">{{ importError }}</p>
+            <div *ngIf="!importError" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px">
+              <div [innerHTML]="'adminMarket.importReady' | translate:{ count: '<strong>' + importRows.length + '</strong>' }"></div>
+              <div class="muted" style="font-size:12px;margin-top:4px">{{ 'adminMarket.importNote' | translate }}</div>
+            </div>
+            <div class="row gap-2" style="margin-top:20px">
+              <button (click)="closeImport()" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+              <button (click)="confirmImport()" [disabled]="importing || !!importError || importRows.length === 0" class="btn primary" style="flex:1">
+                {{ (importing ? 'common.saving' : 'adminMarket.import') | translate }}
+              </button>
+            </div>
+          </ng-container>
+
+          <!-- stage 2: result -->
+          <ng-container *ngIf="importResult as r">
+            <div class="row gap-2" style="margin-bottom:12px">
+              <span class="badge emerald"><span class="mi sm">add_circle</span> {{ r.created }} {{ 'adminMarket.importCreated' | translate }}</span>
+              <span class="badge violet"><span class="mi sm">sync</span> {{ r.updated }} {{ 'adminMarket.importUpdated' | translate }}</span>
+              <span *ngIf="r.failed.length > 0" class="badge rose"><span class="mi sm">error</span> {{ r.failed.length }} {{ 'adminMarket.importFailed' | translate }}</span>
+            </div>
+            <div *ngIf="r.failed.length > 0" style="max-height:180px;overflow-y:auto;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px">
+              <div *ngFor="let f of r.failed" class="row gap-2" style="padding:2px 0">
+                <span class="mono faint">#{{ f.item_id }}</span><span class="muted">{{ f.error }}</span>
+              </div>
+            </div>
+            <div class="row gap-2" style="margin-top:20px">
+              <button (click)="closeImport()" class="btn primary" style="flex:1">{{ 'common.done' | translate }}</button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
     </div>
   `,
 })
@@ -238,6 +286,14 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   pickerResults: Item[] = [];
   selectedItem: Item | null = null;
   private pickerTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Export / Import
+  exporting = false;
+  importOpen = false;
+  importing = false;
+  importError: string | null = null;
+  importRows: MarketExportRow[] = [];
+  importResult: ImportResult | null = null;
 
   constructor(
     private svc: AdminMarketService,
@@ -379,5 +435,73 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       this.deleting = null;
       this.reload();
     });
+  }
+
+  // ---- Export / Import ----------------------------------------------------
+  exportJson() {
+    this.exporting = true;
+    this.svc.exportAll().subscribe({
+      next: rows => {
+        this.exporting = false;
+        const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `market-export-${stamp}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => { this.exporting = false; },
+    });
+  }
+
+  onImportFile(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // allow re-selecting the same file later
+    if (!file) return;
+
+    this.importOpen = true;
+    this.importResult = null;
+    this.importError = null;
+    this.importRows = [];
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const rows = Array.isArray(parsed) ? parsed : parsed?.items;
+        if (!Array.isArray(rows)) throw new Error('not-array');
+        this.importRows = rows.filter((r: any) => r && Number.isFinite(Number(r.item_id)));
+        if (this.importRows.length === 0) {
+          this.importError = this.t.instant('adminMarket.importEmpty');
+        }
+      } catch {
+        this.importError = this.t.instant('adminMarket.importBadFile');
+      }
+    };
+    reader.onerror = () => { this.importError = this.t.instant('adminMarket.importBadFile'); };
+    reader.readAsText(file);
+  }
+
+  confirmImport() {
+    if (this.importRows.length === 0) return;
+    this.importing = true;
+    this.svc.import(this.importRows).subscribe({
+      next: res => { this.importing = false; this.importResult = res; this.reload(); },
+      error: e => {
+        this.importing = false;
+        this.importError = e?.error?.message?.join?.(', ') || e?.error?.message || this.t.instant('adminMarket.errors.saveFail');
+      },
+    });
+  }
+
+  closeImport() {
+    this.importOpen = false;
+    this.importRows = [];
+    this.importResult = null;
+    this.importError = null;
+    this.importing = false;
   }
 }
