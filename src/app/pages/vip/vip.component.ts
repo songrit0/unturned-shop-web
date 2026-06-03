@@ -10,7 +10,7 @@ import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vi
         <h1>VIP</h1>
       </div>
 
-      <!-- maintenance notice (flip `maintenance` to false to reopen the user VIP page) -->
+      <!-- maintenance notice: set the maintenance field to false to reopen the user VIP page -->
       <div *ngIf="maintenance" class="card" style="text-align:center;padding:48px 24px;max-width:520px;margin:24px auto">
         <span class="mi xxl" style="color:var(--accent-hi)">construction</span>
         <h2 style="margin:12px 0 6px">🔧 กำลังแก้ไขระบบ VIP</h2>
