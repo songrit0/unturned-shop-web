@@ -10,6 +10,17 @@ import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vi
         <h1>VIP</h1>
       </div>
 
+      <!-- maintenance notice (flip `maintenance` to false to reopen the user VIP page) -->
+      <div *ngIf="maintenance" class="card" style="text-align:center;padding:48px 24px;max-width:520px;margin:24px auto">
+        <span class="mi xxl" style="color:var(--accent-hi)">construction</span>
+        <h2 style="margin:12px 0 6px">🔧 กำลังแก้ไขระบบ VIP</h2>
+        <p class="muted" style="margin:0">
+          ขออภัยในความไม่สะดวก หน้านี้ปิดปรับปรุงชั่วคราว เปิดให้บริการเร็ว ๆ นี้<br>
+          The VIP page is under maintenance — please check back soon.
+        </p>
+      </div>
+
+      <ng-container *ngIf="!maintenance">
       <!-- not linked -->
       <div *ngIf="mine && !mine.linked" class="welcome-alert" style="margin-bottom:16px">
         <span class="alert-icon mi">link_off</span>
@@ -59,10 +70,13 @@ import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vi
         <span class="alert-icon mi" style="color:var(--emerald)">check_circle</span>
         <div>{{ okMsg }}</div>
       </div>
+      </ng-container>
     </div>
   `,
 })
 export class VipComponent implements OnInit {
+  /** Temporary: show a "VIP under maintenance" notice on the user page. Set to false to reopen. */
+  maintenance = true;
   loading = true;
   packages: VipPackage[] = [];
   mine: VipMine | null = null;
@@ -73,6 +87,7 @@ export class VipComponent implements OnInit {
   constructor(private vip: VipService) {}
 
   ngOnInit() {
+    if (this.maintenance) { this.loading = false; return; }
     this.vip.packages().subscribe({
       next: p => { this.packages = p; this.loading = false; },
       error: e => { this.loading = false; this.error = e?.error?.message || 'โหลดแพ็กเกจไม่สำเร็จ'; },
