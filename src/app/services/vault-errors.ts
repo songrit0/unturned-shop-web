@@ -19,6 +19,8 @@ export function mapVaultP2pErrorKey(e: unknown): string {
     case 'already_claimed':
     case 'not_buyer':
     case 'code_collision_retry_exhausted':
+    case 'buyer_garage_not_empty':
+    case 'garage_vehicle_gone':
       return `errors.${msg}`;
   }
   if (msg === 'Discord account not linked to Steam') return 'errors.steam_not_linked';

@@ -25,6 +25,7 @@
     "adminSubmissions": "Item Submissions",
     "marketHistory": "Market History",
     "p2pMarket": "P2P Market",
+    "p2pGarage": "P2P Garage",
     "vaults": "My Vaults",
     "myListings": "My Listings",
     "inventory": "My Inventory",
@@ -592,6 +593,8 @@
     "already_claimed": "This purchase has already been claimed.",
     "not_buyer": "Only the buyer can claim this item.",
     "code_collision_retry_exhausted": "Couldn't generate a unique code right now — try again.",
+    "buyer_garage_not_empty": "Your garage must be empty before you can buy a vehicle. Retrieve or remove your current vehicle first.",
+    "garage_vehicle_gone": "This vehicle is no longer in the seller's garage.",
     "purchase_not_found": "Purchase not found.",
     "steam_not_linked": "Link your Steam account first.",
     "vault_not_found": "Vault not found.",
@@ -877,6 +880,36 @@
       "commission": "Commission",
       "youReceive": "You receive",
       "confirm": "List"
+    }
+  },
+  "p2pGarage": {
+    "title": "P2P Garage",
+    "market": "Market",
+    "sell": "Sell a vehicle",
+    "sellTitle": "Sell from my garage",
+    "empty": "No vehicles for sale right now.",
+    "seller": "Seller",
+    "legacyId": "Vehicle ID",
+    "price": "Price",
+    "priceLabel": "Price (coins)",
+    "buy": "Buy",
+    "buying": "Buying...",
+    "buyNote": "Buying transfers ownership — the vehicle is moved straight into your garage (no redeem code).",
+    "buySuccess": "Purchase successful — the vehicle is now in your garage.",
+    "listForSale": "List for sale",
+    "listed": "Listed",
+    "cancel": "Cancel",
+    "myVehicles": "My garage vehicles",
+    "myListings": "My garage listings",
+    "noVehicles": "Your garage is empty.",
+    "noListings": "You have no garage listings yet.",
+    "col": {
+      "vehicle": "Vehicle",
+      "legacyId": "Vehicle ID",
+      "price": "Price",
+      "status": "Status",
+      "buyer": "Buyer",
+      "created": "Created"
     }
   },
   "adminVaults": {

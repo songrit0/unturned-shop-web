@@ -38,6 +38,8 @@ import { SuggestEditModalComponent } from './components/suggest-edit-modal/sugge
 import { QualityBarComponent } from './components/quality-bar/quality-bar.component';
 import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
+import { P2pGarageMarketComponent } from './pages/p2p-garage-market/p2p-garage-market.component';
+import { P2pGarageSellComponent } from './pages/p2p-garage-sell/p2p-garage-sell.component';
 import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
 import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
@@ -94,6 +96,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     QualityBarComponent,
     VaultsComponent,
     P2pMarketComponent,
+    P2pGarageMarketComponent,
+    P2pGarageSellComponent,
     AdminVaultsComponent,
     MyListingsComponent,
     MySubmissionsComponent,

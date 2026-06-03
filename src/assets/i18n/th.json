@@ -25,6 +25,7 @@
     "adminSubmissions": "คำขอแก้ไขไอเทม",
     "marketHistory": "ประวัติตลาด",
     "p2pMarket": "ตลาด P2P",
+    "p2pGarage": "โรงรถ P2P",
     "vaults": "My Vaults",
     "myListings": "ประกาศขายของฉัน",
     "inventory": "ของที่ซื้อ",
@@ -624,6 +625,8 @@
     "already_claimed": "รายการนี้ถูกรับไปแล้ว",
     "not_buyer": "เฉพาะผู้ซื้อเท่านั้นที่รับของได้",
     "code_collision_retry_exhausted": "สร้างโค้ดไม่สำเร็จ ลองใหม่อีกครั้ง",
+    "buyer_garage_not_empty": "โรงรถของคุณต้องว่างก่อนจึงจะซื้อรถได้ — นำรถคันปัจจุบันออกจากโรงรถก่อน",
+    "garage_vehicle_gone": "รถคันนี้ไม่อยู่ในโรงรถของผู้ขายแล้ว",
     "purchase_not_found": "ไม่พบรายการที่ซื้อ",
     "steam_not_linked": "กรุณาผูกบัญชี Steam ก่อน",
     "vault_not_found": "ไม่พบคลัง",
@@ -878,6 +881,36 @@
       "commission": "ค่าธรรมเนียม",
       "youReceive": "ได้รับสุทธิ",
       "confirm": "ลงขาย"
+    }
+  },
+  "p2pGarage": {
+    "title": "โรงรถ P2P",
+    "market": "ตลาด",
+    "sell": "ลงขายรถ",
+    "sellTitle": "ขายจากโรงรถของฉัน",
+    "empty": "ตอนนี้ยังไม่มีรถวางขาย",
+    "seller": "ผู้ขาย",
+    "legacyId": "รหัสรถ",
+    "price": "ราคา",
+    "priceLabel": "ราคา (coin)",
+    "buy": "ซื้อ",
+    "buying": "กำลังซื้อ...",
+    "buyNote": "การซื้อจะโอนกรรมสิทธิ์ — รถจะถูกย้ายเข้าโรงรถของคุณทันที (ไม่มีโค้ดรับของ)",
+    "buySuccess": "ซื้อสำเร็จ — รถอยู่ในโรงรถของคุณแล้ว",
+    "listForSale": "ลงขาย",
+    "listed": "กำลังขาย",
+    "cancel": "ยกเลิก",
+    "myVehicles": "รถในโรงรถของฉัน",
+    "myListings": "ประกาศขายรถของฉัน",
+    "noVehicles": "โรงรถของคุณว่างเปล่า",
+    "noListings": "คุณยังไม่มีประกาศขายรถ",
+    "col": {
+      "vehicle": "รถ",
+      "legacyId": "รหัสรถ",
+      "price": "ราคา",
+      "status": "สถานะ",
+      "buyer": "ผู้ซื้อ",
+      "created": "สร้างเมื่อ"
     }
   },
   "adminVaults": {

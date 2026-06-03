@@ -22,6 +22,8 @@ import { MarketDetailComponent } from './pages/market-detail/market-detail.compo
 import { MarketHistoryComponent } from './pages/market-history/market-history.component';
 import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
+import { P2pGarageMarketComponent } from './pages/p2p-garage-market/p2p-garage-market.component';
+import { P2pGarageSellComponent } from './pages/p2p-garage-sell/p2p-garage-sell.component';
 import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.component';
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
@@ -61,6 +63,8 @@ const routes: Routes = [
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },
   { path: 'p2p-market', component: P2pMarketComponent, canActivate: [authGuard] },
+  { path: 'p2p-garage', component: P2pGarageMarketComponent, canActivate: [authGuard] },
+  { path: 'p2p-garage/sell', component: P2pGarageSellComponent, canActivate: [authGuard] },
   { path: 'my-listings', component: MyListingsComponent, canActivate: [authGuard] },
   { path: 'admin/vaults', component: AdminVaultsComponent, canActivate: [adminGuard] },
   { path: 'my-submissions', component: MySubmissionsComponent, canActivate: [authGuard] },

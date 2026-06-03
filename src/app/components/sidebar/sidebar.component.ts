@@ -24,6 +24,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <span class="mi">storefront</span>{{ 'nav.p2pMarket' | translate }}
       </a>
       <ng-container *ngIf="auth.me$ | async as me">
+        <a routerLink="/p2p-garage" routerLinkActive="active" class="nav-item">
+          <span class="mi">directions_car</span>{{ 'nav.p2pGarage' | translate }}
+        </a>
         <a routerLink="/my-listings" routerLinkActive="active" class="nav-item">
           <span class="mi">sell</span>{{ 'nav.myListings' | translate }}
         </a>
