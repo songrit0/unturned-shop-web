@@ -37,7 +37,8 @@
       "account": "ACCOUNT",
       "p2p": "P2P",
       "admin": "ADMIN"
-    }
+    },
+    "adminCodes": "จัดการโค้ด"
   },
   "header": {
     "search": "ค้นหาไอเทม..."
@@ -678,8 +679,14 @@
     "empty": "ยังไม่มีประเภทไอเทม",
     "delete": "ลบ",
     "deleteConfirm": "ลบประเภทไอเทมนี้?",
-    "col": { "name": "ชื่อ", "description": "รายละเอียด" },
-    "form": { "name": "ชื่อ", "description": "รายละเอียด" }
+    "col": {
+      "name": "ชื่อ",
+      "description": "รายละเอียด"
+    },
+    "form": {
+      "name": "ชื่อ",
+      "description": "รายละเอียด"
+    }
   },
   "adminQuests": {
     "title": "เควส",
@@ -919,6 +926,42 @@
       "sold": "ยังไม่มีรายการที่ขายสำเร็จ",
       "expired": "ไม่มีประกาศที่หมดอายุ",
       "cancelled": "ไม่มีประกาศที่ยกเลิก"
+    }
+  },
+  "adminCodes": {
+    "title": "จัดการโค้ดแลกรับ",
+    "create": "สร้างโค้ด",
+    "createTitle": "สร้างโค้ดใหม่",
+    "createdMsg": "สร้างโค้ดสำเร็จ:",
+    "search": "ค้นหาโค้ด...",
+    "empty": "ยังไม่มีโค้ด",
+    "on": "เปิด",
+    "off": "ปิด",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบโค้ดนี้?",
+    "usesUnlimited": "ใช้ไป {{uses}} ครั้ง (ไม่จำกัด)",
+    "usesOf": "ใช้ไป {{uses}} / {{max}}",
+    "form": {
+      "code": "โค้ด",
+      "codeHint": "เว้นว่างไว้ = สุ่มให้อัตโนมัติ",
+      "maxUses": "จำนวนครั้งสูงสุด",
+      "maxUsesHint": "0 = ไม่จำกัด",
+      "expiresAt": "วันหมดอายุ",
+      "enabled": "เปิดใช้งาน",
+      "rewards": "ของรางวัล",
+      "addReward": "เพิ่มรางวัล",
+      "type": "ประเภท",
+      "item": "ไอเทม",
+      "vehicle": "ยานพาหนะ",
+      "amount": "จำนวน",
+      "quality": "คุณภาพ",
+      "pickItem": "ค้นหาไอเทมจากชื่อหรือ id...",
+      "pickVehicle": "ค้นหารถจากชื่อหรือ id..."
+    },
+    "errors": {
+      "noRewards": "ต้องมีรางวัลอย่างน้อย 1 อย่าง",
+      "saveFail": "สร้างไม่สำเร็จ",
+      "deleteFail": "ลบไม่สำเร็จ"
     }
   }
 }

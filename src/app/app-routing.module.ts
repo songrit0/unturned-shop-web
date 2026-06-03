@@ -30,6 +30,7 @@ import { InventoryComponent } from './pages/inventory/inventory.component';
 import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
+import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -55,6 +56,7 @@ const routes: Routes = [
   { path: 'admin/items', component: AdminItemsComponent, canActivate: [adminGuard] },
   { path: 'admin/vehicles', component: AdminVehiclesComponent, canActivate: [adminGuard] },
   { path: 'admin/vehicle-market', component: AdminVehicleMarketComponent, canActivate: [adminGuard] },
+  { path: 'admin/codes', component: AdminCodesComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },

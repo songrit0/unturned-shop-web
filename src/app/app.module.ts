@@ -46,6 +46,7 @@ import { InventoryComponent } from './pages/inventory/inventory.component';
 import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
+import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -101,6 +102,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     VehiclesComponent,
     AdminVehiclesComponent,
     AdminVehicleMarketComponent,
+    AdminCodesComponent,
   ],
   imports: [
     BrowserModule,

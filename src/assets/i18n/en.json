@@ -37,7 +37,8 @@
       "account": "ACCOUNT",
       "p2p": "P2P",
       "admin": "ADMIN"
-    }
+    },
+    "adminCodes": "Manage Codes"
   },
   "header": {
     "search": "Search items..."
@@ -646,8 +647,14 @@
     "empty": "No item types yet",
     "delete": "Delete",
     "deleteConfirm": "Delete this item type?",
-    "col": { "name": "Name", "description": "Description" },
-    "form": { "name": "Name", "description": "Description" }
+    "col": {
+      "name": "Name",
+      "description": "Description"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description"
+    }
   },
   "adminQuests": {
     "title": "Quests",
@@ -918,6 +925,42 @@
       "sold": "No completed sales yet.",
       "expired": "No expired listings.",
       "cancelled": "No cancelled listings."
+    }
+  },
+  "adminCodes": {
+    "title": "Manage Redeem Codes",
+    "create": "Create code",
+    "createTitle": "Create a new code",
+    "createdMsg": "Code created:",
+    "search": "Search codes...",
+    "empty": "No codes yet",
+    "on": "On",
+    "off": "Off",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this code?",
+    "usesUnlimited": "{{uses}} uses (unlimited)",
+    "usesOf": "{{uses}} / {{max}} uses",
+    "form": {
+      "code": "Code",
+      "codeHint": "Leave blank = auto-generate",
+      "maxUses": "Max uses",
+      "maxUsesHint": "0 = unlimited",
+      "expiresAt": "Expires at",
+      "enabled": "Enabled",
+      "rewards": "Rewards",
+      "addReward": "Add reward",
+      "type": "Type",
+      "item": "Item",
+      "vehicle": "Vehicle",
+      "amount": "Amount",
+      "quality": "Quality",
+      "pickItem": "Search items by name or id...",
+      "pickVehicle": "Search vehicles by name or id..."
+    },
+    "errors": {
+      "noRewards": "Add at least one reward",
+      "saveFail": "Create failed",
+      "deleteFail": "Delete failed"
     }
   }
 }
