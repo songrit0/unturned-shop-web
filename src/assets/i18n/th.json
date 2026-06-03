@@ -18,6 +18,9 @@
     "adminQuests": "จัดการเควส",
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
+    "vehicles": "ยานพาหนะ",
+    "adminVehicles": "จัดการรถ",
+    "adminVehicleMarket": "ราคารถ/สต็อก",
     "adminVaults": "จัดการคลัง",
     "adminSubmissions": "คำขอแก้ไขไอเทม",
     "marketHistory": "ประวัติตลาด",
@@ -179,6 +182,76 @@
     "sortName": "ชื่อ A→Z",
     "allTypes": "ทั้งหมด",
     "resetFilter": "ล้าง"
+  },
+  "vehicles": {
+    "title": "ยานพาหนะ",
+    "search": "ค้นหา...",
+    "empty": "ไม่พบยานพาหนะ",
+    "all": "ทั้งหมด",
+    "hot": "เหลือน้อย",
+    "sortPriceAsc": "ราคา ↑",
+    "sortPriceDesc": "ราคา ↓",
+    "sortName": "ชื่อ A→Z",
+    "allTypes": "ทั้งหมด"
+  },
+  "adminVehicles": {
+    "title": "จัดการรถ",
+    "add": "เพิ่มรถ",
+    "addTitle": "เพิ่มรถ",
+    "editTitle": "แก้ไขรถ",
+    "search": "ค้นหา id / ชื่อ...",
+    "allTypes": "ทั้งหมด",
+    "empty": "ยังไม่มีรถ",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบรถคันนี้?",
+    "deleteWarn": "รถอาจถูกใช้งานอยู่ในร้านค้า — การลบอาจล้มเหลว",
+    "loadMore": "โหลดเพิ่ม",
+    "loadingMore": "กำลังโหลด...",
+    "loadedCount": "แสดง {{shown}} จาก {{total}}",
+    "col": {
+      "image": "รูป",
+      "name": "ชื่อ",
+      "type": "ประเภท"
+    },
+    "form": {
+      "id": "รหัสรถ",
+      "name": "ชื่อ",
+      "description": "รายละเอียด",
+      "imageUrl": "ลิงก์รูป",
+      "type": "ประเภท",
+      "preview": "ตัวอย่าง"
+    }
+  },
+  "adminVehicleMarket": {
+    "title": "ราคารถ/สต็อก",
+    "add": "เพิ่มรถ",
+    "addTitle": "เพิ่มรถ",
+    "editTitle": "แก้ไขรถ",
+    "search": "ค้นหา id/ชื่อ...",
+    "empty": "ไม่พบรถ",
+    "on": "เปิด",
+    "off": "ปิด",
+    "col": {
+      "image": "รูป",
+      "id": "ID",
+      "name": "ชื่อ",
+      "price": "ราคา",
+      "stock": "สต็อก",
+      "enabled": "เปิด"
+    },
+    "form": {
+      "pickVehicle": "เลือกรถ",
+      "pickVehicleSearch": "ค้นหารถจากชื่อหรือ id...",
+      "price": "ราคา",
+      "stock": "สต็อกปัจจุบัน",
+      "enabled": "เปิดขาย (แสดงในร้าน)"
+    },
+    "errors": {
+      "missing": "เลือกรถก่อน",
+      "saveFail": "บันทึกไม่สำเร็จ"
+    },
+    "deleteConfirm": "ลบรถคันนี้ออกจากร้าน?",
+    "delete": "ลบ"
   },
   "basket": {
     "title": "ตะกร้า",

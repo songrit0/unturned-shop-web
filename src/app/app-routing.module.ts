@@ -27,6 +27,9 @@ import { AdminVaultsComponent } from './pages/admin-vaults/admin-vaults.componen
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
 import { AdminItemSubmissionsComponent } from './pages/admin-item-submissions/admin-item-submissions.component';
 import { InventoryComponent } from './pages/inventory/inventory.component';
+import { VehiclesComponent } from './pages/vehicles/vehicles.component';
+import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
+import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -36,6 +39,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'p2p-market', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'shop', component: ShopComponent, canActivate: [authGuard] },
+  { path: 'vehicles', component: VehiclesComponent, canActivate: [authGuard] },
   { path: 'sell-prices', component: SellPricesComponent, canActivate: [authGuard] },
   { path: 'bills', component: BillsComponent, canActivate: [authGuard] },
   { path: 'coins', component: CoinsComponent, canActivate: [authGuard] },
@@ -49,6 +53,8 @@ const routes: Routes = [
   { path: 'admin/quests', component: AdminQuestsComponent, canActivate: [adminGuard] },
   { path: 'admin/item-types', component: AdminItemTypesComponent, canActivate: [adminGuard] },
   { path: 'admin/items', component: AdminItemsComponent, canActivate: [adminGuard] },
+  { path: 'admin/vehicles', component: AdminVehiclesComponent, canActivate: [adminGuard] },
+  { path: 'admin/vehicle-market', component: AdminVehicleMarketComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },

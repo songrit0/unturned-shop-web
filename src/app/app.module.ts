@@ -43,6 +43,9 @@ import { MyListingsComponent } from './pages/my-listings/my-listings.component';
 import { MySubmissionsComponent } from './pages/my-submissions/my-submissions.component';
 import { AdminItemSubmissionsComponent } from './pages/admin-item-submissions/admin-item-submissions.component';
 import { InventoryComponent } from './pages/inventory/inventory.component';
+import { VehiclesComponent } from './pages/vehicles/vehicles.component';
+import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
+import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -95,6 +98,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     MySubmissionsComponent,
     AdminItemSubmissionsComponent,
     InventoryComponent,
+    VehiclesComponent,
+    AdminVehiclesComponent,
+    AdminVehicleMarketComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,7 +1,7 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { MarketItem } from '../../services/market.service';
-import { BasketService } from '../../services/basket.service';
+import { BasketService, BasketKind } from '../../services/basket.service';
 
 @Component({
   selector: 'app-item-card',
@@ -52,6 +52,8 @@ import { BasketService } from '../../services/basket.service';
 export class ItemCardComponent {
   @Input({ required: true }) item!: MarketItem;
   @Input() layout: 'grid' | 'list' = 'grid';
+  /** 'item' (default) keeps existing behavior; 'vehicle' adds to basket as a vehicle and skips the market-detail link. */
+  @Input() kind: BasketKind = 'item';
   loading = false;
   added = false;
 
@@ -64,12 +66,16 @@ export class ItemCardComponent {
     return Math.round(((base - price) / base) * 100);
   }
 
-  open() { this.router.navigate(['/market', this.item.item_id]); }
+  open() {
+    // Vehicles have no market-detail page; only items navigate.
+    if (this.kind !== 'item') return;
+    this.router.navigate(['/market', this.item.item_id]);
+  }
 
   add(ev: Event) {
     ev.stopPropagation();
     this.loading = true;
-    this.basket.add(this.item.item_id).subscribe({
+    this.basket.add(this.item.item_id, 1, this.kind).subscribe({
       next: () => { this.loading = false; this.added = true; setTimeout(() => this.added = false, 1500); },
       error: () => { this.loading = false; },
     });

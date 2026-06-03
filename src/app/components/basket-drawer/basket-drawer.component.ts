@@ -91,9 +91,9 @@ export class BasketDrawerComponent implements OnInit {
   ngOnInit() { this.basket.view().subscribe(); }
 
   close() { this.basket.setOpen(false); }
-  inc(it: BasketItem) { this.basket.setQty(it.item_id, it.qty + 1).subscribe(); }
-  dec(it: BasketItem) { this.basket.setQty(it.item_id, it.qty - 1).subscribe(); }
-  remove(it: BasketItem) { this.basket.remove(it.item_id).subscribe(); }
+  inc(it: BasketItem) { this.basket.setQty(it.item_id, it.qty + 1, it.kind).subscribe(); }
+  dec(it: BasketItem) { this.basket.setQty(it.item_id, it.qty - 1, it.kind).subscribe(); }
+  remove(it: BasketItem) { this.basket.remove(it.item_id, it.kind).subscribe(); }
 
   checkout() {
     this.loading = true; this.error = null;

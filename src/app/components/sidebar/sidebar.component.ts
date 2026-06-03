@@ -60,6 +60,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
       <a routerLink="/shop" routerLinkActive="active" class="nav-item">
         <span class="mi">shopping_bag</span>{{ 'nav.shop' | translate }}
       </a>
+      <a routerLink="/vehicles" routerLinkActive="active" class="nav-item">
+        <span class="mi">directions_car</span>{{ 'nav.vehicles' | translate }}
+      </a>
       <a routerLink="/sell-prices" routerLinkActive="active" class="nav-item">
         <span class="mi">sell</span>{{ 'nav.sellPrices' | translate }}
       </a>
@@ -78,6 +81,12 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         </a>
         <a routerLink="/admin/items" routerLinkActive="active" class="nav-item admin">
           <span class="mi">inventory_2</span>{{ 'nav.adminItems' | translate }}
+        </a>
+        <a routerLink="/admin/vehicles" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">directions_car</span>{{ 'nav.adminVehicles' | translate }}
+        </a>
+        <a routerLink="/admin/vehicle-market" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">two_wheeler</span>{{ 'nav.adminVehicleMarket' | translate }}
         </a>
         <a routerLink="/admin/item-types" routerLinkActive="active" class="nav-item admin">
           <span class="mi">category</span>{{ 'nav.adminItemTypes' | translate }}

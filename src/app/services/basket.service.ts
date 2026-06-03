@@ -6,13 +6,18 @@ import { ApiUrlService } from './api-url.service';
 
 function normalizeBasket(raw: unknown): BasketView {
   const r = (raw ?? {}) as Partial<BasketView>;
+  const items = (Array.isArray(r.items) ? r.items : []).map(it => ({
+    ...it,
+    kind: (it.kind === 'vehicle' ? 'vehicle' : 'item') as BasketKind,
+  }));
   return {
-    items: Array.isArray(r.items) ? r.items : [],
+    items,
     total: Number.isFinite(r.total as number) ? Number(r.total) : 0,
   };
 }
 
-export interface BasketItem { item_id: number; name: string; price: number; amount_avail: number; qty: number; image_url: string | null; }
+export type BasketKind = 'item' | 'vehicle';
+export interface BasketItem { item_id: number; name: string; price: number; amount_avail: number; qty: number; image_url: string | null; kind: BasketKind; }
 export interface BasketView { items: BasketItem[]; total: number; }
 
 export type CheckoutResult =
@@ -32,16 +37,16 @@ export class BasketService {
     return this.http.get<unknown>(`${this.apiUrl.get()}/basket`)
       .pipe(map(normalizeBasket), tap(v => this._basket$.next(v)));
   }
-  add(item_id: number, qty = 1) {
-    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/add`, { item_id, qty })
+  add(item_id: number, qty = 1, kind: BasketKind = 'item') {
+    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/add`, { item_id, qty, kind })
       .pipe(map(normalizeBasket), tap(v => this._basket$.next(v)));
   }
-  setQty(item_id: number, qty: number) {
-    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/set`, { item_id, qty })
+  setQty(item_id: number, qty: number, kind: BasketKind = 'item') {
+    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/set`, { item_id, qty, kind })
       .pipe(map(normalizeBasket), tap(v => this._basket$.next(v)));
   }
-  remove(item_id: number) {
-    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/remove`, { item_id })
+  remove(item_id: number, kind: BasketKind = 'item') {
+    return this.http.post<unknown>(`${this.apiUrl.get()}/basket/remove`, { item_id, kind })
       .pipe(map(normalizeBasket), tap(v => this._basket$.next(v)));
   }
   clear() {

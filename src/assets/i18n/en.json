@@ -18,6 +18,9 @@
     "adminQuests": "Manage Quests",
     "adminItemTypes": "Manage Item Types",
     "adminItems": "Manage Items",
+    "vehicles": "Vehicles",
+    "adminVehicles": "Manage Vehicles",
+    "adminVehicleMarket": "Vehicle Prices",
     "adminVaults": "Manage Vaults",
     "adminSubmissions": "Item Submissions",
     "marketHistory": "Market History",
@@ -179,6 +182,76 @@
     "sortName": "Name A→Z",
     "allTypes": "All types",
     "resetFilter": "Clear"
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "search": "Search...",
+    "empty": "No vehicles",
+    "all": "All",
+    "hot": "Low stock",
+    "sortPriceAsc": "Price ↑",
+    "sortPriceDesc": "Price ↓",
+    "sortName": "Name A→Z",
+    "allTypes": "All types"
+  },
+  "adminVehicles": {
+    "title": "Master Vehicles",
+    "add": "Add vehicle",
+    "addTitle": "Add vehicle",
+    "editTitle": "Edit vehicle",
+    "search": "Search id / name...",
+    "allTypes": "All types",
+    "empty": "No vehicles yet",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this vehicle?",
+    "deleteWarn": "Vehicle may be referenced by the market — delete may fail.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading...",
+    "loadedCount": "Showing {{shown}} of {{total}}",
+    "col": {
+      "image": "Image",
+      "name": "Name",
+      "type": "Type"
+    },
+    "form": {
+      "id": "Vehicle ID",
+      "name": "Name",
+      "description": "Description",
+      "imageUrl": "Image URL",
+      "type": "Type",
+      "preview": "Preview"
+    }
+  },
+  "adminVehicleMarket": {
+    "title": "Vehicle Prices",
+    "add": "Add vehicle",
+    "addTitle": "Add vehicle",
+    "editTitle": "Edit vehicle",
+    "search": "Search id/name...",
+    "empty": "No vehicles",
+    "on": "On",
+    "off": "Off",
+    "col": {
+      "image": "Image",
+      "id": "ID",
+      "name": "Name",
+      "price": "Price",
+      "stock": "Stock",
+      "enabled": "On"
+    },
+    "form": {
+      "pickVehicle": "Pick a vehicle",
+      "pickVehicleSearch": "Search vehicles by name or id...",
+      "price": "Price",
+      "stock": "Current stock",
+      "enabled": "Enabled (shows in shop)"
+    },
+    "errors": {
+      "missing": "Pick a vehicle first",
+      "saveFail": "Save failed"
+    },
+    "deleteConfirm": "Delete this vehicle from the market?",
+    "delete": "Delete"
   },
   "basket": {
     "title": "Basket",
