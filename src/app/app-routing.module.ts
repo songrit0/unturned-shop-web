@@ -33,6 +33,7 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
+import { TopupComponent } from './pages/topup/topup.component';
 import { adminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -47,6 +48,7 @@ const routes: Routes = [
   { path: 'bills', component: BillsComponent, canActivate: [authGuard] },
   { path: 'coins', component: CoinsComponent, canActivate: [authGuard] },
   { path: 'codes', component: CodesComponent, canActivate: [authGuard] },
+  { path: 'topup', component: TopupComponent, canActivate: [authGuard] },
   { path: 'vip', component: VipComponent, canActivate: [authGuard] },
   { path: 'help', component: HelpComponent },
   { path: 'quests', component: QuestsComponent, canActivate: [authGuard] },

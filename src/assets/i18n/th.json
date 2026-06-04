@@ -286,6 +286,47 @@
     "rewardLog": "Reward Log",
     "empty": "ยังไม่มีรายการ"
   },
+  "topup": {
+    "title": "เติม Vcoins",
+    "vcoins": "Vcoins",
+    "baht": "บาท",
+    "vcoinsTip": "Vcoins เป็นสกุลเงินแยกต่างหากจาก coins ในเกม",
+    "intro": "เติม Vcoins ด้วยเงินจริงผ่าน PromptPay QR — Vcoins เป็นสกุลเงินแยกต่างหากจาก coins ในเกม",
+    "formTitle": "เลือกจำนวนเงิน",
+    "amountLabel": "จำนวนเงิน (บาท)",
+    "amountPlaceholder": "เช่น 100",
+    "createBtn": "สร้าง QR PromptPay",
+    "payTitle": "สแกนเพื่อชำระเงิน",
+    "exactAmountLabel": "โอนยอดนี้ให้ตรงเป๊ะ",
+    "exactWarn": "ต้องโอนยอดนี้ให้ตรงเป๊ะ มิฉะนั้นระบบจะจับคู่รายการเติมเงินไม่ได้",
+    "promptpayId": "PromptPay ID",
+    "ref": "เลขอ้างอิง",
+    "credits": "ได้รับ",
+    "expiresIn": "QR หมดอายุใน",
+    "expiring": "กำลังหมดอายุ...",
+    "statusWaiting": "กำลังรอการชำระเงิน...",
+    "statusConfirmed": "ได้รับการชำระเงินแล้ว กำลังเติม Vcoins...",
+    "cancelBtn": "ยกเลิก",
+    "successTitle": "เติมเงินสำเร็จ",
+    "successBody": "เติม {{vcoins}} Vcoins เข้าบัญชีของคุณเรียบร้อยแล้ว",
+    "newBalance": "ยอด Vcoin คงเหลือใหม่",
+    "again": "เติมอีกครั้ง",
+    "expiredTitle": "QR หมดอายุ",
+    "expiredBody": "หมดเวลาการเติมเงินนี้แล้วโดยไม่พบการชำระเงินที่ตรงกัน",
+    "tryAgain": "ลองอีกครั้ง",
+    "historyTitle": "ประวัติการเติมเงิน",
+    "historyEmpty": "ยังไม่มีการเติมเงิน",
+    "status": {
+      "pending": "รอดำเนินการ",
+      "confirmed": "ยืนยันแล้ว",
+      "credited": "เติมแล้ว",
+      "expired": "หมดอายุ",
+      "cancelled": "ยกเลิก"
+    },
+    "errors": {
+      "createFail": "สร้างรายการเติมเงินไม่สำเร็จ กรุณาลองใหม่"
+    }
+  },
   "codes": {
     "title": "ประวัติโค้ด",
     "desc": "โค้ดทั้งหมดที่คุณสั่งซื้อ — กด คัดลอก ไปใช้ในเกมได้",

@@ -44,6 +44,9 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
         </a>
+        <a routerLink="/topup" routerLinkActive="active" class="nav-item">
+          <span class="mi">account_balance_wallet</span>{{ 'topup.title' | translate }}
+        </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
           <span class="mi">qr_code_2</span>{{ 'nav.codes' | translate }}
         </a>

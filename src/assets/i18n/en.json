@@ -286,6 +286,47 @@
     "rewardLog": "Reward Log",
     "empty": "No items"
   },
+  "topup": {
+    "title": "Top up Vcoins",
+    "vcoins": "Vcoins",
+    "baht": "baht",
+    "vcoinsTip": "Vcoins are a separate currency from in-game coins.",
+    "intro": "Top up Vcoins with real money via PromptPay QR. Vcoins are a separate currency from your in-game coins.",
+    "formTitle": "Choose amount",
+    "amountLabel": "Amount (baht)",
+    "amountPlaceholder": "e.g. 100",
+    "createBtn": "Generate PromptPay QR",
+    "payTitle": "Scan to pay",
+    "exactAmountLabel": "Transfer this EXACT amount",
+    "exactWarn": "You must transfer this exact amount, or the top-up will not be matched.",
+    "promptpayId": "PromptPay ID",
+    "ref": "Reference",
+    "credits": "Credits",
+    "expiresIn": "QR expires in",
+    "expiring": "Expiring...",
+    "statusWaiting": "Waiting for payment...",
+    "statusConfirmed": "Payment received, crediting Vcoins...",
+    "cancelBtn": "Cancel",
+    "successTitle": "Top-up complete",
+    "successBody": "{{vcoins}} Vcoins have been credited to your account.",
+    "newBalance": "New Vcoin balance",
+    "again": "Top up again",
+    "expiredTitle": "QR expired",
+    "expiredBody": "This top-up window has closed without a matching payment.",
+    "tryAgain": "Try again",
+    "historyTitle": "Top-up history",
+    "historyEmpty": "No top-ups yet.",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "credited": "Credited",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "createFail": "Couldn't create the top-up. Please try again."
+    }
+  },
   "codes": {
     "title": "Code history",
     "desc": "All codes you've purchased — copy to use in-game",

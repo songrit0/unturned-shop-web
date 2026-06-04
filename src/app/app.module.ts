@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { QRCodeModule } from 'angularx-qrcode';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -50,6 +51,7 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
+import { TopupComponent } from './pages/topup/topup.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -109,6 +111,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminVehiclesComponent,
     AdminVehicleMarketComponent,
     AdminCodesComponent,
+    TopupComponent,
   ],
   imports: [
     BrowserModule,
@@ -116,6 +119,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     AppRoutingModule,
     HttpClientModule,
+    QRCodeModule,
     TranslateModule.forRoot({
       defaultLanguage: 'th',
       loader: {

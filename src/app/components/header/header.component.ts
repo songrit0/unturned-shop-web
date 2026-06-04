@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { CoinsService } from '../../services/coins.service';
+import { TopupService } from '../../services/topup.service';
 import { ThemeService } from '../../services/theme.service';
 import { LangService } from '../../services/lang.service';
 import { BasketService } from '../../services/basket.service';
@@ -25,7 +26,16 @@ import { daysUntil } from '../../services/expiry';
             <span class="mi fill">paid</span>
             <div class="col" style="gap:0; line-height:1;">
               <span class="coin-amount">{{ (coins.balance$ | async) ?? '—' }}</span>
-              <span class="coin-label">BALANCE</span>
+              <span class="coin-label">{{ 'coins.title' | translate | uppercase }}</span>
+            </div>
+          </button>
+
+          <!-- Vcoins (real-money currency, distinct from in-game coins) -->
+          <button class="coin-pill vcoin" (click)="goTopup()" [title]="'topup.vcoinsTip' | translate">
+            <span class="mi fill">toll</span>
+            <div class="col" style="gap:0; line-height:1;">
+              <span class="coin-amount">{{ (topup.balance$ | async) ?? '—' }}</span>
+              <span class="coin-label">{{ 'topup.vcoins' | translate | uppercase }}</span>
             </div>
           </button>
 
@@ -163,6 +173,8 @@ import { daysUntil } from '../../services/expiry';
     .code-box { display: inline-block; padding: 12px 20px; background: var(--surface-2);
       border: 1px dashed var(--accent); border-radius: 8px; font-size: 22px; font-weight: 700;
       letter-spacing: 2px; user-select: all; }
+    .coin-pill.vcoin { color: var(--amber); }
+    .coin-pill.vcoin .mi { color: var(--amber); }
   `],
 })
 export class HeaderComponent implements OnInit {
@@ -177,6 +189,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     public auth: AuthService,
     public coins: CoinsService,
+    public topup: TopupService,
     public theme: ThemeService,
     public lang: LangService,
     public basket: BasketService,
@@ -189,6 +202,7 @@ export class HeaderComponent implements OnInit {
     this.auth.me$.subscribe(me => {
       if (me) {
         this.coins.refreshMe().subscribe();
+        this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
         this.basket.view().subscribe();
         this.notifs.startPolling();
       }
@@ -198,6 +212,7 @@ export class HeaderComponent implements OnInit {
   basketCount(): number { return this.basket.count; }
   initial(name: string): string { return (name?.[0] || '?').toUpperCase(); }
   goCoins() { this.router.navigate(['/coins']); }
+  goTopup() { this.router.navigate(['/topup']); }
   search() {
     const s = this.q.trim();
     if (!s) return;
