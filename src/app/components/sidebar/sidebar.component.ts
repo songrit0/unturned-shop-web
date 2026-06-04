@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { filter, switchMap } from 'rxjs/operators';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, Me } from '../../services/auth.service';
 import { BasketService } from '../../services/basket.service';
 import { VersionService } from '../../services/version.service';
 import { ItemSubmissionsService } from '../../services/item-submissions.service';
+import { TopupService } from '../../services/topup.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -44,7 +45,7 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
         </a>
-        <a routerLink="/topup" routerLinkActive="active" class="nav-item">
+        <a *ngIf="canTopup(me)" routerLink="/topup" routerLinkActive="active" class="nav-item">
           <span class="mi">account_balance_wallet</span>{{ 'topup.title' | translate }}
         </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
@@ -136,15 +137,24 @@ import { ItemSubmissionsService } from '../../services/item-submissions.service'
 export class SidebarComponent implements OnInit {
   apiStatus = 'online';
   pendingSubmissions = 0;
+  // Soft-launch gate: while admin_only, only admins see the Top-up entry. Opened to all when false.
+  topupAdminOnly = true;
 
   constructor(
     public auth: AuthService,
     public basket: BasketService,
     public version: VersionService,
     private submissions: ItemSubmissionsService,
+    private topup: TopupService,
   ) { }
 
+  /** Show the Top-up nav item when the user can actually reach the page (matches topupGuard). */
+  canTopup(me: Me | null): boolean {
+    return !!me && (me.is_admin || !this.topupAdminOnly);
+  }
+
   ngOnInit() {
+    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => {} });
     this.version.fetchApi().subscribe(v => {
       this.apiStatus = v ? `api v${v.version} · online` : 'api · offline';
     });

@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, Me } from '../../services/auth.service';
 import { CoinsService } from '../../services/coins.service';
 import { TopupService } from '../../services/topup.service';
 import { ThemeService } from '../../services/theme.service';
@@ -30,8 +30,9 @@ import { daysUntil } from '../../services/expiry';
             </div>
           </button>
 
-          <!-- Vcoins (real-money currency, distinct from in-game coins) -->
-          <button class="coin-pill vcoin" (click)="goTopup()" [title]="'topup.vcoinsTip' | translate">
+          <!-- Vcoins (real-money currency, distinct from in-game coins) — hidden when the user
+               has no top-up access (non-admin while admin_only). -->
+          <button *ngIf="canTopup(me)" class="coin-pill vcoin" (click)="goTopup()" [title]="'topup.vcoinsTip' | translate">
             <span class="mi fill">toll</span>
             <div class="col" style="gap:0; line-height:1;">
               <span class="coin-amount">{{ (topup.balance$ | async) ?? '—' }}</span>
@@ -185,6 +186,8 @@ export class HeaderComponent implements OnInit {
   notifications: ShopNotification[] = [];
   codeFor: ShopNotification | null = null;
   copied = false;
+  // Soft-launch gate for the VCOINS pill (matches topupGuard / sidebar).
+  topupAdminOnly = true;
 
   constructor(
     public auth: AuthService,
@@ -198,11 +201,20 @@ export class HeaderComponent implements OnInit {
     private router: Router,
   ) { }
 
+  /** Whether to show the Vcoins pill / top-up entry for this user (matches topupGuard). */
+  canTopup(me: Me | null): boolean {
+    return !!me && (me.is_admin || !this.topupAdminOnly);
+  }
+
   ngOnInit() {
+    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => {} });
     this.auth.me$.subscribe(me => {
       if (me) {
         this.coins.refreshMe().subscribe();
-        this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+        // Only fetch the Vcoin balance for users who can use top-up (admins, or once opened to all).
+        if (me.is_admin || !this.topupAdminOnly) {
+          this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+        }
         this.basket.view().subscribe();
         this.notifs.startPolling();
       }

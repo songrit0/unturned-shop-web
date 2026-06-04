@@ -316,6 +316,9 @@
     "tryAgain": "Try again",
     "historyTitle": "Top-up history",
     "historyEmpty": "No top-ups yet.",
+    "adminOnlyTitle": "Available to admins only",
+    "adminOnlyBody": "Vcoin top-up is in a limited soft launch and is currently available to admins only. It will open to everyone soon.",
+    "adminOnlyHome": "Back to home",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",

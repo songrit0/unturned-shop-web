@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 import { TopupCreated, TopupRow, TopupService, TopupState } from '../../services/topup.service';
 
 type Phase = 'form' | 'pay' | 'success' | 'expired';
@@ -10,7 +11,7 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
     <div class="page">
       <div class="page-header">
         <h1><span class="h-icon amber"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
-        <div class="page-actions">
+        <div class="page-actions" *ngIf="hasAccess">
           <div class="vcoin-pill" [title]="'topup.vcoinsTip' | translate">
             <span class="mi fill">toll</span>
             <div class="col" style="gap:0;line-height:1">
@@ -21,6 +22,16 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
         </div>
       </div>
 
+      <!-- Backstop: the route guard normally blocks non-admins while admin_only is on, but if the
+           page is somehow reached without access, show a notice instead of the form. -->
+      <div *ngIf="!hasAccess" class="card tactical" style="max-width:520px;text-align:center;padding:32px 24px">
+        <span class="mi xxl" style="color:var(--amber)">lock</span>
+        <h2 style="margin:8px 0 4px;font-size:18px;font-weight:700">{{ 'topup.adminOnlyTitle' | translate }}</h2>
+        <p class="muted" style="margin:0">{{ 'topup.adminOnlyBody' | translate }}</p>
+        <a routerLink="/" class="btn primary" style="margin-top:16px"><span class="mi sm">home</span>{{ 'topup.adminOnlyHome' | translate }}</a>
+      </div>
+
+      <ng-container *ngIf="hasAccess">
       <p class="muted" style="margin:-4px 0 16px 0;font-size:13px;max-width:560px">{{ 'topup.intro' | translate }}</p>
 
       <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
@@ -135,6 +146,7 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
           </ng-container>
         </div>
       </div>
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -169,6 +181,10 @@ export class TopupComponent implements OnInit, OnDestroy {
   // 1 baht = 1 Vcoin display rate; the authoritative figure comes back as `vcoins` on create.
   private static readonly RATE = 1;
 
+  // Soft-launch access backstop. True until the config + admin check say otherwise; the route
+  // guard normally prevents non-admins from reaching this page while admin_only is on.
+  hasAccess = true;
+
   phase: Phase = 'form';
   baht: number | null = null;
   vcoinPreview = 0;
@@ -188,11 +204,23 @@ export class TopupComponent implements OnInit, OnDestroy {
   private pollSub?: Subscription;
   private tickSub?: Subscription;
 
-  constructor(public topup: TopupService) {}
+  constructor(public topup: TopupService, private auth: AuthService) {}
 
   ngOnInit() {
-    this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
-    this.loadHistory();
+    // Resolve access from the soft-launch gate + admin status (same rule as topupGuard).
+    const me = this.auth.current;
+    this.topup.getTopupConfig().subscribe({
+      next: cfg => {
+        this.hasAccess = !!me && (me.is_admin || !cfg.admin_only);
+        if (this.hasAccess) {
+          this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+          this.loadHistory();
+        } else {
+          this.historyLoading = false;
+        }
+      },
+      error: () => { this.historyLoading = false; },
+    });
   }
 
   ngOnDestroy() {
