@@ -10,7 +10,7 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
   template: `
     <div class="page">
       <div class="page-header">
-        <h1><span class="h-icon amber"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
+        <h1><span class="h-icon vcoin"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
         <div class="page-actions" *ngIf="hasAccess">
           <div class="vcoin-pill" [title]="'topup.vcoinsTip' | translate">
             <span class="mi fill">toll</span>
@@ -106,7 +106,7 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
               <p class="muted">{{ 'topup.successBody' | translate:{ vcoins: (creditedVcoins | number) } }}</p>
               <div class="balance-box">
                 <span class="muted" style="font-size:12px">{{ 'topup.newBalance' | translate }}</span>
-                <div class="mono" style="font-size:28px;font-weight:700">
+                <div class="mono balance-amt" style="font-size:28px;font-weight:700">
                   {{ (topup.balance$ | async) ?? '—' }} <span class="muted" style="font-size:14px">{{ 'topup.vcoins' | translate }}</span>
                 </div>
               </div>
@@ -150,10 +150,12 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
     </div>
   `,
   styles: [`
+    .h-icon.vcoin { color:var(--vcoin); background:rgb(59 130 246 / 0.14); border-color:rgb(59 130 246 / 0.3); }
+    .balance-amt { color:var(--vcoin); }
     .vcoin-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
-      background:var(--surface-2); border:1px solid var(--amber); border-radius:999px; color:var(--amber); }
-    .vcoin-pill .mi { color:var(--amber); }
-    .convert { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:16px; font-weight:700; color:var(--amber); }
+      background:var(--surface-2); border:1px solid var(--vcoin); border-radius:999px; color:var(--vcoin); }
+    .vcoin-pill .mi { color:var(--vcoin); }
+    .convert { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:16px; font-weight:700; color:var(--vcoin); }
     .qr-wrap { display:flex; justify-content:center; padding:16px; margin-top:12px;
       background:#fff; border-radius:10px; }
     .qr-wrap ::ng-deep img, .qr-wrap ::ng-deep canvas { display:block; }

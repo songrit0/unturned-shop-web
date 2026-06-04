@@ -64,7 +64,7 @@ type StatusFilter = 'all' | AdminTopupStatus;
                     </button>
                   </td>
                   <td class="r mono">{{ num(t.baht) | number:'1.0-2' }}</td>
-                  <td class="r mono" style="color:var(--accent-hi)">{{ num(t.vcoins) | number }}</td>
+                  <td class="r mono" style="color:var(--vcoin)">{{ num(t.vcoins) | number }}</td>
                   <td><span class="badge" [ngClass]="statusClass(t.status)">{{ ('adminVcoins.status.' + t.status) | translate }}</span></td>
                   <td class="mono muted" style="font-size:11px">{{ t.ref }}</td>
                 </tr>
@@ -111,7 +111,7 @@ type StatusFilter = 'all' | AdminTopupStatus;
             </div>
             <div style="text-align:right">
               <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminVcoins.currentBalance' | translate }}</div>
-              <div class="mono" style="font-size:26px;font-weight:700" [style.color]="num(wallet.balance) < 0 ? 'var(--rose)' : 'var(--accent-hi)'">
+              <div class="mono" style="font-size:26px;font-weight:700" [style.color]="num(wallet.balance) < 0 ? 'var(--rose)' : 'var(--vcoin)'">
                 {{ num(wallet.balance) | number }} <span class="muted" style="font-size:13px">{{ 'adminVcoins.vcoins' | translate }}</span>
               </div>
             </div>

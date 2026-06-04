@@ -174,8 +174,8 @@ import { daysUntil } from '../../services/expiry';
     .code-box { display: inline-block; padding: 12px 20px; background: var(--surface-2);
       border: 1px dashed var(--accent); border-radius: 8px; font-size: 22px; font-weight: 700;
       letter-spacing: 2px; user-select: all; }
-    .coin-pill.vcoin { color: var(--amber); }
-    .coin-pill.vcoin .mi { color: var(--amber); }
+    .coin-pill.vcoin { color: var(--vcoin); }
+    .coin-pill.vcoin .mi { color: var(--vcoin); }
   `],
 })
 export class HeaderComponent implements OnInit {

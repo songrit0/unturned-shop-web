@@ -32,6 +32,10 @@
   --violet: #a78bfa;
   --violet-bg: rgb(167 139 250 / 0.14);
   --indigo: #6366f1;
+
+  /* Vcoins currency accent (real-money currency). Blue so it reads as distinct from the
+     amber in-game coins. Single source of truth for every Vcoin-currency visual. */
+  --vcoin: #3b82f6;
 }
 
 .theme-light {
