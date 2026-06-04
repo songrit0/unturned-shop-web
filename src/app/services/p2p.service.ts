@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
-import { P2pConfig, P2pCreatePayload, P2pListing, P2pListingStatus } from '../models/vault';
+import { P2pConfig, P2pConfigRaw, P2pCreatePayload, P2pListing, P2pListingStatus } from '../models/vault';
 import { buildPagedParams, normalizePaginated } from './paged-http';
 
 // API contract (unturned-shop-api p2p.controller.ts):
@@ -15,7 +15,8 @@ import { buildPagedParams, normalizePaginated } from './paged-http';
 //   DELETE /p2p/listings/:id                   seller cancel
 //   POST   /p2p/listings/:id/buy
 //   POST   /admin/p2p/listings/:id/force-close (admin)
-//   GET    /config/p2p                         -> { commission, ttl_days } (no auth; commission is 0-1 fraction)
+//   GET    /config/p2p                         -> { commission_pct, refund_code_ttl_days, cancel_penalty_pct }
+//                                                 (no auth; pcts are whole numbers, e.g. 25 = 25%)
 //
 // Status filter at /p2p/listings defaults to 'active' server-side; pass `status` to query others.
 
@@ -33,6 +34,9 @@ export interface P2pFilters {
 
 @Injectable({ providedIn: 'root' })
 export class P2pService {
+  // Cached, shared config stream — /config/p2p is fetched at most once per app session.
+  private config$?: Observable<P2pConfig>;
+
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
 
   listActive(filters: P2pFilters = {}): Observable<Paginated<P2pListing>> {
@@ -75,7 +79,33 @@ export class P2pService {
     return this.http.post<P2pListing>(`${this.apiUrl.get()}/admin/p2p/listings/${id}/force-close`, {});
   }
 
+  /**
+   * Fetch + cache the P2P config, normalized to {@link P2pConfig}.
+   * Shared across all subscribers (shareReplay) so the endpoint is hit once per session.
+   * Tolerates the legacy `{ commission, ttl_days }` shape so it can't regress mid-rollout.
+   */
   getConfig(): Observable<P2pConfig> {
-    return this.http.get<P2pConfig>(`${this.apiUrl.get()}/config/p2p`);
+    if (!this.config$) {
+      this.config$ = this.http.get<P2pConfigRaw & { commission?: number; ttl_days?: number }>(
+        `${this.apiUrl.get()}/config/p2p`,
+      ).pipe(
+        map(r => {
+          const pct = Number(r?.commission_pct);
+          const commissionPct = Number.isFinite(pct)
+            ? pct
+            : Number(r?.commission) * 100 || 0; // legacy fraction fallback
+          const ttl = Number(r?.refund_code_ttl_days);
+          const penalty = Number(r?.cancel_penalty_pct);
+          return {
+            commission_pct: commissionPct,
+            commission: commissionPct / 100,
+            ttl_days: Number.isFinite(ttl) ? ttl : (Number(r?.ttl_days) || 7),
+            cancel_penalty_pct: Number.isFinite(penalty) ? penalty : 0,
+          } as P2pConfig;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+    return this.config$;
   }
 }

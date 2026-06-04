@@ -875,12 +875,19 @@
       "cancelled": "ยกเลิก",
       "expired": "หมดอายุ"
     },
+    "gun": {
+      "title": "อุปกรณ์เสริม",
+      "rounds": "นัด",
+      "bare": "ปืนเปล่า"
+    },
     "list": {
       "title": "ลงขายในตลาด",
       "price": "ราคา (coin)",
       "commission": "ค่าธรรมเนียม",
       "youReceive": "ได้รับสุทธิ",
-      "confirm": "ลงขาย"
+      "confirm": "ลงขาย",
+      "cancelWarn": "ยกเลิกการขายจะถูกหัก {{pct}}% ของราคาที่ตั้ง และ coins อาจติดลบ",
+      "cancelWarnAmount": "ค่าปรับเมื่อยกเลิก: {{amount}} coins"
     }
   },
   "p2pGarage": {
@@ -954,6 +961,13 @@
     "showCode": "ดูโค้ด",
     "codeExpiresIn": "โค้ดหมดอายุในอีก {{days}} วัน",
     "codeExpiresToday": "โค้ดหมดอายุวันนี้",
+    "cancelConfirm": {
+      "title": "ยกเลิกประกาศนี้?",
+      "penalty": "จะถูกหักค่าปรับ {{pct}}% ({{amount}} coins) จากการยกเลิก",
+      "negative": "ยอด coins ของคุณอาจติดลบได้",
+      "keep": "เก็บประกาศไว้",
+      "confirm": "ยกเลิกและจ่ายค่าปรับ"
+    },
     "empty": {
       "active": "คุณยังไม่มีประกาศที่เปิดอยู่",
       "sold": "ยังไม่มีรายการที่ขายสำเร็จ",

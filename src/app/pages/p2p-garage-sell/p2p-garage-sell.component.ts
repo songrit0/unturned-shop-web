@@ -183,7 +183,7 @@ export class P2pGarageSellComponent implements OnInit {
     this.reload();
     this.p2p.getConfig().subscribe({
       next: c => (this.config = c),
-      error: () => (this.config = { commission: 0, ttl_days: 7 }),
+      error: () => (this.config = { commission: 0, commission_pct: 0, ttl_days: 7, cancel_penalty_pct: 0 }),
     });
   }
 

@@ -11,6 +11,25 @@ export interface VaultItem {
   State: string;
 }
 
+// One attachment slot on a gun (sight / tactical / grip / barrel / magazine).
+// `name` may be null when the API can't resolve the attachment id to a display name.
+export interface GunAttachment {
+  id: number;
+  name: string | null;
+}
+
+// Decoded gun State the API attaches to gun items (P2P listings + vault items).
+// `gun` is null on the parent item when the item isn't a gun.
+export interface GunInfo {
+  sight: GunAttachment | null;
+  tactical: GunAttachment | null;
+  grip: GunAttachment | null;
+  barrel: GunAttachment | null;
+  magazine: GunAttachment | null;
+  ammo: number;
+  hasAttachments: boolean;
+}
+
 // VaultItem joined with sv_items metadata on the API side for display.
 // Matches api `VaultItemView`.
 export interface EnrichedVaultItem extends VaultItem {
@@ -19,6 +38,8 @@ export interface EnrichedVaultItem extends VaultItem {
   image_url: string | null;
   type_id: number | null;
   type_name: string | null;
+  // Decoded gun attachments/ammo; null when the item isn't a gun.
+  gun?: GunInfo | null;
 }
 
 export interface VaultSummary {
@@ -73,6 +94,8 @@ export interface P2pListing {
   // for the my-listings "Show code" button (more robust than the notification, which can be read).
   redeem_code?: string | null;
   code_expires_at?: string | null;
+  // Decoded gun attachments/ammo; null when the listed item isn't a gun.
+  gun?: GunInfo | null;
 }
 
 export interface P2pCreatePayload {
@@ -101,7 +124,21 @@ export function isDeletedActor(discordName: string | null): boolean {
   return discordName === DELETED_DISCORD_SENTINEL;
 }
 
+// Raw shape returned by GET /config/p2p. Percentages are whole numbers (e.g. 25 = 25%).
+//   commission_pct       — sale commission taken from the seller
+//   refund_code_ttl_days — how long a refund redeem code stays valid
+//   cancel_penalty_pct   — % of the listing price charged when the seller cancels (coins can go negative)
+export interface P2pConfigRaw {
+  commission_pct: number;
+  refund_code_ttl_days: number;
+  cancel_penalty_pct: number;
+}
+
+// Normalized config used across the UI. `commission` is a 0-1 fraction (kept for the
+// existing payout preview); `commission_pct` / `cancel_penalty_pct` are whole-number percentages.
 export interface P2pConfig {
-  commission: number;
-  ttl_days: number;
+  commission: number;          // 0-1 fraction (commission_pct / 100)
+  commission_pct: number;      // whole-number percent
+  ttl_days: number;            // = refund_code_ttl_days
+  cancel_penalty_pct: number;  // whole-number percent
 }

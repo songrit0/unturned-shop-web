@@ -37,6 +37,17 @@ import { P2pService } from '../../services/p2p.service';
           <div class="row" style="justify-content:space-between"><span class="muted">{{ 'p2p.list.youReceive' | translate }}</span><span class="mono"><b>{{ payout | number:'1.0-2' }}</b></span></div>
         </div>
 
+        <!-- Cancel-penalty warning shown before submit (Task 2). -->
+        <div *ngIf="cancelPenaltyPct > 0" class="warn">
+          <span class="mi sm">warning</span>
+          <div>
+            <div>{{ 'p2p.list.cancelWarn' | translate:{ pct: cancelPenaltyPct } }}</div>
+            <div *ngIf="price > 0" class="warn-amt mono">
+              {{ 'p2p.list.cancelWarnAmount' | translate:{ amount: (cancelPenaltyCoins | number) } }}
+            </div>
+          </div>
+        </div>
+
         <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ error | translate }}</p>
 
         <div class="row gap-2" style="margin-top:16px">
@@ -50,6 +61,11 @@ import { P2pService } from '../../services/p2p.service';
   `,
   styles: [`
     .preview { background: var(--surface-2); border-radius: 6px; padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+    .warn { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; padding: 8px 10px;
+            background: color-mix(in srgb, var(--amber) 12%, transparent); border: 1px solid var(--amber);
+            border-radius: 6px; font-size: 12px; line-height: 1.5; color: var(--text); }
+    .warn .mi { color: var(--amber); flex-shrink: 0; margin-top: 1px; }
+    .warn-amt { margin-top: 4px; font-weight: 700; color: var(--amber); }
   `],
 })
 export class ListOnMarketModalComponent implements OnInit {
@@ -68,7 +84,7 @@ export class ListOnMarketModalComponent implements OnInit {
   ngOnInit() {
     this.p2p.getConfig().subscribe({
       next: c => (this.config = c),
-      error: () => (this.config = { commission: 0, ttl_days: 7 }),
+      error: () => (this.config = { commission: 0, commission_pct: 0, ttl_days: 7, cancel_penalty_pct: 0 }),
     });
   }
 
@@ -77,6 +93,16 @@ export class ListOnMarketModalComponent implements OnInit {
   get payout(): number {
     if (!this.config) return this.price;
     return this.price * (1 - this.config.commission);
+  }
+
+  /** Whole-number cancel penalty percentage from /config/p2p (0 hides the warning). */
+  get cancelPenaltyPct(): number {
+    return this.config?.cancel_penalty_pct ?? 0;
+  }
+
+  /** Live baht-equivalent of the cancel penalty for the entered price. */
+  get cancelPenaltyCoins(): number {
+    return Math.round((Number(this.price) || 0) * this.cancelPenaltyPct / 100);
   }
 
   onConfirm() {

@@ -62,6 +62,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                           </span>
                         </ng-container>
                       </div>
+                      <app-gun-chips *ngIf="it.gun" [gun]="it.gun"></app-gun-chips>
                     </td>
                     <td class="mono">×{{ it.Amount }}</td>
                     <td>

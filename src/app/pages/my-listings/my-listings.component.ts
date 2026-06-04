@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { formatActorLabel, isDeletedActor, P2pListing } from '../../models/vault';
+import { formatActorLabel, isDeletedActor, P2pConfig, P2pListing } from '../../models/vault';
 import { P2pService } from '../../services/p2p.service';
 import { daysUntil } from '../../services/expiry';
+import { mapVaultP2pErrorKey } from '../../services/vault-errors';
 
 type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
 
@@ -55,7 +56,7 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
                   <td *ngIf="tab === 'sold'" class="muted mono" style="font-size:12px" [class.deleted-actor]="isBuyerDeleted(l)">{{ buyerLabel(l) }}</td>
                   <td class="muted mono" style="font-size:12px">{{ l.created_at | date:'short' }}</td>
                   <td>
-                    <button *ngIf="l.status === 'active'" class="btn ghost sm" style="color:var(--rose)" (click)="cancel(l)">
+                    <button *ngIf="l.status === 'active'" class="btn ghost sm" style="color:var(--rose)" (click)="askCancel(l)">
                       {{ 'myListings.cancel' | translate }}
                     </button>
                     <button *ngIf="l.status !== 'active' && l.redeem_code" class="btn ghost sm" (click)="showCode(l)">
@@ -81,6 +82,30 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
       </ng-template>
+
+      <!-- Cancel-confirm modal: states the exact penalty + negative-balance risk before cancelling. -->
+      <div *ngIf="cancelFor" class="modal-backdrop" (click)="closeCancel()">
+        <div class="modal-card tactical" style="max-width:420px" (click)="$event.stopPropagation()">
+          <h3 style="display:flex;align-items:center;gap:8px;margin:0 0 12px 0;font-size:18px;font-weight:700;color:var(--rose)">
+            <span class="mi">warning</span>{{ 'myListings.cancelConfirm.title' | translate }}
+          </h3>
+          <p style="font-size:13px;margin:0 0 10px 0">
+            {{ cancelFor.item_name || ('#' + cancelFor.item_id) }}
+            <span class="mono muted">· {{ cancelFor.price | number }} coins</span>
+          </p>
+          <div class="warn">
+            <div>{{ 'myListings.cancelConfirm.penalty' | translate:{ pct: cancelPenaltyPct, amount: (cancelPenaltyCoins | number) } }}</div>
+            <div style="margin-top:6px">{{ 'myListings.cancelConfirm.negative' | translate }}</div>
+          </div>
+          <p *ngIf="cancelError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ cancelError | translate }}</p>
+          <div class="row gap-2" style="margin-top:16px">
+            <button class="btn secondary" style="flex:1" [disabled]="cancelling" (click)="closeCancel()">{{ 'myListings.cancelConfirm.keep' | translate }}</button>
+            <button class="btn danger" style="flex:1" [disabled]="cancelling" (click)="confirmCancel()">
+              {{ (cancelling ? 'common.saving' : 'myListings.cancelConfirm.confirm') | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Refund code modal — reuses the inventory code-reveal pattern -->
       <div *ngIf="codeFor" class="modal-backdrop" (click)="closeCode()">
@@ -123,6 +148,8 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
       letter-spacing: 2px;
       user-select: all;
     }
+    .warn { padding: 10px 12px; background: color-mix(in srgb, var(--rose) 12%, transparent);
+            border: 1px solid var(--rose); border-radius: 6px; font-size: 13px; line-height: 1.5; }
   `],
 })
 export class MyListingsComponent implements OnInit {
@@ -137,9 +164,28 @@ export class MyListingsComponent implements OnInit {
   codeFor: P2pListing | null = null;
   copied = false;
 
+  // Cancel-confirm dialog state.
+  cancelFor: P2pListing | null = null;
+  cancelling = false;
+  cancelError: string | null = null;
+  config: P2pConfig | null = null;
+
   constructor(private svc: P2pService, private t: TranslateService) {}
 
-  ngOnInit() { this.reload(); }
+  ngOnInit() {
+    this.reload();
+    this.svc.getConfig().subscribe({ next: c => this.config = c, error: () => {} });
+  }
+
+  get cancelPenaltyPct(): number {
+    return this.config?.cancel_penalty_pct ?? 0;
+  }
+
+  /** Exact penalty in coins for the listing pending cancellation. */
+  get cancelPenaltyCoins(): number {
+    if (!this.cancelFor) return 0;
+    return Math.round((Number(this.cancelFor.price) || 0) * this.cancelPenaltyPct / 100);
+  }
 
   get items(): P2pListing[] {
     return this.all.filter(l => l.status === this.tab);
@@ -158,11 +204,27 @@ export class MyListingsComponent implements OnInit {
     });
   }
 
-  cancel(l: P2pListing) {
-    this.svc.cancel(l.id).subscribe({
-      next: () => this.reload(),
-      error: () => {},
+  /** Open the cancel-confirm dialog (penalty is shown there before the API call). */
+  askCancel(l: P2pListing) {
+    this.cancelFor = l;
+    this.cancelError = null;
+    this.cancelling = false;
+  }
+
+  confirmCancel() {
+    if (!this.cancelFor) return;
+    this.cancelling = true;
+    this.cancelError = null;
+    this.svc.cancel(this.cancelFor.id).subscribe({
+      next: () => { this.cancelling = false; this.closeCancel(); this.reload(); },
+      error: e => { this.cancelling = false; this.cancelError = mapVaultP2pErrorKey(e); },
     });
+  }
+
+  closeCancel() {
+    this.cancelFor = null;
+    this.cancelling = false;
+    this.cancelError = null;
   }
 
   showCode(l: P2pListing) {

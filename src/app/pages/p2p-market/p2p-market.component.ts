@@ -76,6 +76,7 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
               </div>
               <app-quality-bar [value]="l.quality" [showPercent]="true"></app-quality-bar>
               <div *ngIf="l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
+              <app-gun-chips *ngIf="l.gun" [gun]="l.gun"></app-gun-chips>
               <div class="price mono">{{ l.price | number }} <span class="muted" style="font-weight:400">coins</span></div>
             </div>
           </div>
@@ -112,6 +113,10 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
               <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.price' | translate }}</div>
               <div class="mono" style="font-weight:700;font-size:18px">{{ selected.price | number }} coins</div>
             </div>
+          </div>
+          <div *ngIf="selected.gun" style="margin-bottom:12px">
+            <div class="muted" style="font-size:12px;margin-bottom:4px">{{ 'p2p.gun.title' | translate }}</div>
+            <app-gun-chips [gun]="selected.gun"></app-gun-chips>
           </div>
           <p *ngIf="buyError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ buyError | translate }}</p>
           <div class="row gap-2" style="margin-top:16px">

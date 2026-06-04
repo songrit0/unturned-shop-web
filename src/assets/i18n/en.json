@@ -874,12 +874,19 @@
       "cancelled": "Cancelled",
       "expired": "Expired"
     },
+    "gun": {
+      "title": "Attachments",
+      "rounds": "rounds",
+      "bare": "Bare gun"
+    },
     "list": {
       "title": "List on market",
       "price": "Price (coins)",
       "commission": "Commission",
       "youReceive": "You receive",
-      "confirm": "List"
+      "confirm": "List",
+      "cancelWarn": "Cancelling this listing costs {{pct}}% of your price; your coins can go negative.",
+      "cancelWarnAmount": "Cancel penalty: {{amount}} coins"
     }
   },
   "p2pGarage": {
@@ -953,6 +960,13 @@
     "showCode": "Show code",
     "codeExpiresIn": "Code expires in {{days}} day(s)",
     "codeExpiresToday": "Code expires today",
+    "cancelConfirm": {
+      "title": "Cancel this listing?",
+      "penalty": "A penalty of {{pct}}% ({{amount}} coins) will be charged for cancelling.",
+      "negative": "Your coin balance can go negative.",
+      "keep": "Keep listing",
+      "confirm": "Cancel & pay penalty"
+    },
     "empty": {
       "active": "You have no active listings.",
       "sold": "No completed sales yet.",

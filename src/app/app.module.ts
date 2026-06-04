@@ -36,6 +36,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ListOnMarketModalComponent } from './components/list-on-market-modal/list-on-market-modal.component';
 import { SuggestEditModalComponent } from './components/suggest-edit-modal/suggest-edit-modal.component';
 import { QualityBarComponent } from './components/quality-bar/quality-bar.component';
+import { GunChipsComponent } from './components/gun-chips/gun-chips.component';
 import { VaultsComponent } from './pages/vaults/vaults.component';
 import { P2pMarketComponent } from './pages/p2p-market/p2p-market.component';
 import { P2pGarageMarketComponent } from './pages/p2p-garage-market/p2p-garage-market.component';
@@ -94,6 +95,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ListOnMarketModalComponent,
     SuggestEditModalComponent,
     QualityBarComponent,
+    GunChipsComponent,
     VaultsComponent,
     P2pMarketComponent,
     P2pGarageMarketComponent,
