@@ -296,10 +296,13 @@
     "formTitle": "Choose amount",
     "amountLabel": "Amount (baht)",
     "amountPlaceholder": "e.g. 100",
+    "providerLabel": "Payment method",
     "createBtn": "Generate PromptPay QR",
     "payTitle": "Scan to pay",
     "exactAmountLabel": "Transfer this EXACT amount",
     "exactWarn": "You must transfer this exact amount, or the top-up will not be matched.",
+    "amountToTransfer": "Amount to transfer",
+    "receiver": "Receiver",
     "promptpayId": "PromptPay ID",
     "ref": "Reference",
     "credits": "Credits",
@@ -326,6 +329,27 @@
       "credited": "Credited",
       "expired": "Expired",
       "cancelled": "Cancelled"
+    },
+    "thunder": {
+      "step1": "Transfer the exact amount above to the receiver via PromptPay.",
+      "step2": "Then upload your transfer slip below to confirm and receive your Vcoins.",
+      "chooseSlip": "Upload transfer slip",
+      "changeSlip": "Choose a different slip",
+      "verifyBtn": "Verify slip",
+      "verifying": "Verifying slip...",
+      "errors": {
+        "badType": "Unsupported file type. Use PNG, JPG, WEBP or GIF.",
+        "tooLarge": "File too large. Maximum size is 4MB.",
+        "readFail": "Couldn't read that file. Please try again.",
+        "slip_not_matched": "Slip doesn't match the account or amount. Check and re-upload.",
+        "amount_mismatch": "The slip amount doesn't match. Transfer the exact amount and re-upload.",
+        "duplicate_slip": "This slip has already been used.",
+        "slip_already_used": "This slip has already been used.",
+        "slip_not_found": "No matching transfer was found for this slip.",
+        "slip_pending": "The bank is still processing this transfer. Please try again shortly.",
+        "quota_exceeded": "Slip verification is at capacity right now. Please try again later.",
+        "generic": "Couldn't verify the slip. Please try again."
+      }
     },
     "errors": {
       "createFail": "Couldn't create the top-up. Please try again."
@@ -615,6 +639,15 @@
     "title": "Manage Vcoin",
     "info": "Vcoins are the real-money currency. Top-ups are credited via PromptPay; manual adjust/set can take a balance negative (intended).",
     "vcoins": "Vcoins",
+    "providersTitle": "Payment providers",
+    "providersHint": "Enable or disable a payment provider. Disabling a provider hides it from the players' top-up page.",
+    "provider": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable": "Enable",
+      "disable": "Disable",
+      "none": "No payment providers configured."
+    },
     "topupsTitle": "Top-ups",
     "searchTopups": "Search steam_id / discord...",
     "walletTitle": "Player wallet manager",
@@ -669,7 +702,8 @@
     },
     "errors": {
       "lookupFail": "Couldn't load that wallet",
-      "saveFail": "Save failed"
+      "saveFail": "Save failed",
+      "providersFail": "Couldn't load or update providers"
     }
   },
   "pager": {

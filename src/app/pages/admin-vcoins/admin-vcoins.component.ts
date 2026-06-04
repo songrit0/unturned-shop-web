@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
   AdjustResult,
+  AdminProviderRow,
   AdminTopupRow,
   AdminTopupStatus,
   AdminVcoinsService,
@@ -24,6 +25,34 @@ type StatusFilter = 'all' | AdminTopupStatus;
       <div class="welcome-alert" style="margin-bottom:16px">
         <span class="alert-icon mi">info</span>
         <div>{{ 'adminVcoins.info' | translate }}</div>
+      </div>
+
+      <!-- ===== Payment providers ===== -->
+      <div class="card" style="margin-bottom:24px">
+        <h3 style="margin:0 0 4px 0;font-size:16px;font-weight:700"><span class="mi sm">tune</span> {{ 'adminVcoins.providersTitle' | translate }}</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 12px 0">{{ 'adminVcoins.providersHint' | translate }}</p>
+
+        <div *ngIf="providersLoading" style="text-align:center;padding:24px 0"><div class="spinner"></div></div>
+        <p *ngIf="providersError" style="color:var(--rose);font-size:13px;margin:0">{{ providersError }}</p>
+
+        <ng-container *ngIf="!providersLoading">
+          <div *ngFor="let p of providers" class="row" style="align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-weight:600">{{ p.label }} <span class="mono muted" style="font-size:11px">({{ p.key }})</span></div>
+              <div class="muted" style="font-size:12px">
+                <span [style.color]="p.enabled ? 'var(--emerald)' : 'var(--text-faint)'">
+                  {{ (p.enabled ? 'adminVcoins.provider.enabled' : 'adminVcoins.provider.disabled') | translate }}
+                </span>
+              </div>
+            </div>
+            <button class="btn sm" [class.danger]="p.enabled" [class.emerald]="!p.enabled"
+                    [disabled]="providerSaving === p.key" (click)="toggleProvider(p)">
+              <span class="mi sm">{{ p.enabled ? 'toggle_off' : 'toggle_on' }}</span>
+              {{ (p.enabled ? 'adminVcoins.provider.disable' : 'adminVcoins.provider.enable') | translate }}
+            </button>
+          </div>
+          <p *ngIf="providers.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminVcoins.provider.none' | translate }}</p>
+        </ng-container>
       </div>
 
       <!-- ===== A. Top-ups ===== -->
@@ -205,6 +234,12 @@ type StatusFilter = 'all' | AdminTopupStatus;
   `],
 })
 export class AdminVcoinsComponent implements OnInit {
+  // ---- Payment providers ----
+  providers: AdminProviderRow[] = [];
+  providersLoading = true;
+  providersError: string | null = null;
+  providerSaving: string | null = null;
+
   // ---- A. Top-ups ----
   loading = true;
   page: Paginated<AdminTopupRow> | null = null;
@@ -227,7 +262,7 @@ export class AdminVcoinsComponent implements OnInit {
 
   constructor(private svc: AdminVcoinsService, private t: TranslateService) {}
 
-  ngOnInit() { this.load(1, 20); }
+  ngOnInit() { this.load(1, 20); this.loadProviders(); }
 
   /** Coerce string/number DECIMAL/BIGINT fields to a number for display/math. */
   num(v: string | number | null | undefined): number {
@@ -235,6 +270,24 @@ export class AdminVcoinsComponent implements OnInit {
     return Number.isFinite(n) ? n : 0;
   }
   num2(v: number | null): number { return this.num(v); }
+
+  // ---- Payment providers ----
+  loadProviders() {
+    this.providersLoading = true;
+    this.providersError = null;
+    this.svc.listProviders().subscribe({
+      next: list => { this.providers = list; this.providersLoading = false; },
+      error: e => { this.providersLoading = false; this.providersError = e?.error?.message || this.t.instant('adminVcoins.errors.providersFail'); },
+    });
+  }
+
+  toggleProvider(p: AdminProviderRow) {
+    this.providerSaving = p.key;
+    this.svc.setProvider(p.key, !p.enabled).subscribe({
+      next: () => { this.providerSaving = null; this.loadProviders(); },
+      error: e => { this.providerSaving = null; this.providersError = e?.error?.message || this.t.instant('adminVcoins.errors.providersFail'); },
+    });
+  }
 
   // ---- A. Top-ups ----
   load(page: number, limit: number) {

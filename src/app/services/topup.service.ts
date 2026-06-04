@@ -9,15 +9,18 @@ import { buildPagedParams, normalizePaginated } from './paged-http';
 export { Paginated };
 
 // API contract (unturned-shop-api topup/vcoins controllers; JWT via authInterceptor):
-//   POST /topup/create  body { baht } -> TopupCreated (status 'pending', PromptPay QR payload)
+//   POST /topup/create  body { baht, provider } -> TopupCreated (status 'pending')
 //                                        (403 topup_admin_only for non-admins while admin_only is on)
-//   GET  /topup/:ref               -> TopupStatus
+//   POST /topup/thunder/verify { ref, slip_base64 } -> ThunderVerifyResult | 400 { reason }
+//   GET  /topup/:ref               -> TopupStatus (plernpay polling only)
 //   GET  /topup/me                 -> paginated TopupRow history
 //   GET  /vcoins/me                -> VcoinsMe
-//   GET  /config/topup             -> TopupConfig (PUBLIC, no auth) — soft-launch gate flag
+//   GET  /config/topup             -> TopupConfig (PUBLIC, no auth) — gate flag + enabled providers
 //
 // Vcoins are a SEPARATE currency from in-game coins. unique_amount is the EXACT baht the
 // user must transfer (the cents are a per-ref discriminator the backend reconciles on).
+
+export type TopupProvider = 'plernpay' | 'thunder';
 
 export type TopupStatus =
   | 'pending'    // QR shown, waiting for payment
@@ -26,14 +29,35 @@ export type TopupStatus =
   | 'expired'    // QR window elapsed without payment (terminal)
   | 'cancelled'; // cancelled (terminal)
 
+// create() response. Shape depends on `provider`:
+//   plernpay -> unique_amount (exact baht to transfer, cents are the discriminator), polled via /topup/:ref.
+//   thunder  -> amount (baht) + receiver_name; credited by uploading a slip to /topup/thunder/verify.
+// Both carry qr_code (PromptPay EMVCo payload), promptpay_id, expires_at, vcoins.
 export interface TopupCreated {
   ref: string;
-  unique_amount: number;       // exact baht to transfer
+  provider: TopupProvider;
   qr_code: string;             // PromptPay EMVCo payload to render as a QR
   promptpay_id: string;
   expires_at: string;          // ISO
   vcoins: number;              // vcoins this top-up will credit
   status: TopupStatus;
+  // plernpay only:
+  unique_amount?: number;      // exact baht to transfer
+  // thunder only:
+  amount?: number;             // baht to transfer
+  receiver_name?: string;      // account holder name to verify against
+}
+
+// Thunder slip-verify reasons (HTTP 400 body `{ reason }`).
+export type ThunderVerifyReason =
+  | 'slip_not_matched' | 'amount_mismatch' | 'duplicate_slip' | 'slip_already_used'
+  | 'slip_not_found' | 'slip_pending' | 'quota_exceeded';
+
+export interface ThunderVerifyResult {
+  ref: string;
+  status: 'credited';
+  vcoins: number;
+  balance: number;
 }
 
 export interface TopupState {
@@ -60,7 +84,13 @@ export interface VcoinsMe {
   balance: number;
 }
 
-// Soft-launch gate + rate/limits from GET /config/topup (public).
+// One ENABLED provider option from GET /config/topup (already filtered + ordered server-side).
+export interface TopupProviderOption {
+  key: TopupProvider;
+  label: string;
+}
+
+// Soft-launch gate + rate/limits + enabled providers from GET /config/topup (public).
 // While `admin_only` is true, only admins may create top-ups (API enforces with 403
 // topup_admin_only). Flip TOPUP_ADMIN_ONLY=false on the API to open it to everyone — the UI
 // reacts automatically, no web redeploy needed.
@@ -69,6 +99,7 @@ export interface TopupConfig {
   vcoin_per_baht: number;
   min_baht: number;
   max_baht: number;
+  providers: TopupProviderOption[];   // enabled providers, ordered
 }
 
 // Conservative fallback if /config/topup is unreachable: stay locked (admin_only true) so a
@@ -78,6 +109,7 @@ const TOPUP_CONFIG_FALLBACK: TopupConfig = {
   vcoin_per_baht: 1,
   min_baht: 1,
   max_baht: 100000,
+  providers: [],
 };
 
 @Injectable({ providedIn: 'root' })
@@ -104,6 +136,10 @@ export class TopupService {
           vcoin_per_baht: Number(r?.vcoin_per_baht) > 0 ? Number(r!.vcoin_per_baht) : 1,
           min_baht: Number(r?.min_baht) > 0 ? Number(r!.min_baht) : 1,
           max_baht: Number(r?.max_baht) > 0 ? Number(r!.max_baht) : TOPUP_CONFIG_FALLBACK.max_baht,
+          // Keep only well-formed provider options; preserve server order.
+          providers: Array.isArray(r?.providers)
+            ? r!.providers!.filter((p): p is TopupProviderOption => !!p && !!p.key).map(p => ({ key: p.key, label: p.label || p.key }))
+            : [],
         } as TopupConfig)),
         catchError(() => of(TOPUP_CONFIG_FALLBACK)),
         shareReplay({ bufferSize: 1, refCount: false }),
@@ -120,12 +156,17 @@ export class TopupService {
   }
 
   // ---- Top-up ----
-  create(baht: number): Observable<TopupCreated> {
-    return this.http.post<TopupCreated>(`${this.apiUrl.get()}/topup/create`, { baht });
+  create(baht: number, provider: TopupProvider): Observable<TopupCreated> {
+    return this.http.post<TopupCreated>(`${this.apiUrl.get()}/topup/create`, { baht, provider });
   }
 
   status(ref: string): Observable<TopupState> {
     return this.http.get<TopupState>(`${this.apiUrl.get()}/topup/${encodeURIComponent(ref)}`);
+  }
+
+  /** Thunder: verify an uploaded payment slip. slip_base64 is a data URL from FileReader. */
+  verifyThunder(ref: string, slip_base64: string): Observable<ThunderVerifyResult> {
+    return this.http.post<ThunderVerifyResult>(`${this.apiUrl.get()}/topup/thunder/verify`, { ref, slip_base64 });
   }
 
   history(page = 1, limit = 20): Observable<Paginated<TopupRow>> {

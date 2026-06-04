@@ -13,6 +13,8 @@ export { Paginated };
 //   GET  /admin/vcoins/wallet/:steamId                 -> AdminVcoinWallet (balance + latest 50 log)
 //   POST /admin/vcoins/adjust  { steam_id, delta, reason? }   -> AdjustResult (delta may be negative)
 //   POST /admin/vcoins/set     { steam_id, balance, reason? } -> AdjustResult (absolute set)
+//   GET  /admin/vcoins/providers               -> AdminProviderRow[] (all providers incl. disabled)
+//   POST /admin/vcoins/providers { key, enabled } -> on/off toggle (disabling hides it from players)
 //
 // IMPORTANT: baht / unique_amount / vcoins / balance / delta arrive as STRINGS (DECIMAL/BIGINT).
 // Coerce with Number() before display/math.
@@ -54,6 +56,13 @@ export interface AdjustResult {
   balance: string | number;
 }
 
+export interface AdminProviderRow {
+  key: string;
+  label: string;
+  enabled: boolean;
+  sort: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminVcoinsService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -81,5 +90,17 @@ export class AdminVcoinsService {
   /** Absolute set (balance may be negative — intended). */
   set(steam_id: string, balance: number, reason?: string): Observable<AdjustResult> {
     return this.http.post<AdjustResult>(`${this.apiUrl.get()}/admin/vcoins/set`, { steam_id, balance, reason });
+  }
+
+  // ---- Payment providers ----
+  /** All providers (including disabled), ordered by sort. */
+  listProviders(): Observable<AdminProviderRow[]> {
+    return this.http.get<AdminProviderRow[]>(`${this.apiUrl.get()}/admin/vcoins/providers`)
+      .pipe(map(r => Array.isArray(r) ? r : []));
+  }
+
+  /** Enable/disable a provider. Disabling hides it from the players' top-up page. */
+  setProvider(key: string, enabled: boolean): Observable<unknown> {
+    return this.http.post(`${this.apiUrl.get()}/admin/vcoins/providers`, { key, enabled });
   }
 }

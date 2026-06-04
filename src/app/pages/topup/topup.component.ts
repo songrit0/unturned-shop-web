@@ -1,9 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { TopupCreated, TopupRow, TopupService, TopupState } from '../../services/topup.service';
+import {
+  ThunderVerifyReason,
+  TopupCreated,
+  TopupProvider,
+  TopupProviderOption,
+  TopupRow,
+  TopupService,
+  TopupState,
+} from '../../services/topup.service';
 
 type Phase = 'form' | 'pay' | 'success' | 'expired';
+
+// Client-side slip cap (bytes). The API may enforce its own limit too.
+const MAX_SLIP_BYTES = 4 * 1024 * 1024;
+const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
 @Component({
   selector: 'app-topup',
@@ -40,6 +52,18 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
           <!-- Phase: amount form -->
           <ng-container *ngIf="phase === 'form'">
             <div class="card-title"><span class="mi">payments</span>{{ 'topup.formTitle' | translate }}</div>
+
+            <!-- Provider picker: only shown when more than one provider is enabled. -->
+            <div *ngIf="providers.length > 1" style="margin-top:12px">
+              <span class="muted" style="font-size:12px">{{ 'topup.providerLabel' | translate }}</span>
+              <div class="seg" style="margin-top:4px">
+                <button *ngFor="let p of providers" type="button" class="seg-btn"
+                        [class.active]="provider === p.key" (click)="provider = p.key">
+                  <span class="mi sm">{{ providerIcon(p.key) }}</span> {{ p.label }}
+                </button>
+              </div>
+            </div>
+
             <label style="display:block;margin-top:12px">
               <span class="muted" style="font-size:12px">{{ 'topup.amountLabel' | translate }}</span>
               <input type="number" min="1" step="1" class="input mono" style="margin-top:4px"
@@ -56,8 +80,8 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
             </button>
           </ng-container>
 
-          <!-- Phase: pay (QR + exact amount + countdown) -->
-          <ng-container *ngIf="phase === 'pay' && created">
+          <!-- Phase: pay — PlernPay (QR + exact amount + countdown + polling) -->
+          <ng-container *ngIf="phase === 'pay' && created && created.provider === 'plernpay'">
             <div class="card-title"><span class="mi">qr_code_2</span>{{ 'topup.payTitle' | translate }}</div>
 
             <div class="qr-wrap">
@@ -94,6 +118,57 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
             </div>
 
             <button class="btn secondary" style="width:100%;margin-top:12px" (click)="reset()">
+              {{ 'topup.cancelBtn' | translate }}
+            </button>
+          </ng-container>
+
+          <!-- Phase: pay — Thunder (QR + transfer, then upload slip to verify) -->
+          <ng-container *ngIf="phase === 'pay' && created && created.provider === 'thunder'">
+            <div class="card-title"><span class="mi">qr_code_2</span>{{ 'topup.payTitle' | translate }}</div>
+
+            <div class="qr-wrap">
+              <qrcode [qrdata]="created.qr_code" [width]="220" [margin]="2" [errorCorrectionLevel]="'M'"
+                      [alt]="'topup.payTitle' | translate"></qrcode>
+            </div>
+
+            <div class="exact">
+              <div class="muted" style="font-size:12px">{{ 'topup.amountToTransfer' | translate }}</div>
+              <div class="exact-amt mono">{{ created.amount | number:'1.2-2' }} <span class="cur">{{ 'topup.baht' | translate }}</span></div>
+            </div>
+
+            <div class="metarow mono">
+              <div><span class="muted">{{ 'topup.receiver' | translate }}:</span> {{ created.receiver_name }}</div>
+              <div><span class="muted">{{ 'topup.promptpayId' | translate }}:</span> {{ created.promptpay_id }}</div>
+              <div><span class="muted">{{ 'topup.ref' | translate }}:</span> {{ created.ref }}</div>
+              <div><span class="muted">{{ 'topup.credits' | translate }}:</span> {{ created.vcoins | number }} {{ 'topup.vcoins' | translate }}</div>
+            </div>
+
+            <!-- Steps -->
+            <ol class="steps">
+              <li>{{ 'topup.thunder.step1' | translate }}</li>
+              <li>{{ 'topup.thunder.step2' | translate }}</li>
+            </ol>
+
+            <!-- Slip upload -->
+            <div class="slip">
+              <input #slipInput type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="onSlipSelected($event)">
+              <button type="button" class="btn secondary" style="width:100%" [disabled]="verifying" (click)="slipInput.click()">
+                <span class="mi sm">upload_file</span> {{ (slipName ? 'topup.thunder.changeSlip' : 'topup.thunder.chooseSlip') | translate }}
+              </button>
+              <div *ngIf="slipName" class="slip-name mono">
+                <span class="mi sm">image</span> {{ slipName }}
+              </div>
+            </div>
+
+            <p *ngIf="slipError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ slipError | translate }}</p>
+
+            <button class="btn primary" style="width:100%;margin-top:12px" [disabled]="!slipBase64 || verifying" (click)="verifyThunder()">
+              <span *ngIf="!verifying" class="mi sm">verified</span>
+              <span *ngIf="verifying" class="spinner sm" style="margin-right:6px"></span>
+              {{ (verifying ? 'topup.thunder.verifying' : 'topup.thunder.verifyBtn') | translate }}
+            </button>
+
+            <button class="btn ghost" style="width:100%;margin-top:8px" [disabled]="verifying" (click)="reset()">
               {{ 'topup.cancelBtn' | translate }}
             </button>
           </ng-container>
@@ -177,6 +252,14 @@ type Phase = 'form' | 'pay' | 'success' | 'expired';
     .result h2 { margin:8px 0 4px; font-size:18px; font-weight:700; }
     .balance-box { margin-top:14px; padding:12px; background:var(--surface-2); border-radius:8px; }
     .spinner.sm { width:14px; height:14px; border-width:2px; }
+    .seg { display:flex; gap:6px; flex-wrap:wrap; }
+    .seg-btn { flex:1; min-width:120px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:8px 10px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text);
+      background:var(--surface-2); border:1px solid var(--border); border-radius:8px; }
+    .seg-btn.active { border-color:var(--vcoin); color:var(--vcoin); background:rgb(59 130 246 / 0.12); }
+    .steps { margin:14px 0 0 0; padding-left:20px; font-size:13px; line-height:1.7; color:var(--text); }
+    .slip { margin-top:14px; }
+    .slip-name { display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12px; color:var(--muted); word-break:break-all; }
   `],
 })
 export class TopupComponent implements OnInit, OnDestroy {
@@ -192,6 +275,16 @@ export class TopupComponent implements OnInit, OnDestroy {
   vcoinPreview = 0;
   creating = false;
   createError: string | null = null;
+
+  // Providers (enabled, from /config/topup). `provider` is the selected one.
+  providers: TopupProviderOption[] = [];
+  provider: TopupProvider = 'plernpay';
+
+  // Thunder slip-upload state.
+  slipName: string | null = null;
+  slipBase64: string | null = null;
+  slipError: string | null = null;
+  verifying = false;
 
   created: TopupCreated | null = null;
   currentStatus: TopupState['status'] = 'pending';
@@ -214,6 +307,9 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.topup.getTopupConfig().subscribe({
       next: cfg => {
         this.hasAccess = !!me && (me.is_admin || !cfg.admin_only);
+        this.providers = cfg.providers;
+        // Auto-select: single provider -> use it; multiple -> default to the first enabled one.
+        if (this.providers.length > 0) this.provider = this.providers[0].key;
         if (this.hasAccess) {
           this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
           this.loadHistory();
@@ -239,25 +335,88 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.vcoinPreview = v >= 1 ? v * TopupComponent.RATE : 0;
   }
 
+  providerIcon(key: TopupProvider): string {
+    return key === 'thunder' ? 'bolt' : 'qr_code_2';
+  }
+
   create() {
     if (!this.canCreate) return;
     this.creating = true;
     this.createError = null;
+    this.resetSlip();
     const amount = Math.floor(Number(this.baht));
-    this.topup.create(amount).subscribe({
+    this.topup.create(amount, this.provider).subscribe({
       next: c => {
         this.creating = false;
         this.created = c;
         this.currentStatus = c.status;
         this.phase = 'pay';
         this.startCountdown();
-        this.startPolling();
+        // PlernPay credits via webhook -> poll status. Thunder credits via slip upload -> no poll.
+        if (c.provider === 'plernpay') this.startPolling();
       },
       error: e => {
         this.creating = false;
         this.createError = e?.error?.message || 'topup.errors.createFail';
       },
     });
+  }
+
+  // ---- Thunder slip upload + verify ----
+  /** Read the chosen image as a data URL (slip_base64). Rejects wrong type / >4MB client-side. */
+  onSlipSelected(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // allow re-selecting the same file
+    if (!file) return;
+    this.slipError = null;
+    this.slipName = null;
+    this.slipBase64 = null;
+    if (!ALLOWED_SLIP_TYPES.includes(file.type)) {
+      this.slipError = 'topup.thunder.errors.badType';
+      return;
+    }
+    if (file.size > MAX_SLIP_BYTES) {
+      this.slipError = 'topup.thunder.errors.tooLarge';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.slipBase64 = String(reader.result); // data URL: "data:image/...;base64,...."
+      this.slipName = file.name;
+    };
+    reader.onerror = () => { this.slipError = 'topup.thunder.errors.readFail'; };
+    reader.readAsDataURL(file);
+  }
+
+  verifyThunder() {
+    if (!this.created || !this.slipBase64 || this.verifying) return;
+    this.verifying = true;
+    this.slipError = null;
+    this.topup.verifyThunder(this.created.ref, this.slipBase64).subscribe({
+      next: r => {
+        this.verifying = false;
+        this.creditedVcoins = r.vcoins;
+        this.phase = 'success';
+        this.stopTimers();
+        // Refresh shared balance (header + page); fall back to the returned balance.
+        this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+        this.loadHistory();
+      },
+      error: e => {
+        this.verifying = false;
+        // Map the API reason to a friendly i18n key; keep the QR so the user can re-upload.
+        const reason = e?.error?.reason as ThunderVerifyReason | undefined;
+        this.slipError = reason ? `topup.thunder.errors.${reason}` : 'topup.thunder.errors.generic';
+      },
+    });
+  }
+
+  private resetSlip() {
+    this.slipName = null;
+    this.slipBase64 = null;
+    this.slipError = null;
+    this.verifying = false;
   }
 
   // ---- Polling ----
@@ -347,5 +506,6 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.createError = null;
     this.baht = null;
     this.vcoinPreview = 0;
+    this.resetSlip();
   }
 }
