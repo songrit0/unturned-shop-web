@@ -15,6 +15,7 @@
     "help": "Help",
     "adminMarket": "Manage Market",
     "adminCoins": "Manage Coin",
+    "adminVcoins": "Manage Vcoin",
     "adminQuests": "Manage Quests",
     "adminItemTypes": "Manage Item Types",
     "adminItems": "Manage Items",
@@ -607,6 +608,67 @@
     "noHistory": "No history",
     "errors": {
       "needAmount": "Amount must be > 0",
+      "saveFail": "Save failed"
+    }
+  },
+  "adminVcoins": {
+    "title": "Manage Vcoin",
+    "info": "Vcoins are the real-money currency. Top-ups are credited via PromptPay; manual adjust/set can take a balance negative (intended).",
+    "vcoins": "Vcoins",
+    "topupsTitle": "Top-ups",
+    "searchTopups": "Search steam_id / discord...",
+    "walletTitle": "Player wallet manager",
+    "steamIdPlaceholder": "Steam ID (17 digits)",
+    "lookup": "Look up",
+    "loadWallet": "Load this player's wallet",
+    "player": "Player",
+    "currentBalance": "Current balance",
+    "adjust": "Adjust (relative)",
+    "adjustHint": "Add or subtract from the current balance. Negative deltas allowed.",
+    "delta": "Delta (+/-)",
+    "preview": "New balance",
+    "applyAdjust": "Apply adjust",
+    "setBalance": "Set balance (absolute)",
+    "setHint": "Overwrite the balance to an exact value. Can be negative.",
+    "newBalance": "New balance",
+    "negativeNote": "This will set a negative balance.",
+    "applySet": "Set balance",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. manual correction",
+    "saving": "Saving...",
+    "logTitle": "Wallet log (latest 50)",
+    "noLog": "No wallet activity yet",
+    "noTopups": "No top-ups match",
+    "col": {
+      "date": "Date",
+      "player": "Player",
+      "baht": "Baht",
+      "vcoins": "Vcoins",
+      "status": "Status",
+      "ref": "Ref",
+      "delta": "Delta",
+      "reason": "Reason",
+      "actor": "Actor"
+    },
+    "statusFilter": {
+      "all": "All statuses",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "credited": "Credited",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "credited": "Credited",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    },
+    "errors": {
+      "lookupFail": "Couldn't load that wallet",
       "saveFail": "Save failed"
     }
   },

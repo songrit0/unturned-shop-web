@@ -51,6 +51,7 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
+import { AdminVcoinsComponent } from './pages/admin-vcoins/admin-vcoins.component';
 import { TopupComponent } from './pages/topup/topup.component';
 
 import { ApiUrlService } from './services/api-url.service';
@@ -111,6 +112,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminVehiclesComponent,
     AdminVehicleMarketComponent,
     AdminCodesComponent,
+    AdminVcoinsComponent,
     TopupComponent,
   ],
   imports: [

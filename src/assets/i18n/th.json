@@ -15,6 +15,7 @@
     "help": "วิธีใช้",
     "adminMarket": "จัดการร้านค้า",
     "adminCoins": "จัดการ Coin",
+    "adminVcoins": "จัดการ Vcoin",
     "adminQuests": "จัดการเควส",
     "adminItemTypes": "จัดการประเภทไอเทม",
     "adminItems": "จัดการ Items",
@@ -639,6 +640,67 @@
     "noHistory": "ยังไม่มีประวัติ",
     "errors": {
       "needAmount": "ใส่จำนวน > 0",
+      "saveFail": "บันทึกไม่สำเร็จ"
+    }
+  },
+  "adminVcoins": {
+    "title": "จัดการ Vcoin",
+    "info": "Vcoin คือสกุลเงินที่เติมด้วยเงินจริง การเติมจะเครดิตผ่าน PromptPay ส่วนการปรับ/ตั้งยอดด้วยตนเองสามารถทำให้ยอดติดลบได้ (ตั้งใจ)",
+    "vcoins": "Vcoin",
+    "topupsTitle": "รายการเติมเงิน",
+    "searchTopups": "ค้นหา steam_id / discord...",
+    "walletTitle": "จัดการกระเป๋าเงินผู้เล่น",
+    "steamIdPlaceholder": "Steam ID (17 หลัก)",
+    "lookup": "ค้นหา",
+    "loadWallet": "โหลดกระเป๋าเงินผู้เล่นนี้",
+    "player": "ผู้เล่น",
+    "currentBalance": "ยอดคงเหลือปัจจุบัน",
+    "adjust": "ปรับ (สัมพัทธ์)",
+    "adjustHint": "บวกหรือลบจากยอดปัจจุบัน ใส่ค่าติดลบได้",
+    "delta": "ส่วนต่าง (+/-)",
+    "preview": "ยอดใหม่",
+    "applyAdjust": "ยืนยันการปรับ",
+    "setBalance": "ตั้งยอด (ค่าสัมบูรณ์)",
+    "setHint": "เขียนทับยอดเป็นค่าที่กำหนด ติดลบได้",
+    "newBalance": "ยอดใหม่",
+    "negativeNote": "การตั้งค่านี้จะทำให้ยอดติดลบ",
+    "applySet": "ตั้งยอด",
+    "reason": "เหตุผล (optional)",
+    "reasonPlaceholder": "เช่น: แก้ไขด้วยตนเอง",
+    "saving": "กำลังบันทึก...",
+    "logTitle": "ประวัติกระเป๋าเงิน (50 ล่าสุด)",
+    "noLog": "ยังไม่มีความเคลื่อนไหว",
+    "noTopups": "ไม่พบรายการเติมเงิน",
+    "col": {
+      "date": "วันที่",
+      "player": "ผู้เล่น",
+      "baht": "บาท",
+      "vcoins": "Vcoin",
+      "status": "สถานะ",
+      "ref": "อ้างอิง",
+      "delta": "ส่วนต่าง",
+      "reason": "เหตุผล",
+      "actor": "ผู้ดำเนินการ"
+    },
+    "statusFilter": {
+      "all": "ทุกสถานะ",
+      "pending": "รอดำเนินการ",
+      "confirmed": "ยืนยันแล้ว",
+      "credited": "เติมแล้ว",
+      "expired": "หมดอายุ",
+      "cancelled": "ยกเลิก",
+      "failed": "ล้มเหลว"
+    },
+    "status": {
+      "pending": "รอดำเนินการ",
+      "confirmed": "ยืนยันแล้ว",
+      "credited": "เติมแล้ว",
+      "expired": "หมดอายุ",
+      "cancelled": "ยกเลิก",
+      "failed": "ล้มเหลว"
+    },
+    "errors": {
+      "lookupFail": "โหลดกระเป๋าเงินไม่สำเร็จ",
       "saveFail": "บันทึกไม่สำเร็จ"
     }
   },
