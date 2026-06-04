@@ -34,16 +34,17 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
         </div>
       </div>
 
-      <!-- Backstop: the route guard normally blocks non-admins while admin_only is on, but if the
-           page is somehow reached without access, show a notice instead of the form. -->
-      <div *ngIf="!hasAccess" class="card tactical" style="max-width:520px;text-align:center;padding:32px 24px">
-        <span class="mi xxl" style="color:var(--amber)">lock</span>
-        <h2 style="margin:8px 0 4px;font-size:18px;font-weight:700">{{ 'topup.adminOnlyTitle' | translate }}</h2>
-        <p class="muted" style="margin:0">{{ 'topup.adminOnlyBody' | translate }}</p>
-        <a routerLink="/" class="btn primary" style="margin-top:16px"><span class="mi sm">home</span>{{ 'topup.adminOnlyHome' | translate }}</a>
+      <!-- Single notice card for the two "can't show the form" states (mutually exclusive):
+           - no access (admin_only gate)            -> notice('admin-only')
+           - access but every provider disabled ([]) -> notice('closed') -->
+      <div *ngIf="notice as n" class="card tactical notice">
+        <span class="mi xxl" [style.color]="n === 'closed' ? 'var(--muted)' : 'var(--amber)'">{{ n === 'closed' ? 'pause_circle' : 'lock' }}</span>
+        <h2>{{ (n === 'closed' ? 'topup.closedTitle' : 'topup.adminOnlyTitle') | translate }}</h2>
+        <p class="muted">{{ (n === 'closed' ? 'topup.closedBody' : 'topup.adminOnlyBody') | translate }}</p>
+        <a routerLink="/" class="btn primary"><span class="mi sm">home</span>{{ 'topup.adminOnlyHome' | translate }}</a>
       </div>
 
-      <ng-container *ngIf="hasAccess">
+      <ng-container *ngIf="!notice">
       <p class="muted" style="margin:-4px 0 16px 0;font-size:13px;max-width:560px">{{ 'topup.intro' | translate }}</p>
 
       <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
@@ -225,6 +226,10 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
     </div>
   `,
   styles: [`
+    .notice { max-width:520px; text-align:center; padding:32px 24px; }
+    .notice h2 { margin:8px 0 4px; font-size:18px; font-weight:700; }
+    .notice p { margin:0; }
+    .notice .btn { margin-top:16px; }
     .h-icon.vcoin { color:var(--vcoin); background:rgb(59 130 246 / 0.14); border-color:rgb(59 130 246 / 0.3); }
     .balance-amt { color:var(--vcoin); }
     .vcoin-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
@@ -269,6 +274,17 @@ export class TopupComponent implements OnInit, OnDestroy {
   // Soft-launch access backstop. True until the config + admin check say otherwise; the route
   // guard normally prevents non-admins from reaching this page while admin_only is on.
   hasAccess = true;
+
+  /**
+   * Which "can't show the form" notice to render (null = show the form):
+   *  - 'admin-only' : failed the admin_only gate.
+   *  - 'closed'     : has access but every provider is disabled (providers: []).
+   */
+  get notice(): 'admin-only' | 'closed' | null {
+    if (!this.hasAccess) return 'admin-only';
+    if (this.providers.length === 0) return 'closed';
+    return null;
+  }
 
   phase: Phase = 'form';
   baht: number | null = null;

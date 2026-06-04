@@ -323,6 +323,8 @@
     "adminOnlyTitle": "Available to admins only",
     "adminOnlyBody": "Vcoin top-up is in a limited soft launch and is currently available to admins only. It will open to everyone soon.",
     "adminOnlyHome": "Back to home",
+    "closedTitle": "Top-up temporarily closed",
+    "closedBody": "Vcoin top-up is temporarily unavailable. Please check back later.",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
