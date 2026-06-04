@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } from '../../services/admin-vip.service';
+import { bangkokInputToIso, isoToBangkokInput } from '../../services/thai-time';
 
 @Component({
   selector: 'app-admin-vip',
@@ -69,7 +70,7 @@ import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } fro
         <div class="table-wrap">
           <table class="tbl">
             <thead>
-              <tr><th>ผู้เล่น</th><th>group_id</th><th>หมดอายุ (UTC)</th><th>สถานะ</th><th></th></tr>
+              <tr><th>ผู้เล่น</th><th>group_id</th><th>หมดอายุ (เวลาไทย)</th><th>สถานะ</th><th></th></tr>
             </thead>
             <tbody>
               <tr *ngFor="let g of all?.items">
@@ -80,7 +81,7 @@ import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } fro
                   </div>
                 </td>
                 <td class="mono">{{ g.group_id }}</td>
-                <td class="mono" style="font-size:12px">{{ g.expires_at | date:'medium':'UTC' }}</td>
+                <td class="mono" style="font-size:12px">{{ g.expires_at | date:'medium':'+0700' }}</td>
                 <td><span class="badge" [class.emerald]="isActive(g)" [class.rose]="!isActive(g)">{{ isActive(g) ? 'ACTIVE' : 'EXPIRED' }}</span></td>
                 <td>
                   <div class="row gap-1" style="justify-content:flex-end">
@@ -114,11 +115,11 @@ import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } fro
 
         <div *ngIf="grantsLoaded" style="margin-top:16px">
           <table class="tbl" *ngIf="grants.length">
-            <thead><tr><th>group_id</th><th>หมดอายุ (UTC)</th><th>สถานะ</th><th></th></tr></thead>
+            <thead><tr><th>group_id</th><th>หมดอายุ (เวลาไทย)</th><th>สถานะ</th><th></th></tr></thead>
             <tbody>
               <tr *ngFor="let g of grants">
                 <td class="mono">{{ g.group_id }}</td>
-                <td class="mono" style="font-size:12px">{{ g.expires_at | date:'medium':'UTC' }}</td>
+                <td class="mono" style="font-size:12px">{{ g.expires_at | date:'medium':'+0700' }}</td>
                 <td>
                   <span class="badge" [class.emerald]="isActive(g)" [class.rose]="!isActive(g)">
                     {{ isActive(g) ? 'ACTIVE' : 'EXPIRED' }}
@@ -186,7 +187,7 @@ import { AdminVipService, Paginated, VipGrant, VipPackage, VipPackageInput } fro
         <div class="modal-card tactical" style="max-width:420px">
           <h3 style="margin:0 0 4px 0;font-size:18px;font-weight:700">ตั้งวันหมดอายุ</h3>
           <p class="mono muted" style="font-size:11px;margin:0 0 16px 0">{{ settingExpiry.steam_id }} · {{ settingExpiry.group_id }}</p>
-          <label><span class="muted" style="font-size:12px">วันหมดอายุ (เวลาเครื่องคุณ → เก็บเป็น UTC)</span>
+          <label><span class="muted" style="font-size:12px">วันหมดอายุ (เวลาไทย)</span>
             <input type="datetime-local" class="input mono" [(ngModel)]="expiryLocal"></label>
           <p *ngIf="error" style="color:var(--rose);font-size:13px;margin:12px 0 0 0">{{ error }}</p>
           <div class="row gap-2" style="margin-top:20px">
@@ -321,16 +322,15 @@ export class AdminVipComponent implements OnInit {
 
   openSet(g: VipGrant) {
     this.settingExpiry = g;
-    // prefill datetime-local with current expiry in the admin's local time
-    const d = new Date(g.expires_at);
-    const pad = (n: number) => String(n).padStart(2, '0');
-    this.expiryLocal = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    // prefill datetime-local with current expiry in Thai time (Asia/Bangkok)
+    this.expiryLocal = isoToBangkokInput(g.expires_at);
     this.error = null;
   }
 
   doSet() {
     if (!this.settingExpiry || !this.expiryLocal) { this.error = 'เลือกวันก่อน'; return; }
-    const iso = new Date(this.expiryLocal).toISOString(); // local -> UTC ISO
+    const iso = bangkokInputToIso(this.expiryLocal); // Thai wall-clock -> UTC ISO
+    if (!iso) { this.error = 'รูปแบบวันไม่ถูกต้อง'; return; }
     this.saving = true;
     this.svc.setExpiry(this.settingExpiry.steam_id, this.settingExpiry.group_id, iso).subscribe({
       next: () => { this.saving = false; this.settingExpiry = null; this.refresh(); },

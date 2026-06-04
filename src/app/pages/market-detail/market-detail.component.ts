@@ -4,6 +4,7 @@ import { CandlestickSeries, createChart, HistogramSeries, IChartApi, ISeriesApi,
 import { MarketItem, MarketService } from '../../services/market.service';
 import { Candle, CandleInterval, Forecast, MarketHistoryService, MarketTxn } from '../../services/market-history.service';
 import { BasketService } from '../../services/basket.service';
+import { formatBangkokUnix } from '../../services/thai-time';
 
 const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
 
@@ -218,7 +219,13 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         horzLines: { color: dark ? '#1f2c47' : '#e6e2d4', style: 1 },
       },
       rightPriceScale: { borderVisible: false },
-      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      timeScale: {
+        borderVisible: false, timeVisible: true, secondsVisible: false,
+        // Axis tick labels in Thai time (lib defaults to the browser's local zone).
+        tickMarkFormatter: (time: Time) => formatBangkokUnix(Number(time)),
+      },
+      // Crosshair / tooltip time also in Thai time.
+      localization: { timeFormatter: (time: Time) => formatBangkokUnix(Number(time)) },
     });
     this.candleSeries = this.chart.addSeries(CandlestickSeries, {
       upColor: '#10b981', downColor: '#f43f5e',

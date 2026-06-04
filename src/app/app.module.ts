@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClient, HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -132,6 +132,10 @@ export function HttpLoaderFactory(http: HttpClient) {
   providers: [
     { provide: APP_INITIALIZER, useFactory: initApiUrl, deps: [ApiUrlService], multi: true },
     provideHttpClient(withInterceptors([authInterceptor])),
+    // Thailand is the canonical timezone for the whole app (Thai game server). Every `| date`
+    // pipe without an explicit timezone renders in Asia/Bangkok (UTC+7) regardless of the
+    // viewer's device zone. Usages that need a different zone must override it explicitly.
+    { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { timezone: '+0700' } },
   ],
   bootstrap: [AppComponent],
 })

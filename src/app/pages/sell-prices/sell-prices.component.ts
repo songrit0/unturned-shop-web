@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import html2canvas from 'html2canvas';
 import { MarketService, MarketTypeOption, SellPriceItem } from '../../services/market.service';
+import { bangkokDateStamp } from '../../services/thai-time';
 
 @Component({
   selector: 'app-sell-prices',
@@ -111,7 +112,7 @@ export class SellPricesComponent implements OnInit {
   types: MarketTypeOption[] = [];
   typeId: number | null = null;
   q = '';
-  today = new Date().toISOString().slice(0, 10);
+  today = bangkokDateStamp();
 
   constructor(private svc: MarketService) {}
 
