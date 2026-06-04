@@ -21,7 +21,7 @@ interface SlotChip {
           <span class="mi sm">{{ c.icon }}</span>{{ c.label }}
         </span>
         <span *ngIf="gun.magazine" class="chip ammo">
-          🔫 {{ attachLabel(gun.magazine) }} {{ gun.ammo | number }} {{ 'p2p.gun.rounds' | translate }}
+          <span class="mi sm">view_agenda</span>{{ attachLabel(gun.magazine) }} {{ gun.ammo | number }} {{ 'p2p.gun.rounds' | translate }}
         </span>
       </ng-container>
       <ng-template #bare>
