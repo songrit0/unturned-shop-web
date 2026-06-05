@@ -14,6 +14,8 @@ export interface VipPackage {
   group_id: string;
   days: number;
   price_coins: number;
+  /** Meowcoin price, or null when this package is not sold with Meowcoin. */
+  price_meowcoins: number | null;
   label: string | null;
   sort: number;
   enabled: number;

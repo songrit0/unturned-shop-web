@@ -36,7 +36,7 @@ import { bangkokInputToIso, isoToBangkokInput } from '../../services/thai-time';
                 <td style="font-weight:600">{{ p.tier }}</td>
                 <td class="mono" style="font-size:12px">{{ p.group_id }}</td>
                 <td class="r mono">{{ p.days }}</td>
-                <td class="r mono" style="color:var(--accent-hi)">{{ p.price_coins | number }}</td>
+                <td class="r mono" style="color:var(--accent-hi)">{{ p.price_coins > 0 ? (p.price_coins | number) : '—' }}<span *ngIf="p.price_meowcoins" style="color:var(--meowcoin)"> / {{ p.price_meowcoins | number }} M</span></td>
                 <td class="muted">{{ p.label || '—' }}</td>
                 <td class="r mono muted">{{ p.sort }}</td>
                 <td><span class="mi" [style.color]="p.enabled ? 'var(--emerald)' : 'var(--rose)'">{{ p.enabled ? 'check_circle' : 'cancel' }}</span></td>
@@ -149,8 +149,10 @@ import { bangkokInputToIso, isoToBangkokInput } from '../../services/thai-time';
             <label><span class="muted" style="font-size:12px">group_id (ใน Permissions.config.xml)</span><input class="input mono" [(ngModel)]="pkgForm.group_id" maxlength="64" placeholder="vip"></label>
             <div class="row gap-2">
               <label style="flex:1"><span class="muted" style="font-size:12px">วัน</span><input type="number" class="input mono" [(ngModel)]="pkgForm.days" min="1"></label>
-              <label style="flex:1"><span class="muted" style="font-size:12px">ราคา (Coin)</span><input type="number" class="input mono" [(ngModel)]="pkgForm.price_coins" min="0"></label>
+              <label style="flex:1"><span class="muted" style="font-size:12px">ราคา (Coin)</span><input type="number" class="input mono" [(ngModel)]="pkgForm.price_coins" min="0" placeholder="0 = ไม่ขาย"></label>
+              <label style="flex:1"><span class="muted" style="font-size:12px">ราคา (Meowcoin)</span><input type="number" class="input mono" [(ngModel)]="pkgForm.price_meowcoins" min="0" placeholder="ว่าง = ไม่ขาย"></label>
             </div>
+            <p class="muted" style="font-size:11px;margin:-2px 0 0 0">ตั้งราคาสกุลไหน = ขายสกุลนั้น · ตั้งทั้งคู่ = ขายได้ทั้ง Coin และ Meowcoin · ต้องตั้งอย่างน้อย 1 สกุล</p>
             <label><span class="muted" style="font-size:12px">Label (ปุ่มในร้าน)</span><input class="input" [(ngModel)]="pkgForm.label" maxlength="64" placeholder="VIP 30 วัน"></label>
             <div class="row gap-2" style="align-items:center">
               <label style="flex:1"><span class="muted" style="font-size:12px">Sort</span><input type="number" class="input mono" [(ngModel)]="pkgForm.sort"></label>
@@ -263,13 +265,13 @@ export class AdminVipComponent implements OnInit {
 
   openNewPackage() {
     this.editingPkg = { id: 0 };
-    this.pkgForm = { tier: 'VIP', group_id: 'vip', days: 30, price_coins: 1000, label: '', sort: 0, enabled: true };
+    this.pkgForm = { tier: 'VIP', group_id: 'vip', days: 30, price_coins: 1000, price_meowcoins: null, label: '', sort: 0, enabled: true };
     this.error = null;
   }
 
   openEditPackage(p: VipPackage) {
     this.editingPkg = p;
-    this.pkgForm = { tier: p.tier, group_id: p.group_id, days: p.days, price_coins: p.price_coins, label: p.label || '', sort: p.sort, enabled: p.enabled === 1 };
+    this.pkgForm = { tier: p.tier, group_id: p.group_id, days: p.days, price_coins: p.price_coins, price_meowcoins: p.price_meowcoins, label: p.label || '', sort: p.sort, enabled: p.enabled === 1 };
     this.error = null;
   }
 

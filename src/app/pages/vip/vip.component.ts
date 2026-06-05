@@ -52,14 +52,14 @@ import { TopupService } from '../../services/topup.service';
               <span class="mono muted" style="font-size:12px">{{ p.days }} วัน</span>
             </div>
             <div style="font-weight:700;font-size:15px">{{ p.label || (p.tier + ' ' + p.days + ' วัน') }}</div>
-            <div class="coin-amt lg" style="color:var(--accent-hi)"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ p.price_coins | number }}</div>
-            <div *ngIf="p.price_meowcoins != null" class="coin-amt" style="color:var(--accent-hi)"><img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">{{ p.price_meowcoins | number }}</div>
-            <button (click)="buy(p)" [disabled]="!mine?.linked || buyingId === p.id"
+            <div *ngIf="p.price_coins > 0" class="coin-amt lg" style="color:var(--accent-hi)"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ p.price_coins | number }}</div>
+            <div *ngIf="p.price_meowcoins && p.price_meowcoins > 0" class="coin-amt" style="color:var(--accent-hi)"><img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">{{ p.price_meowcoins | number }}</div>
+            <button *ngIf="p.price_coins > 0" (click)="buy(p)" [disabled]="!mine?.linked || buyingId === p.id"
                     class="btn emerald" style="margin-top:auto">
               <span class="mi sm">shopping_cart</span>
               {{ buyingId === p.id ? 'กำลังซื้อ…' : 'จ่ายด้วย Coin' }}
             </button>
-            <button *ngIf="p.price_meowcoins != null" (click)="buyMeow(p)" [disabled]="!mine?.linked || buyingId === p.id"
+            <button *ngIf="p.price_meowcoins && p.price_meowcoins > 0" (click)="buyMeow(p)" [disabled]="!mine?.linked || buyingId === p.id"
                     class="btn secondary">
               <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
               {{ buyingId === p.id ? 'กำลังซื้อ…' : 'จ่ายด้วย Meowcoin' }}
