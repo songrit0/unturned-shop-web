@@ -22,13 +22,13 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
   template: `
     <div class="page">
       <div class="page-header">
-        <h1><span class="h-icon vcoin"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
+        <h1><span class="h-icon meow"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
         <div class="page-actions" *ngIf="hasAccess">
-          <div class="vcoin-pill" [title]="'topup.vcoinsTip' | translate">
-            <span class="mi fill">toll</span>
+          <div class="meow-pill" [title]="'topup.meowcoinsTip' | translate">
+            <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
             <div class="col" style="gap:0;line-height:1">
               <span class="mono" style="font-weight:700;font-size:15px">{{ (topup.balance$ | async) ?? '—' }}</span>
-              <span class="muted" style="font-size:10px;letter-spacing:.06em">{{ 'topup.vcoins' | translate | uppercase }}</span>
+              <span class="muted" style="font-size:10px;letter-spacing:.06em">{{ 'topup.meowcoins' | translate | uppercase }}</span>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
             </label>
             <div class="convert mono">
               <span class="mi sm">swap_horiz</span>
-              <span>= {{ vcoinPreview | number }} {{ 'topup.vcoins' | translate }}</span>
+              <span>= {{ meowcoinPreview | number }} {{ 'topup.meowcoins' | translate }}</span>
             </div>
             <p *ngIf="createError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ createError | translate }}</p>
             <button class="btn primary" style="width:100%;margin-top:16px" [disabled]="!canCreate || creating" (click)="create()">
@@ -102,7 +102,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
             <div class="metarow mono">
               <div><span class="muted">{{ 'topup.promptpayId' | translate }}:</span> {{ created.promptpay_id }}</div>
               <div><span class="muted">{{ 'topup.ref' | translate }}:</span> {{ created.ref }}</div>
-              <div><span class="muted">{{ 'topup.credits' | translate }}:</span> {{ created.vcoins | number }} {{ 'topup.vcoins' | translate }}</div>
+              <div><span class="muted">{{ 'topup.credits' | translate }}:</span> {{ created.meowcoins | number }} {{ 'topup.meowcoins' | translate }}</div>
             </div>
 
             <div class="countdown" [class.danger]="secondsLeft <= 60">
@@ -141,7 +141,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
               <div><span class="muted">{{ 'topup.receiver' | translate }}:</span> {{ created.receiver_name }}</div>
               <div><span class="muted">{{ 'topup.promptpayId' | translate }}:</span> {{ created.promptpay_id }}</div>
               <div><span class="muted">{{ 'topup.ref' | translate }}:</span> {{ created.ref }}</div>
-              <div><span class="muted">{{ 'topup.credits' | translate }}:</span> {{ created.vcoins | number }} {{ 'topup.vcoins' | translate }}</div>
+              <div><span class="muted">{{ 'topup.credits' | translate }}:</span> {{ created.meowcoins | number }} {{ 'topup.meowcoins' | translate }}</div>
             </div>
 
             <!-- Steps -->
@@ -179,11 +179,11 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
             <div class="result emerald">
               <span class="mi xxl">check_circle</span>
               <h2>{{ 'topup.successTitle' | translate }}</h2>
-              <p class="muted">{{ 'topup.successBody' | translate:{ vcoins: (creditedVcoins | number) } }}</p>
+              <p class="muted">{{ 'topup.successBody' | translate:{ meowcoins: (creditedMeowcoins | number) } }}</p>
               <div class="balance-box">
                 <span class="muted" style="font-size:12px">{{ 'topup.newBalance' | translate }}</span>
                 <div class="mono balance-amt" style="font-size:28px;font-weight:700">
-                  {{ (topup.balance$ | async) ?? '—' }} <span class="muted" style="font-size:14px">{{ 'topup.vcoins' | translate }}</span>
+                  {{ (topup.balance$ | async) ?? '—' }} <span class="muted" style="font-size:14px">{{ 'topup.meowcoins' | translate }}</span>
                 </div>
               </div>
             </div>
@@ -212,7 +212,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
                 <span class="mi sm">{{ statusIcon(h.status) }}</span>
               </div>
               <div class="grow" style="min-width:0">
-                <div class="a-name">{{ h.vcoins | number }} {{ 'topup.vcoins' | translate }} <span class="muted mono" style="font-size:11px">· {{ h.unique_amount | number:'1.2-2' }} {{ 'topup.baht' | translate }}</span></div>
+                <div class="a-name">{{ h.meowcoins | number }} {{ 'topup.meowcoins' | translate }} <span class="muted mono" style="font-size:11px">· {{ h.unique_amount | number:'1.2-2' }} {{ 'topup.baht' | translate }}</span></div>
                 <div class="a-src mono" style="font-size:11px">
                   <span class="badge" [class.emerald]="h.status === 'credited'" [class.rose]="h.status === 'expired' || h.status === 'cancelled'">{{ ('topup.status.' + h.status) | translate }}</span>
                   <span class="muted">{{ (h.credited_at || h.created_at || h.expires_at) | date:'short' }}</span>
@@ -230,12 +230,12 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
     .notice h2 { margin:8px 0 4px; font-size:18px; font-weight:700; }
     .notice p { margin:0; }
     .notice .btn { margin-top:16px; }
-    .h-icon.vcoin { color:var(--vcoin); background:rgb(59 130 246 / 0.14); border-color:rgb(59 130 246 / 0.3); }
-    .balance-amt { color:var(--vcoin); }
-    .vcoin-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
-      background:var(--surface-2); border:1px solid var(--vcoin); border-radius:999px; color:var(--vcoin); }
-    .vcoin-pill .mi { color:var(--vcoin); }
-    .convert { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:16px; font-weight:700; color:var(--vcoin); }
+    .h-icon.meow { color:var(--meowcoin); background:rgb(59 130 246 / 0.14); border-color:rgb(59 130 246 / 0.3); }
+    .balance-amt { color:var(--meowcoin); }
+    .meow-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
+      background:var(--surface-2); border:1px solid var(--meowcoin); border-radius:999px; color:var(--meowcoin); }
+    .meow-pill .mi { color:var(--meowcoin); }
+    .convert { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:16px; font-weight:700; color:var(--meowcoin); }
     .qr-wrap { display:flex; justify-content:center; padding:16px; margin-top:12px;
       background:#fff; border-radius:10px; }
     .qr-wrap ::ng-deep img, .qr-wrap ::ng-deep canvas { display:block; }
@@ -261,14 +261,14 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
     .seg-btn { flex:1; min-width:120px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
       padding:8px 10px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text);
       background:var(--surface-2); border:1px solid var(--border); border-radius:8px; }
-    .seg-btn.active { border-color:var(--vcoin); color:var(--vcoin); background:rgb(59 130 246 / 0.12); }
+    .seg-btn.active { border-color:var(--meowcoin); color:var(--meowcoin); background:rgb(59 130 246 / 0.12); }
     .steps { margin:14px 0 0 0; padding-left:20px; font-size:13px; line-height:1.7; color:var(--text); }
     .slip { margin-top:14px; }
     .slip-name { display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12px; color:var(--muted); word-break:break-all; }
   `],
 })
 export class TopupComponent implements OnInit, OnDestroy {
-  // 1 baht = 1 Vcoin display rate; the authoritative figure comes back as `vcoins` on create.
+  // 1 baht = 1 Meowcoin display rate; the authoritative figure comes back as `meowcoins` on create.
   private static readonly RATE = 1;
 
   // Soft-launch access backstop. True until the config + admin check say otherwise; the route
@@ -288,7 +288,7 @@ export class TopupComponent implements OnInit, OnDestroy {
 
   phase: Phase = 'form';
   baht: number | null = null;
-  vcoinPreview = 0;
+  meowcoinPreview = 0;
   creating = false;
   createError: string | null = null;
 
@@ -304,7 +304,7 @@ export class TopupComponent implements OnInit, OnDestroy {
 
   created: TopupCreated | null = null;
   currentStatus: TopupState['status'] = 'pending';
-  creditedVcoins = 0;
+  creditedMeowcoins = 0;
 
   secondsLeft = 0;
   countdownText = '';
@@ -327,7 +327,7 @@ export class TopupComponent implements OnInit, OnDestroy {
         // Auto-select: single provider -> use it; multiple -> default to the first enabled one.
         if (this.providers.length > 0) this.provider = this.providers[0].key;
         if (this.hasAccess) {
-          this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+          this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
           this.loadHistory();
         } else {
           this.historyLoading = false;
@@ -348,7 +348,7 @@ export class TopupComponent implements OnInit, OnDestroy {
 
   onAmountChange() {
     const v = Math.floor(Number(this.baht) || 0);
-    this.vcoinPreview = v >= 1 ? v * TopupComponent.RATE : 0;
+    this.meowcoinPreview = v >= 1 ? v * TopupComponent.RATE : 0;
   }
 
   providerIcon(key: TopupProvider): string {
@@ -412,11 +412,11 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.topup.verifyThunder(this.created.ref, this.slipBase64).subscribe({
       next: r => {
         this.verifying = false;
-        this.creditedVcoins = r.vcoins;
+        this.creditedMeowcoins = r.meowcoins;
         this.phase = 'success';
         this.stopTimers();
         // Refresh shared balance (header + page); fall back to the returned balance.
-        this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+        this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
         this.loadHistory();
       },
       error: e => {
@@ -451,11 +451,11 @@ export class TopupComponent implements OnInit, OnDestroy {
   private applyStatus(s: TopupState) {
     this.currentStatus = s.status;
     if (s.status === 'credited') {
-      this.creditedVcoins = s.vcoins;
+      this.creditedMeowcoins = s.meowcoins;
       this.phase = 'success';
       this.stopTimers();
       // Refresh the shared balance so the header + this page update.
-      this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+      this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
       this.loadHistory();
     } else if (s.status === 'expired' || s.status === 'cancelled') {
       this.phase = 'expired';
@@ -518,10 +518,10 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.phase = 'form';
     this.created = null;
     this.currentStatus = 'pending';
-    this.creditedVcoins = 0;
+    this.creditedMeowcoins = 0;
     this.createError = null;
     this.baht = null;
-    this.vcoinPreview = 0;
+    this.meowcoinPreview = 0;
     this.resetSlip();
   }
 }

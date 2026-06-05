@@ -30,7 +30,7 @@ import { P2pListing } from '../../models/vault';
         <div class="stats-strip">
           <div class="stat">
             <span class="stat-label">BALANCE</span>
-            <span class="stat-value">{{ (coins.balance$ | async) ?? '—' }} <span class="mi fill">paid</span></span>
+            <span class="stat-value">{{ (coins.balance$ | async) ?? '—' }} <img class="coin-img" src="assets/coins/coin.png" alt=""></span>
             <span class="delta" [class.up]="recentGain >= 0" [class.down]="recentGain < 0">{{ recentGain >= 0 ? '+' : '' }}{{ recentGain | number }} / 7d</span>
           </div>
           <div class="stat">

@@ -5,32 +5,32 @@ import {
   AdminProviderRow,
   AdminTopupRow,
   AdminTopupStatus,
-  AdminVcoinsService,
-  AdminVcoinWallet,
+  AdminMeowcoinsService,
+  AdminMeowcoinWallet,
   Paginated,
-} from '../../services/admin-vcoins.service';
+} from '../../services/admin-meowcoins.service';
 
 type StatusFilter = 'all' | AdminTopupStatus;
 
 @Component({
-  selector: 'app-admin-vcoins',
+  selector: 'app-admin-meowcoins',
   template: `
     <div class="page">
       <div class="page-header">
         <div class="h-icon rose"><span class="mi lg">account_balance_wallet</span></div>
-        <h1>{{ 'adminVcoins.title' | translate }}</h1>
+        <h1>{{ 'adminMeowcoins.title' | translate }}</h1>
         <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
       </div>
 
       <div class="welcome-alert" style="margin-bottom:16px">
         <span class="alert-icon mi">info</span>
-        <div>{{ 'adminVcoins.info' | translate }}</div>
+        <div>{{ 'adminMeowcoins.info' | translate }}</div>
       </div>
 
       <!-- ===== Payment providers ===== -->
       <div class="card" style="margin-bottom:24px">
-        <h3 style="margin:0 0 4px 0;font-size:16px;font-weight:700"><span class="mi sm">tune</span> {{ 'adminVcoins.providersTitle' | translate }}</h3>
-        <p class="muted" style="font-size:12px;margin:0 0 12px 0">{{ 'adminVcoins.providersHint' | translate }}</p>
+        <h3 style="margin:0 0 4px 0;font-size:16px;font-weight:700"><span class="mi sm">tune</span> {{ 'adminMeowcoins.providersTitle' | translate }}</h3>
+        <p class="muted" style="font-size:12px;margin:0 0 12px 0">{{ 'adminMeowcoins.providersHint' | translate }}</p>
 
         <div *ngIf="providersLoading" style="text-align:center;padding:24px 0"><div class="spinner"></div></div>
         <p *ngIf="providersError" style="color:var(--rose);font-size:13px;margin:0">{{ providersError }}</p>
@@ -41,31 +41,31 @@ type StatusFilter = 'all' | AdminTopupStatus;
               <div style="font-weight:600">{{ p.label }} <span class="mono muted" style="font-size:11px">({{ p.key }})</span></div>
               <div class="muted" style="font-size:12px">
                 <span [style.color]="p.enabled ? 'var(--emerald)' : 'var(--text-faint)'">
-                  {{ (p.enabled ? 'adminVcoins.provider.enabled' : 'adminVcoins.provider.disabled') | translate }}
+                  {{ (p.enabled ? 'adminMeowcoins.provider.enabled' : 'adminMeowcoins.provider.disabled') | translate }}
                 </span>
               </div>
             </div>
             <button class="btn sm" [class.danger]="p.enabled" [class.emerald]="!p.enabled"
                     [disabled]="providerSaving === p.key" (click)="toggleProvider(p)">
               <span class="mi sm">{{ p.enabled ? 'toggle_off' : 'toggle_on' }}</span>
-              {{ (p.enabled ? 'adminVcoins.provider.disable' : 'adminVcoins.provider.enable') | translate }}
+              {{ (p.enabled ? 'adminMeowcoins.provider.disable' : 'adminMeowcoins.provider.enable') | translate }}
             </button>
           </div>
-          <p *ngIf="providers.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminVcoins.provider.none' | translate }}</p>
+          <p *ngIf="providers.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminMeowcoins.provider.none' | translate }}</p>
         </ng-container>
       </div>
 
       <!-- ===== A. Top-ups ===== -->
       <div class="card flush" style="margin-bottom:24px">
         <div class="row" style="justify-content:space-between;align-items:center;padding:12px 16px;gap:12px;flex-wrap:wrap">
-          <h3 style="margin:0;font-size:16px;font-weight:700"><span class="mi sm">receipt_long</span> {{ 'adminVcoins.topupsTitle' | translate }}</h3>
+          <h3 style="margin:0;font-size:16px;font-weight:700"><span class="mi sm">receipt_long</span> {{ 'adminMeowcoins.topupsTitle' | translate }}</h3>
           <div class="row gap-2" style="align-items:center;flex-wrap:wrap">
             <select class="select" [(ngModel)]="status" (ngModelChange)="onFilter()">
-              <option *ngFor="let s of statuses" [ngValue]="s">{{ ('adminVcoins.statusFilter.' + s) | translate }}</option>
+              <option *ngFor="let s of statuses" [ngValue]="s">{{ ('adminMeowcoins.statusFilter.' + s) | translate }}</option>
             </select>
             <div class="input-wrap" style="width:260px">
               <span class="mi lead">search</span>
-              <input class="input" [(ngModel)]="q" (ngModelChange)="onSearch()" [placeholder]="'adminVcoins.searchTopups' | translate">
+              <input class="input" [(ngModel)]="q" (ngModelChange)="onSearch()" [placeholder]="'adminMeowcoins.searchTopups' | translate">
             </div>
           </div>
         </div>
@@ -75,31 +75,31 @@ type StatusFilter = 'all' | AdminTopupStatus;
             <table class="tbl">
               <thead>
                 <tr>
-                  <th style="width:150px">{{ 'adminVcoins.col.date' | translate }}</th>
-                  <th>{{ 'adminVcoins.col.player' | translate }}</th>
-                  <th class="r">{{ 'adminVcoins.col.baht' | translate }}</th>
-                  <th class="r">{{ 'adminVcoins.col.vcoins' | translate }}</th>
-                  <th>{{ 'adminVcoins.col.status' | translate }}</th>
-                  <th>{{ 'adminVcoins.col.ref' | translate }}</th>
+                  <th style="width:150px">{{ 'adminMeowcoins.col.date' | translate }}</th>
+                  <th>{{ 'adminMeowcoins.col.player' | translate }}</th>
+                  <th class="r">{{ 'adminMeowcoins.col.baht' | translate }}</th>
+                  <th class="r">{{ 'adminMeowcoins.col.meowcoins' | translate }}</th>
+                  <th>{{ 'adminMeowcoins.col.status' | translate }}</th>
+                  <th>{{ 'adminMeowcoins.col.ref' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let t of page?.items">
                   <td class="mono muted" style="font-size:12px">{{ t.created_at | date:'short' }}</td>
                   <td>
-                    <button class="link-player" (click)="pickPlayer(t.steam_id)" [title]="'adminVcoins.loadWallet' | translate">
+                    <button class="link-player" (click)="pickPlayer(t.steam_id)" [title]="'adminMeowcoins.loadWallet' | translate">
                       <span style="font-weight:600">{{ t.discord_name || '—' }}</span>
                       <span class="mono muted" style="font-size:11px;display:block">{{ t.steam_id }}</span>
                     </button>
                   </td>
                   <td class="r mono">{{ num(t.baht) | number:'1.0-2' }}</td>
-                  <td class="r mono" style="color:var(--vcoin)">{{ num(t.vcoins) | number }}</td>
-                  <td><span class="badge" [ngClass]="statusClass(t.status)">{{ ('adminVcoins.status.' + t.status) | translate }}</span></td>
+                  <td class="r mono" style="color:var(--meowcoin)">{{ num(t.meowcoins) | number }}</td>
+                  <td><span class="badge" [ngClass]="statusClass(t.status)">{{ ('adminMeowcoins.status.' + t.status) | translate }}</span></td>
                   <td class="mono muted" style="font-size:11px">{{ t.ref }}</td>
                 </tr>
                 <tr *ngIf="page && page.items.length === 0">
                   <td colspan="6">
-                    <div class="empty"><span class="mi xxl">receipt_long</span><div class="empty-title">{{ 'adminVcoins.noTopups' | translate }}</div></div>
+                    <div class="empty"><span class="mi xxl">receipt_long</span><div class="empty-title">{{ 'adminMeowcoins.noTopups' | translate }}</div></div>
                   </td>
                 </tr>
               </tbody>
@@ -116,14 +116,14 @@ type StatusFilter = 'all' | AdminTopupStatus;
 
       <!-- ===== B. Player wallet manager ===== -->
       <div class="card" style="margin-bottom:16px">
-        <h3 style="margin:0 0 12px 0;font-size:16px;font-weight:700"><span class="mi sm">manage_accounts</span> {{ 'adminVcoins.walletTitle' | translate }}</h3>
+        <h3 style="margin:0 0 12px 0;font-size:16px;font-weight:700"><span class="mi sm">manage_accounts</span> {{ 'adminMeowcoins.walletTitle' | translate }}</h3>
         <div class="row gap-2" style="align-items:center;flex-wrap:wrap">
           <div class="input-wrap" style="flex:1;max-width:360px">
             <span class="mi lead">person_search</span>
-            <input class="input mono" [(ngModel)]="steamId" (keydown.enter)="loadWallet()" [placeholder]="'adminVcoins.steamIdPlaceholder' | translate">
+            <input class="input mono" [(ngModel)]="steamId" (keydown.enter)="loadWallet()" [placeholder]="'adminMeowcoins.steamIdPlaceholder' | translate">
           </div>
           <button (click)="loadWallet()" [disabled]="!steamId.trim() || walletLoading" class="btn primary">
-            <span class="mi sm">search</span> {{ 'adminVcoins.lookup' | translate }}
+            <span class="mi sm">search</span> {{ 'adminMeowcoins.lookup' | translate }}
           </button>
         </div>
 
@@ -134,14 +134,14 @@ type StatusFilter = 'all' | AdminTopupStatus;
         <ng-container *ngIf="wallet && !walletLoading">
           <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:16px;padding:16px;background:var(--surface-2);border-radius:8px">
             <div style="flex:1;min-width:200px">
-              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminVcoins.player' | translate }}</div>
+              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminMeowcoins.player' | translate }}</div>
               <div style="font-weight:600">{{ wallet.discord_name || '—' }}</div>
               <div class="mono muted" style="font-size:12px">{{ wallet.steam_id }}</div>
             </div>
             <div style="text-align:right">
-              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminVcoins.currentBalance' | translate }}</div>
-              <div class="mono" style="font-size:26px;font-weight:700" [style.color]="num(wallet.balance) < 0 ? 'var(--rose)' : 'var(--vcoin)'">
-                {{ num(wallet.balance) | number }} <span class="muted" style="font-size:13px">{{ 'adminVcoins.vcoins' | translate }}</span>
+              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminMeowcoins.currentBalance' | translate }}</div>
+              <div class="mono" style="font-size:26px;font-weight:700" [style.color]="num(wallet.balance) < 0 ? 'var(--rose)' : 'var(--meowcoin)'">
+                {{ num(wallet.balance) | number }} <span class="muted" style="font-size:13px">{{ 'adminMeowcoins.meowcoins' | translate }}</span>
               </div>
             </div>
           </div>
@@ -149,58 +149,58 @@ type StatusFilter = 'all' | AdminTopupStatus;
           <!-- Adjust + Set controls -->
           <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px">
             <div class="card flush" style="padding:14px">
-              <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><span class="mi sm">exposure</span> {{ 'adminVcoins.adjust' | translate }}</div>
-              <p class="muted" style="font-size:12px;margin:4px 0 10px 0">{{ 'adminVcoins.adjustHint' | translate }}</p>
+              <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><span class="mi sm">exposure</span> {{ 'adminMeowcoins.adjust' | translate }}</div>
+              <p class="muted" style="font-size:12px;margin:4px 0 10px 0">{{ 'adminMeowcoins.adjustHint' | translate }}</p>
               <label style="display:block;margin-bottom:8px">
-                <span class="muted" style="font-size:12px">{{ 'adminVcoins.delta' | translate }}</span>
+                <span class="muted" style="font-size:12px">{{ 'adminMeowcoins.delta' | translate }}</span>
                 <input type="number" class="input mono" [(ngModel)]="delta" step="1" style="margin-top:4px" placeholder="-100 / +100">
               </label>
               <label style="display:block;margin-bottom:10px">
-                <span class="muted" style="font-size:12px">{{ 'adminVcoins.reason' | translate }}</span>
-                <input type="text" class="input" [(ngModel)]="adjustReason" maxlength="120" [placeholder]="'adminVcoins.reasonPlaceholder' | translate" style="margin-top:4px">
+                <span class="muted" style="font-size:12px">{{ 'adminMeowcoins.reason' | translate }}</span>
+                <input type="text" class="input" [(ngModel)]="adjustReason" maxlength="120" [placeholder]="'adminMeowcoins.reasonPlaceholder' | translate" style="margin-top:4px">
               </label>
               <div class="row" style="align-items:center;gap:8px">
-                <span class="muted" style="font-size:12px">{{ 'adminVcoins.preview' | translate }}:</span>
+                <span class="muted" style="font-size:12px">{{ 'adminMeowcoins.preview' | translate }}:</span>
                 <span class="mono" [style.color]="previewAdjust() < 0 ? 'var(--rose)' : null">{{ previewAdjust() | number }}</span>
               </div>
               <button (click)="doAdjust()" [disabled]="saving || !delta" class="btn primary" style="width:100%;margin-top:10px">
-                <span class="mi sm">check</span> {{ (saving ? 'adminVcoins.saving' : 'adminVcoins.applyAdjust') | translate }}
+                <span class="mi sm">check</span> {{ (saving ? 'adminMeowcoins.saving' : 'adminMeowcoins.applyAdjust') | translate }}
               </button>
             </div>
 
             <div class="card flush" style="padding:14px">
-              <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><span class="mi sm">edit</span> {{ 'adminVcoins.setBalance' | translate }}</div>
-              <p class="muted" style="font-size:12px;margin:4px 0 10px 0">{{ 'adminVcoins.setHint' | translate }}</p>
+              <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><span class="mi sm">edit</span> {{ 'adminMeowcoins.setBalance' | translate }}</div>
+              <p class="muted" style="font-size:12px;margin:4px 0 10px 0">{{ 'adminMeowcoins.setHint' | translate }}</p>
               <label style="display:block;margin-bottom:8px">
-                <span class="muted" style="font-size:12px">{{ 'adminVcoins.newBalance' | translate }}</span>
+                <span class="muted" style="font-size:12px">{{ 'adminMeowcoins.newBalance' | translate }}</span>
                 <input type="number" class="input mono" [(ngModel)]="newBalance" step="1" style="margin-top:4px" placeholder="0">
               </label>
               <label style="display:block;margin-bottom:10px">
-                <span class="muted" style="font-size:12px">{{ 'adminVcoins.reason' | translate }}</span>
-                <input type="text" class="input" [(ngModel)]="setReason" maxlength="120" [placeholder]="'adminVcoins.reasonPlaceholder' | translate" style="margin-top:4px">
+                <span class="muted" style="font-size:12px">{{ 'adminMeowcoins.reason' | translate }}</span>
+                <input type="text" class="input" [(ngModel)]="setReason" maxlength="120" [placeholder]="'adminMeowcoins.reasonPlaceholder' | translate" style="margin-top:4px">
               </label>
               <div class="muted" style="font-size:11px;display:flex;align-items:center;gap:4px;min-height:18px">
                 <span *ngIf="newBalance !== null && num2(newBalance) < 0" class="mi sm" style="color:var(--rose)">warning</span>
-                <span *ngIf="newBalance !== null && num2(newBalance) < 0" style="color:var(--rose)">{{ 'adminVcoins.negativeNote' | translate }}</span>
+                <span *ngIf="newBalance !== null && num2(newBalance) < 0" style="color:var(--rose)">{{ 'adminMeowcoins.negativeNote' | translate }}</span>
               </div>
               <button (click)="doSet()" [disabled]="saving || newBalance === null" class="btn danger" style="width:100%;margin-top:10px">
-                <span class="mi sm">check</span> {{ (saving ? 'adminVcoins.saving' : 'adminVcoins.applySet') | translate }}
+                <span class="mi sm">check</span> {{ (saving ? 'adminMeowcoins.saving' : 'adminMeowcoins.applySet') | translate }}
               </button>
             </div>
           </div>
 
           <!-- Log -->
           <div style="margin-top:20px">
-            <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="mi sm">history</span> {{ 'adminVcoins.logTitle' | translate }}</div>
+            <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="mi sm">history</span> {{ 'adminMeowcoins.logTitle' | translate }}</div>
             <div class="table-wrap" style="max-height:340px;overflow-y:auto">
               <table class="tbl">
                 <thead>
                   <tr>
-                    <th style="width:150px">{{ 'adminVcoins.col.date' | translate }}</th>
-                    <th class="r">{{ 'adminVcoins.col.delta' | translate }}</th>
-                    <th>{{ 'adminVcoins.col.reason' | translate }}</th>
-                    <th>{{ 'adminVcoins.col.actor' | translate }}</th>
-                    <th>{{ 'adminVcoins.col.ref' | translate }}</th>
+                    <th style="width:150px">{{ 'adminMeowcoins.col.date' | translate }}</th>
+                    <th class="r">{{ 'adminMeowcoins.col.delta' | translate }}</th>
+                    <th>{{ 'adminMeowcoins.col.reason' | translate }}</th>
+                    <th>{{ 'adminMeowcoins.col.actor' | translate }}</th>
+                    <th>{{ 'adminMeowcoins.col.ref' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,7 +214,7 @@ type StatusFilter = 'all' | AdminTopupStatus;
                     <td class="mono muted" style="font-size:11px">{{ l.ref || '—' }}</td>
                   </tr>
                   <tr *ngIf="wallet.log.length === 0">
-                    <td colspan="5"><div class="empty" style="padding:24px 0"><span class="mi xl">history</span><div class="empty-title">{{ 'adminVcoins.noLog' | translate }}</div></div></td>
+                    <td colspan="5"><div class="empty" style="padding:24px 0"><span class="mi xl">history</span><div class="empty-title">{{ 'adminMeowcoins.noLog' | translate }}</div></div></td>
                   </tr>
                 </tbody>
               </table>
@@ -233,7 +233,7 @@ type StatusFilter = 'all' | AdminTopupStatus;
     .badge.st-expired { background:var(--surface-3, var(--surface-2)); color:var(--muted); }
   `],
 })
-export class AdminVcoinsComponent implements OnInit {
+export class AdminMeowcoinsComponent implements OnInit {
   // ---- Payment providers ----
   providers: AdminProviderRow[] = [];
   providersLoading = true;
@@ -250,7 +250,7 @@ export class AdminVcoinsComponent implements OnInit {
 
   // ---- B. Wallet ----
   steamId = '';
-  wallet: AdminVcoinWallet | null = null;
+  wallet: AdminMeowcoinWallet | null = null;
   walletLoading = false;
   walletError: string | null = null;
 
@@ -260,7 +260,7 @@ export class AdminVcoinsComponent implements OnInit {
   setReason = '';
   saving = false;
 
-  constructor(private svc: AdminVcoinsService, private t: TranslateService) {}
+  constructor(private svc: AdminMeowcoinsService, private t: TranslateService) {}
 
   ngOnInit() { this.load(1, 20); this.loadProviders(); }
 
@@ -277,7 +277,7 @@ export class AdminVcoinsComponent implements OnInit {
     this.providersError = null;
     this.svc.listProviders().subscribe({
       next: list => { this.providers = list; this.providersLoading = false; },
-      error: e => { this.providersLoading = false; this.providersError = e?.error?.message || this.t.instant('adminVcoins.errors.providersFail'); },
+      error: e => { this.providersLoading = false; this.providersError = e?.error?.message || this.t.instant('adminMeowcoins.errors.providersFail'); },
     });
   }
 
@@ -285,7 +285,7 @@ export class AdminVcoinsComponent implements OnInit {
     this.providerSaving = p.key;
     this.svc.setProvider(p.key, !p.enabled).subscribe({
       next: () => { this.providerSaving = null; this.loadProviders(); },
-      error: e => { this.providerSaving = null; this.providersError = e?.error?.message || this.t.instant('adminVcoins.errors.providersFail'); },
+      error: e => { this.providerSaving = null; this.providersError = e?.error?.message || this.t.instant('adminMeowcoins.errors.providersFail'); },
     });
   }
 
@@ -327,7 +327,7 @@ export class AdminVcoinsComponent implements OnInit {
         this.delta = null; this.adjustReason = '';
         this.newBalance = this.num(w.balance); this.setReason = '';
       },
-      error: e => { this.walletLoading = false; this.wallet = null; this.walletError = e?.error?.message || this.t.instant('adminVcoins.errors.lookupFail'); },
+      error: e => { this.walletLoading = false; this.wallet = null; this.walletError = e?.error?.message || this.t.instant('adminMeowcoins.errors.lookupFail'); },
     });
   }
 
@@ -343,7 +343,7 @@ export class AdminVcoinsComponent implements OnInit {
     this.saving = true;
     this.svc.adjust(this.wallet.steam_id, d, this.adjustReason.trim() || undefined).subscribe({
       next: (r: AdjustResult) => { this.saving = false; this.afterMutation(r); },
-      error: e => { this.saving = false; this.walletError = e?.error?.message || this.t.instant('adminVcoins.errors.saveFail'); },
+      error: e => { this.saving = false; this.walletError = e?.error?.message || this.t.instant('adminMeowcoins.errors.saveFail'); },
     });
   }
 
@@ -354,7 +354,7 @@ export class AdminVcoinsComponent implements OnInit {
     this.saving = true;
     this.svc.set(this.wallet.steam_id, b, this.setReason.trim() || undefined).subscribe({
       next: (r: AdjustResult) => { this.saving = false; this.afterMutation(r); },
-      error: e => { this.saving = false; this.walletError = e?.error?.message || this.t.instant('adminVcoins.errors.saveFail'); },
+      error: e => { this.saving = false; this.walletError = e?.error?.message || this.t.instant('adminMeowcoins.errors.saveFail'); },
     });
   }
 

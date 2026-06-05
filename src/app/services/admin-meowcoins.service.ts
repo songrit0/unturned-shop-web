@@ -8,15 +8,15 @@ import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
-// Admin Vcoin tooling (unturned-shop-api, JWT + AdminGuard server-side; JWT via authInterceptor).
-//   GET  /admin/vcoins/topups?status=&q=&page=&limit=  -> Paginated<AdminTopupRow>
-//   GET  /admin/vcoins/wallet/:steamId                 -> AdminVcoinWallet (balance + latest 50 log)
-//   POST /admin/vcoins/adjust  { steam_id, delta, reason? }   -> AdjustResult (delta may be negative)
-//   POST /admin/vcoins/set     { steam_id, balance, reason? } -> AdjustResult (absolute set)
-//   GET  /admin/vcoins/providers               -> AdminProviderRow[] (all providers incl. disabled)
-//   POST /admin/vcoins/providers { key, enabled } -> on/off toggle (disabling hides it from players)
+// Admin Meowcoin tooling (unturned-shop-api, JWT + AdminGuard server-side; JWT via authInterceptor).
+//   GET  /admin/meowcoins/topups?status=&q=&page=&limit=  -> Paginated<AdminTopupRow>
+//   GET  /admin/meowcoins/wallet/:steamId                 -> AdminMeowcoinWallet (balance + latest 50 log)
+//   POST /admin/meowcoins/adjust  { steam_id, delta, reason? }   -> AdjustResult (delta may be negative)
+//   POST /admin/meowcoins/set     { steam_id, balance, reason? } -> AdjustResult (absolute set)
+//   GET  /admin/meowcoins/providers               -> AdminProviderRow[] (all providers incl. disabled)
+//   POST /admin/meowcoins/providers { key, enabled } -> on/off toggle (disabling hides it from players)
 //
-// IMPORTANT: baht / unique_amount / vcoins / balance / delta arrive as STRINGS (DECIMAL/BIGINT).
+// IMPORTANT: baht / unique_amount / meowcoins / balance / delta arrive as STRINGS (DECIMAL/BIGINT).
 // Coerce with Number() before display/math.
 
 export type AdminTopupStatus =
@@ -29,14 +29,14 @@ export interface AdminTopupRow {
   discord_name: string | null;
   baht: string | number;
   unique_amount: string | number;
-  vcoins: string | number;
+  meowcoins: string | number;
   status: AdminTopupStatus;
   created_at: string;
   confirmed_at: string | null;
   credited_at: string | null;
 }
 
-export interface AdminVcoinLogRow {
+export interface AdminMeowcoinLogRow {
   delta: string | number;
   reason: string | null;
   ref: string | null;
@@ -44,11 +44,11 @@ export interface AdminVcoinLogRow {
   at: string;
 }
 
-export interface AdminVcoinWallet {
+export interface AdminMeowcoinWallet {
   steam_id: string;
   discord_name: string | null;
   balance: string | number;
-  log: AdminVcoinLogRow[];
+  log: AdminMeowcoinLogRow[];
 }
 
 export interface AdjustResult {
@@ -64,7 +64,7 @@ export interface AdminProviderRow {
 }
 
 @Injectable({ providedIn: 'root' })
-export class AdminVcoinsService {
+export class AdminMeowcoinsService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
 
   /** Paginated top-up list. `status` of '' / 'all' returns every status. */
@@ -73,34 +73,34 @@ export class AdminVcoinsService {
       status: status && status !== 'all' ? status : '',
       q,
     });
-    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/vcoins/topups`, { params })
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/meowcoins/topups`, { params })
       .pipe(map(r => normalizePaginated<AdminTopupRow>(r, limit)));
   }
 
-  /** A player's Vcoin wallet: current balance + latest 50 log entries (newest first). */
-  wallet(steamId: string): Observable<AdminVcoinWallet> {
-    return this.http.get<AdminVcoinWallet>(`${this.apiUrl.get()}/admin/vcoins/wallet/${encodeURIComponent(steamId)}`);
+  /** A player's Meowcoin wallet: current balance + latest 50 log entries (newest first). */
+  wallet(steamId: string): Observable<AdminMeowcoinWallet> {
+    return this.http.get<AdminMeowcoinWallet>(`${this.apiUrl.get()}/admin/meowcoins/wallet/${encodeURIComponent(steamId)}`);
   }
 
   /** Relative change (delta may be negative; balance may go negative — intended). */
   adjust(steam_id: string, delta: number, reason?: string): Observable<AdjustResult> {
-    return this.http.post<AdjustResult>(`${this.apiUrl.get()}/admin/vcoins/adjust`, { steam_id, delta, reason });
+    return this.http.post<AdjustResult>(`${this.apiUrl.get()}/admin/meowcoins/adjust`, { steam_id, delta, reason });
   }
 
   /** Absolute set (balance may be negative — intended). */
   set(steam_id: string, balance: number, reason?: string): Observable<AdjustResult> {
-    return this.http.post<AdjustResult>(`${this.apiUrl.get()}/admin/vcoins/set`, { steam_id, balance, reason });
+    return this.http.post<AdjustResult>(`${this.apiUrl.get()}/admin/meowcoins/set`, { steam_id, balance, reason });
   }
 
   // ---- Payment providers ----
   /** All providers (including disabled), ordered by sort. */
   listProviders(): Observable<AdminProviderRow[]> {
-    return this.http.get<AdminProviderRow[]>(`${this.apiUrl.get()}/admin/vcoins/providers`)
+    return this.http.get<AdminProviderRow[]>(`${this.apiUrl.get()}/admin/meowcoins/providers`)
       .pipe(map(r => Array.isArray(r) ? r : []));
   }
 
   /** Enable/disable a provider. Disabling hides it from the players' top-up page. */
   setProvider(key: string, enabled: boolean): Observable<unknown> {
-    return this.http.post(`${this.apiUrl.get()}/admin/vcoins/providers`, { key, enabled });
+    return this.http.post(`${this.apiUrl.get()}/admin/meowcoins/providers`, { key, enabled });
   }
 }

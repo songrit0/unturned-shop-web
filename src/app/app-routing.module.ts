@@ -33,7 +33,7 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 import { AdminVehiclesComponent } from './pages/admin-vehicles/admin-vehicles.component';
 import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-vehicle-market.component';
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
-import { AdminVcoinsComponent } from './pages/admin-vcoins/admin-vcoins.component';
+import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins.component';
 import { TopupComponent } from './pages/topup/topup.component';
 import { adminGuard } from './guards/admin.guard';
 import { topupGuard } from './guards/topup.guard';
@@ -56,7 +56,7 @@ const routes: Routes = [
   { path: 'quests', component: QuestsComponent, canActivate: [authGuard] },
   { path: 'admin/market', component: AdminMarketComponent, canActivate: [adminGuard] },
   { path: 'admin/coins', component: AdminCoinsComponent, canActivate: [adminGuard] },
-  { path: 'admin/vcoins', component: AdminVcoinsComponent, canActivate: [adminGuard] },
+  { path: 'admin/meowcoins', component: AdminMeowcoinsComponent, canActivate: [adminGuard] },
   { path: 'admin/vip', component: AdminVipComponent, canActivate: [adminGuard] },
   { path: 'admin/quests', component: AdminQuestsComponent, canActivate: [adminGuard] },
   { path: 'admin/item-types', component: AdminItemTypesComponent, canActivate: [adminGuard] },

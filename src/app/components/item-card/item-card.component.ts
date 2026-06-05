@@ -35,7 +35,7 @@ import { BasketService, BasketKind } from '../../services/basket.service';
         <div class="item-foot">
           <div class="item-price">
             <div class="item-price-main" [class.discount]="discountPct() > 0" [class.up]="discountPct() < 0">
-              {{ item.price | number }} <span class="mi fill">paid</span>
+              {{ item.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt="">
             </div>
             <span *ngIf="discountPct() !== 0" class="item-price-old">{{ item.base_price | number }}</span>
             <span class="item-stock">{{ 'shop.stock' | translate:{ n: item.amount } }}</span>

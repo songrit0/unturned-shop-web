@@ -86,7 +86,7 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
           <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ adjusting.steam_id }}</p>
           <div style="display:flex;flex-direction:column;align-items:center;padding:16px;background:var(--surface-2);border-radius:8px;margin-bottom:16px">
             <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminCoins.currentBalance' | translate }}</span>
-            <div class="coin-amt lg" style="margin-top:4px"><span class="mi">paid</span>{{ adjusting.balance | number }}</div>
+            <div class="coin-amt lg" style="margin-top:4px"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ adjusting.balance | number }}</div>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:12px">

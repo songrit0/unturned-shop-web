@@ -51,7 +51,7 @@ import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vi
               <span class="mono muted" style="font-size:12px">{{ p.days }} วัน</span>
             </div>
             <div style="font-weight:700;font-size:15px">{{ p.label || (p.tier + ' ' + p.days + ' วัน') }}</div>
-            <div class="coin-amt lg" style="color:var(--accent-hi)"><span class="mi">paid</span>{{ p.price_coins | number }}</div>
+            <div class="coin-amt lg" style="color:var(--accent-hi)"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ p.price_coins | number }}</div>
             <button (click)="buy(p)" [disabled]="!mine?.linked || buyingId === p.id"
                     class="btn emerald" style="margin-top:auto">
               <span class="mi sm">shopping_cart</span>

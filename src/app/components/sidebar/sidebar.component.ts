@@ -104,8 +104,8 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/admin/coins" routerLinkActive="active" class="nav-item admin">
           <span class="mi">account_balance_wallet</span>{{ 'nav.adminCoins' | translate }}
         </a>
-        <a routerLink="/admin/vcoins" routerLinkActive="active" class="nav-item admin">
-          <span class="mi">paid</span>{{ 'nav.adminVcoins' | translate }}
+        <a routerLink="/admin/meowcoins" routerLinkActive="active" class="nav-item admin">
+          <img class="coin-img meow nav-coin" src="assets/coins/meowcoin.png" alt="">{{ 'nav.adminMeowcoins' | translate }}
         </a>
         <a routerLink="/admin/vip" routerLinkActive="active" class="nav-item admin">
           <span class="mi">workspace_premium</span>VIP

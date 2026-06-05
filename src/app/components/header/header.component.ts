@@ -23,20 +23,20 @@ import { daysUntil } from '../../services/expiry';
       <div class="header-actions">
         <ng-container *ngIf="auth.me$ | async as me; else loginBtn">
           <button class="coin-pill" (click)="goCoins()" title="Coins">
-            <span class="mi fill">paid</span>
+            <img class="coin-img" src="assets/coins/coin.png" alt="">
             <div class="col" style="gap:0; line-height:1;">
               <span class="coin-amount">{{ (coins.balance$ | async) ?? '—' }}</span>
               <span class="coin-label">{{ 'coins.title' | translate | uppercase }}</span>
             </div>
           </button>
 
-          <!-- Vcoins (real-money currency, distinct from in-game coins) — hidden when the user
+          <!-- Meowcoins (real-money currency, distinct from in-game coins) — hidden when the user
                has no top-up access (non-admin while admin_only). -->
-          <button *ngIf="canTopup(me)" class="coin-pill vcoin" (click)="goTopup()" [title]="'topup.vcoinsTip' | translate">
-            <span class="mi fill">toll</span>
+          <button *ngIf="canTopup(me)" class="coin-pill meow" (click)="goTopup()" [title]="'topup.meowcoinsTip' | translate">
+            <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
             <div class="col" style="gap:0; line-height:1;">
               <span class="coin-amount">{{ (topup.balance$ | async) ?? '—' }}</span>
-              <span class="coin-label">{{ 'topup.vcoins' | translate | uppercase }}</span>
+              <span class="coin-label">{{ 'topup.meowcoins' | translate | uppercase }}</span>
             </div>
           </button>
 
@@ -174,8 +174,8 @@ import { daysUntil } from '../../services/expiry';
     .code-box { display: inline-block; padding: 12px 20px; background: var(--surface-2);
       border: 1px dashed var(--accent); border-radius: 8px; font-size: 22px; font-weight: 700;
       letter-spacing: 2px; user-select: all; }
-    .coin-pill.vcoin { color: var(--vcoin); }
-    .coin-pill.vcoin .mi { color: var(--vcoin); }
+    .coin-pill.meow { color: var(--meowcoin); }
+    .coin-pill.meow .mi { color: var(--meowcoin); }
   `],
 })
 export class HeaderComponent implements OnInit {
@@ -186,7 +186,7 @@ export class HeaderComponent implements OnInit {
   notifications: ShopNotification[] = [];
   codeFor: ShopNotification | null = null;
   copied = false;
-  // Soft-launch gate for the VCOINS pill (matches topupGuard / sidebar).
+  // Soft-launch gate for the MEOWCOINS pill (matches topupGuard / sidebar).
   topupAdminOnly = true;
 
   constructor(
@@ -201,7 +201,7 @@ export class HeaderComponent implements OnInit {
     private router: Router,
   ) { }
 
-  /** Whether to show the Vcoins pill / top-up entry for this user (matches topupGuard). */
+  /** Whether to show the Meowcoins pill / top-up entry for this user (matches topupGuard). */
   canTopup(me: Me | null): boolean {
     return !!me && (me.is_admin || !this.topupAdminOnly);
   }
@@ -211,9 +211,9 @@ export class HeaderComponent implements OnInit {
     this.auth.me$.subscribe(me => {
       if (me) {
         this.coins.refreshMe().subscribe();
-        // Only fetch the Vcoin balance for users who can use top-up (admins, or once opened to all).
+        // Only fetch the Meowcoin balance for users who can use top-up (admins, or once opened to all).
         if (me.is_admin || !this.topupAdminOnly) {
-          this.topup.vcoinsMe().subscribe({ next: () => {}, error: () => {} });
+          this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
         }
         this.basket.view().subscribe();
         this.notifs.startPolling();

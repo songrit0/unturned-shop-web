@@ -5,7 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { TopupService } from '../services/topup.service';
 
 /**
- * Soft-launch gate for the Vcoin top-up page.
+ * Soft-launch gate for the Meowcoin top-up page.
  * Access = logged in AND (is_admin || !admin_only):
  *   - admin_only true  -> admins only; non-admins are redirected home.
  *   - admin_only false -> open to everyone (any logged-in user).

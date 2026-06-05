@@ -33,9 +33,9 @@
   --violet-bg: rgb(167 139 250 / 0.14);
   --indigo: #6366f1;
 
-  /* Vcoins currency accent (real-money currency). Blue so it reads as distinct from the
-     amber in-game coins. Single source of truth for every Vcoin-currency visual. */
-  --vcoin: #3b82f6;
+  /* Meowcoin currency accent (real-money currency). Blue so it reads as distinct from the
+     amber in-game coins. Single source of truth for every Meowcoin-currency visual. */
+  --meowcoin: #3b82f6;
 }
 
 .theme-light {
@@ -326,6 +326,21 @@ app-header {
 .coin-pill .mi {
   color: var(--accent-hi);
 }
+
+/* PNG currency icons (replace the Material `paid`/`toll` glyphs at currency render sites).
+   Base size matches the inline `.mi` glyph it stands in for; .lg/.xl track the .coin-amt scale. */
+.coin-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.coin-img.lg { width: 22px; height: 22px; }
+.coin-img.xl { width: 40px; height: 40px; }
+/* Sidebar nav entry: match the 20px Material glyph it replaces. */
+.coin-img.nav-coin { width: 20px; height: 20px; }
 
 .coin-pill .coin-amount {
   font-family: var(--font-mono);

@@ -28,7 +28,7 @@ import { CoinsService } from '../../services/coins.service';
             </div>
             <div class="grow" style="min-width:0;">
               <div class="fw-6" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ it.name }}</div>
-              <div class="muted text-xs row gap-1">{{ it.price | number }} <span class="mi sm" style="color:var(--accent-hi)">paid</span> / {{ 'basket.perItem' | translate }}</div>
+              <div class="muted text-xs row gap-1">{{ it.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""> / {{ 'basket.perItem' | translate }}</div>
             </div>
             <div class="qty-stepper">
               <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
@@ -46,7 +46,7 @@ import { CoinsService } from '../../services/coins.service';
           </div>
           <div class="row-between fw-7" style="font-size:16px;">
             <span>{{ 'basket.total' | translate }}</span>
-            <span class="coin-amt lg">{{ b.total | number }} <span class="mi fill">paid</span></span>
+            <span class="coin-amt lg">{{ b.total | number }} <img class="coin-img lg" src="assets/coins/coin.png" alt=""></span>
           </div>
           <button class="btn primary lg full" (click)="checkout()" [disabled]="b.items.length === 0 || loading">
             <span *ngIf="!loading" class="mi">payments</span>

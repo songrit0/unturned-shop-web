@@ -41,7 +41,7 @@ interface ItemRow { item_id: number | null; qty_required: number; }
                   <td><span class="badge slate">{{ q.reset_type }}</span></td>
                   <td class="r">
                     <span class="mono" style="color:var(--accent-hi);font-weight:600;display:inline-flex;align-items:center;gap:4px;justify-content:flex-end">
-                      {{ q.reward_coins | number }} <span class="mi sm">paid</span>
+                      {{ q.reward_coins | number }} <img class="coin-img" src="assets/coins/coin.png" alt="">
                     </span>
                   </td>
                   <td class="r"><span class="badge slate">{{ q.items?.length || 0 }}</span></td>

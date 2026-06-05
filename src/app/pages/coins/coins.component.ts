@@ -13,7 +13,7 @@ import { ActivityLog, CoinsMe, CoinsService, MarketLog, Paginated } from '../../
         <div class="row gap-4 wrap">
           <div class="grow">
             <span class="stat-label">CURRENT BALANCE</span>
-            <div class="coin-amt xl mt-2">{{ me ? (me.balance | number) : '...' }} <span class="mi fill">paid</span></div>
+            <div class="coin-amt xl mt-2">{{ me ? (me.balance | number) : '...' }} <img class="coin-img xl" src="assets/coins/coin.png" alt=""></div>
             <p *ngIf="me && !me.linked" class="text-rose text-sm row gap-1 mt-2">
               <span class="mi sm">warning</span>{{ 'coins.needLink' | translate }}
             </p>

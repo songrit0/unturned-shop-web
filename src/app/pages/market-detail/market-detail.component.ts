@@ -32,7 +32,7 @@ const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
               <div class="row gap-4 mt-3 wrap">
                 <div class="col gap-1">
                   <span class="stat-label">{{ 'marketDetail.price' | translate }}</span>
-                  <span class="coin-amt lg">{{ item.price | number }} <span class="mi fill">paid</span></span>
+                  <span class="coin-amt lg">{{ item.price | number }} <img class="coin-img lg" src="assets/coins/coin.png" alt=""></span>
                 </div>
                 <div class="col gap-1">
                   <span class="stat-label">{{ 'marketDetail.stock' | translate }}</span>

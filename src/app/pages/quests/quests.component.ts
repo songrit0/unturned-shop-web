@@ -33,7 +33,7 @@ import { CoinsService } from '../../services/coins.service';
                 <div class="grow"></div>
                 <div class="col" style="align-items:flex-end; gap:0;">
                   <span class="stat-label">REWARD</span>
-                  <span class="coin-amt lg" style="color:var(--accent-hi);">+{{ q.reward_coins | number }} <span class="mi fill">paid</span></span>
+                  <span class="coin-amt lg" style="color:var(--accent-hi);">+{{ q.reward_coins | number }} <img class="coin-img lg" src="assets/coins/coin.png" alt=""></span>
                 </div>
               </div>
               <h3>{{ q.name }}</h3>

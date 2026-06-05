@@ -8,16 +8,16 @@ import { buildPagedParams, normalizePaginated } from './paged-http';
 
 export { Paginated };
 
-// API contract (unturned-shop-api topup/vcoins controllers; JWT via authInterceptor):
+// API contract (unturned-shop-api topup/meowcoins controllers; JWT via authInterceptor):
 //   POST /topup/create  body { baht, provider } -> TopupCreated (status 'pending')
 //                                        (403 topup_admin_only for non-admins while admin_only is on)
 //   POST /topup/thunder/verify { ref, slip_base64 } -> ThunderVerifyResult | 400 { reason }
 //   GET  /topup/:ref               -> TopupStatus (plernpay polling only)
 //   GET  /topup/me                 -> paginated TopupRow history
-//   GET  /vcoins/me                -> VcoinsMe
+//   GET  /meowcoins/me             -> MeowcoinsMe
 //   GET  /config/topup             -> TopupConfig (PUBLIC, no auth) — gate flag + enabled providers
 //
-// Vcoins are a SEPARATE currency from in-game coins. unique_amount is the EXACT baht the
+// Meowcoins are a SEPARATE currency from in-game coins. unique_amount is the EXACT baht the
 // user must transfer (the cents are a per-ref discriminator the backend reconciles on).
 
 export type TopupProvider = 'plernpay' | 'thunder';
@@ -25,21 +25,21 @@ export type TopupProvider = 'plernpay' | 'thunder';
 export type TopupStatus =
   | 'pending'    // QR shown, waiting for payment
   | 'confirmed'  // payment seen, crediting in progress
-  | 'credited'   // vcoins credited to the account (terminal success)
+  | 'credited'   // meowcoins credited to the account (terminal success)
   | 'expired'    // QR window elapsed without payment (terminal)
   | 'cancelled'; // cancelled (terminal)
 
 // create() response. Shape depends on `provider`:
 //   plernpay -> unique_amount (exact baht to transfer, cents are the discriminator), polled via /topup/:ref.
 //   thunder  -> amount (baht) + receiver_name; credited by uploading a slip to /topup/thunder/verify.
-// Both carry qr_code (PromptPay EMVCo payload), promptpay_id, expires_at, vcoins.
+// Both carry qr_code (PromptPay EMVCo payload), promptpay_id, expires_at, meowcoins.
 export interface TopupCreated {
   ref: string;
   provider: TopupProvider;
   qr_code: string;             // PromptPay EMVCo payload to render as a QR
   promptpay_id: string;
   expires_at: string;          // ISO
-  vcoins: number;              // vcoins this top-up will credit
+  meowcoins: number;           // meowcoins this top-up will credit
   status: TopupStatus;
   // plernpay only:
   unique_amount?: number;      // exact baht to transfer
@@ -56,7 +56,7 @@ export type ThunderVerifyReason =
 export interface ThunderVerifyResult {
   ref: string;
   status: 'credited';
-  vcoins: number;
+  meowcoins: number;
   balance: number;
 }
 
@@ -64,7 +64,7 @@ export interface TopupState {
   ref: string;
   status: TopupStatus;
   unique_amount: number;
-  vcoins: number;
+  meowcoins: number;
   expires_at: string;
   credited_at: string | null;
 }
@@ -73,13 +73,13 @@ export interface TopupRow {
   ref: string;
   status: TopupStatus;
   unique_amount: number;
-  vcoins: number;
+  meowcoins: number;
   expires_at: string;
   credited_at: string | null;
   created_at?: string;
 }
 
-export interface VcoinsMe {
+export interface MeowcoinsMe {
   steam_id: string | null;
   balance: number;
 }
@@ -96,7 +96,7 @@ export interface TopupProviderOption {
 // reacts automatically, no web redeploy needed.
 export interface TopupConfig {
   admin_only: boolean;
-  vcoin_per_baht: number;
+  meowcoin_per_baht: number;
   min_baht: number;
   max_baht: number;
   providers: TopupProviderOption[];   // enabled providers, ordered
@@ -106,7 +106,7 @@ export interface TopupConfig {
 // failed fetch can never accidentally expose a feature that's meant to be gated.
 const TOPUP_CONFIG_FALLBACK: TopupConfig = {
   admin_only: true,
-  vcoin_per_baht: 1,
+  meowcoin_per_baht: 1,
   min_baht: 1,
   max_baht: 100000,
   providers: [],
@@ -114,7 +114,7 @@ const TOPUP_CONFIG_FALLBACK: TopupConfig = {
 
 @Injectable({ providedIn: 'root' })
 export class TopupService {
-  // Shared Vcoin balance so the header and the top-up page stay in sync.
+  // Shared Meowcoin balance so the header and the top-up page stay in sync.
   private _balance$ = new BehaviorSubject<number | null>(null);
   balance$: Observable<number | null> = this._balance$.asObservable();
 
@@ -133,7 +133,7 @@ export class TopupService {
       this.config$ = this.http.get<Partial<TopupConfig>>(`${this.apiUrl.get()}/config/topup`).pipe(
         map(r => ({
           admin_only: r?.admin_only !== false,                          // default locked unless explicitly false
-          vcoin_per_baht: Number(r?.vcoin_per_baht) > 0 ? Number(r!.vcoin_per_baht) : 1,
+          meowcoin_per_baht: Number(r?.meowcoin_per_baht) > 0 ? Number(r!.meowcoin_per_baht) : 1,
           min_baht: Number(r?.min_baht) > 0 ? Number(r!.min_baht) : 1,
           max_baht: Number(r?.max_baht) > 0 ? Number(r!.max_baht) : TOPUP_CONFIG_FALLBACK.max_baht,
           // Keep only well-formed provider options; preserve server order.
@@ -148,9 +148,9 @@ export class TopupService {
     return this.config$;
   }
 
-  // ---- Vcoins ----
-  vcoinsMe(): Observable<VcoinsMe> {
-    return this.http.get<VcoinsMe>(`${this.apiUrl.get()}/vcoins/me`).pipe(
+  // ---- Meowcoins ----
+  meowcoinsMe(): Observable<MeowcoinsMe> {
+    return this.http.get<MeowcoinsMe>(`${this.apiUrl.get()}/meowcoins/me`).pipe(
       tap(me => this._balance$.next(me.balance)),
     );
   }
