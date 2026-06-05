@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
+import { VersionService } from './services/version.service';
 
 @Component({
   selector: 'app-root',
@@ -32,10 +33,19 @@ export class AppComponent implements OnInit {
     startWith(this.isFullscreen(this.router.url)),
   );
 
-  constructor(private auth: AuthService, private router: Router) {}
-  ngOnInit() { this.auth.refreshMe().subscribe(); }
+  constructor(private auth: AuthService, private router: Router, private version: VersionService) {}
+
+  ngOnInit() {
+    // The startup probe (APP_INITIALIZER) has already run; if the API is unreachable, send the
+    // user to the offline page instead of letting every request fail silently.
+    if (!this.version.online) {
+      this.router.navigate(['/api-error']);
+      return;
+    }
+    this.auth.refreshMe().subscribe();
+  }
 
   private isFullscreen(url: string): boolean {
-    return url.startsWith('/login') || url.startsWith('/auth/callback');
+    return url.startsWith('/login') || url.startsWith('/auth/callback') || url.startsWith('/api-error');
   }
 }

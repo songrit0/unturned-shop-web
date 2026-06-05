@@ -55,12 +55,19 @@ import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins
 import { TopupComponent } from './pages/topup/topup.component';
 import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 
+import { ApiErrorComponent } from './pages/api-error/api-error.component';
 import { ApiUrlService } from './services/api-url.service';
+import { VersionService } from './services/version.service';
 import { authInterceptor } from './services/auth.interceptor';
 import pkg from '../../package.json';
 
-export function initApiUrl(apiUrl: ApiUrlService) {
-  return () => apiUrl.load();
+// Resolve the API URL, then probe `/version` so connectivity is known before the first route
+// renders. AppComponent redirects to /api-error when the probe fails. probe() never throws.
+export function initApi(apiUrl: ApiUrlService, version: VersionService) {
+  return async () => {
+    await apiUrl.load();
+    await version.probe();
+  };
 }
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -116,6 +123,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminMeowcoinsComponent,
     TopupComponent,
     AdminDonateTiersComponent,
+    ApiErrorComponent,
   ],
   imports: [
     BrowserModule,
@@ -134,7 +142,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
   ],
   providers: [
-    { provide: APP_INITIALIZER, useFactory: initApiUrl, deps: [ApiUrlService], multi: true },
+    { provide: APP_INITIALIZER, useFactory: initApi, deps: [ApiUrlService, VersionService], multi: true },
     provideHttpClient(withInterceptors([authInterceptor])),
     // Thailand is the canonical timezone for the whole app (Thai game server). Every `| date`
     // pipe without an explicit timezone renders in Asia/Bangkok (UTC+7) regardless of the

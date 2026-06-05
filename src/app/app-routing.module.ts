@@ -36,12 +36,14 @@ import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
 import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins.component';
 import { TopupComponent } from './pages/topup/topup.component';
 import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
+import { ApiErrorComponent } from './pages/api-error/api-error.component';
 import { adminGuard } from './guards/admin.guard';
 import { topupGuard } from './guards/topup.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'auth/callback', component: AuthCallbackComponent },
+  { path: 'api-error', component: ApiErrorComponent },
   // P2P marketplace is now the landing page; the old dashboard lives at /home.
   { path: '', redirectTo: 'p2p-market', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
