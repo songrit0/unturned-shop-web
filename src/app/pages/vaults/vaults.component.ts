@@ -78,12 +78,14 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                           <span *ngSwitchCase="'pending'" class="badge amber" [title]="'suggestEdit.statusPending' | translate"><span class="mi sm">hourglass_empty</span> {{ 'submissions.status.pending' | translate }}</span>
                           <span *ngSwitchCase="'approved'" class="badge emerald" [title]="'suggestEdit.statusApproved' | translate"><span class="mi sm">check</span> {{ 'submissions.status.approved' | translate }}</span>
                           <span *ngSwitchCase="'rejected'" class="badge rose" [title]="'suggestEdit.statusRejected' | translate"><span class="mi sm">close</span> {{ 'submissions.status.rejected' | translate }}</span>
-                          <button *ngSwitchDefault
-                                  class="btn ghost sm"
-                                  [hidden]="verifyStatus(it).kind === 'verified'"
-                                  (click)="onRequestSuggest(i)">
-                            <span class="mi sm">edit_note</span> {{ 'vaults.suggestEdit' | translate }}
-                          </button>
+                          <ng-container *ngSwitchDefault>
+                            <button *ngIf="displayName(it) === null"
+                                    class="btn ghost sm"
+                                    [hidden]="verifyStatus(it).kind === 'verified'"
+                                    (click)="onRequestSuggest(i)">
+                              <span class="mi sm">edit_note</span> {{ 'vaults.suggestEdit' | translate }}
+                            </button>
+                          </ng-container>
                         </ng-container>
                         <button class="btn ghost sm" style="color:var(--rose)" (click)="onDelete(i)">
                           <span class="mi sm">delete</span> {{ 'vaults.delete' | translate }}
@@ -186,7 +188,7 @@ export class VaultsComponent implements OnInit {
     private p2p: P2pService,
     private submissions: ItemSubmissionsService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.svc.getMine().subscribe({
@@ -216,7 +218,7 @@ export class VaultsComponent implements OnInit {
         }
         this.submissionByItemId = map;
       },
-      error: () => {},
+      error: () => { },
     });
   }
 
