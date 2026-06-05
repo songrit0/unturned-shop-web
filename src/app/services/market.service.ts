@@ -18,6 +18,7 @@ export interface MarketItem {
   image_url: string | null;
   type_id?: number | null;
   type_name?: string | null;
+  meowcoin_price?: number | null; // null = not Meowcoin-buyable (display only)
 }
 
 export interface MarketTypeOption {

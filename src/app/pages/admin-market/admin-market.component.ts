@@ -13,6 +13,7 @@ interface FormState {
   amount: number;
   enabled: boolean;          // shop buys it (รับซื้อ)
   enabledIsForSell: boolean; // shop sells it (ขาย)
+  meowcoin_price: number | null; // optional Meowcoin price; null = not Meowcoin-buyable
 }
 
 @Component({
@@ -224,6 +225,12 @@ interface FormState {
               <label style="flex:1;display:block">
                 <span class="muted" style="font-size:12px">{{ 'adminMarket.form.elasticity' | translate }} <span class="faint">{{ 'adminMarket.form.elasticityHint' | translate }}</span></span>
                 <input type="number" class="input mono" [(ngModel)]="form.elasticity" min="0" max="2" step="0.1" style="margin-top:4px">
+              </label>
+            </div>
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminMarket.form.meowcoinPrice' | translate }}</span>
+                <input type="number" class="input mono" [(ngModel)]="form.meowcoin_price" min="0" step="0.01" style="margin-top:4px" placeholder="—">
               </label>
             </div>
 
@@ -486,7 +493,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
 
   emptyForm(): FormState {
     return { item_id: null, base_price: 100, target_stock: 10, elasticity: 0.5, amount: 10,
-             enabled: true, enabledIsForSell: true };
+             enabled: true, enabledIsForSell: true, meowcoin_price: null };
   }
 
   openNew() {
@@ -506,6 +513,7 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       item_id: it.item_id,
       base_price: it.base_price, target_stock: it.target_stock, elasticity: it.elasticity,
       amount: it.amount, enabled: !!it.enabled, enabledIsForSell: !!it.enabled_isforsell,
+      meowcoin_price: it.meowcoin_price ?? null,
     };
     this.selectedItem = {
       id: it.item_id, name: it.name, description: null,
@@ -567,6 +575,9 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
       amount: Number(this.form.amount) || 0,
       enabled: this.form.enabled !== false,
       enabled_isforsell: this.form.enabledIsForSell !== false,
+      // Empty input → null (clears the Meowcoin price); otherwise the numeric value.
+      meowcoin_price: this.form.meowcoin_price == null || (this.form.meowcoin_price as any) === '' || !Number.isFinite(Number(this.form.meowcoin_price))
+        ? null : Number(this.form.meowcoin_price),
     };
     this.svc.upsert(payload).subscribe({
       next: () => { this.saving = false; this.editing = null; this.reload(); },

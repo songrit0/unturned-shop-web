@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BasketService, BasketItem, CheckoutResult } from '../../services/basket.service';
 import { CoinsService } from '../../services/coins.service';
+import { TopupService } from '../../services/topup.service';
 
 @Component({
   selector: 'app-basket-drawer',
@@ -28,7 +29,12 @@ import { CoinsService } from '../../services/coins.service';
             </div>
             <div class="grow" style="min-width:0;">
               <div class="fw-6" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ it.name }}</div>
-              <div class="muted text-xs row gap-1">{{ it.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""> / {{ 'basket.perItem' | translate }}</div>
+              <div class="muted text-xs row gap-1">
+                {{ it.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""> / {{ 'basket.perItem' | translate }}
+                <span *ngIf="it.meowcoin_price != null" class="row gap-1" style="margin-left:6px;">
+                  · {{ it.meowcoin_price | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                </span>
+              </div>
             </div>
             <div class="qty-stepper">
               <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
@@ -48,11 +54,24 @@ import { CoinsService } from '../../services/coins.service';
             <span>{{ 'basket.total' | translate }}</span>
             <span class="coin-amt lg">{{ b.total | number }} <img class="coin-img lg" src="assets/coins/coin.png" alt=""></span>
           </div>
-          <button class="btn primary lg full" (click)="checkout()" [disabled]="b.items.length === 0 || loading">
+          <div *ngIf="b.meowcoin_eligible_count > 0" class="row-between muted text-sm">
+            <span>{{ 'basket.meowcoinTotal' | translate }}</span>
+            <span class="coin-amt">{{ b.meowcoin_total | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt=""></span>
+          </div>
+          <button class="btn primary lg full" (click)="checkout('coin')" [disabled]="b.items.length === 0 || loading">
             <span *ngIf="!loading" class="mi">payments</span>
             <span *ngIf="loading" class="spinner sm"></span>
-            {{ (loading ? 'basket.checkoutLoading' : 'basket.checkout') | translate }}
+            {{ (loading ? 'basket.checkoutLoading' : 'basket.payCoin') | translate }}
           </button>
+          <button class="btn secondary lg full" (click)="checkout('meowcoin')"
+                  [disabled]="loading || b.meowcoin_eligible_count === 0 || ((topup.balance$ | async) ?? 0) < b.meowcoin_total">
+            <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+            {{ (loading ? 'basket.checkoutLoading' : 'basket.payMeowcoin') | translate }}
+          </button>
+          <p *ngIf="b.meowcoin_eligible_count > 0 && b.meowcoin_eligible_count < b.items.length"
+             class="muted text-xs" style="text-align:center; margin:0;">
+            {{ 'basket.meowcoinPartial' | translate:{ n: b.meowcoin_eligible_count } }}
+          </p>
           <p *ngIf="error" class="text-rose text-sm" style="text-align:center; margin:0;">{{ error }}</p>
         </footer>
       </aside>
@@ -86,23 +105,34 @@ export class BasketDrawerComponent implements OnInit {
   result: { code: string; total: number; items: any[] } | null = null;
   copied = false;
 
-  constructor(public basket: BasketService, public coins: CoinsService, private t: TranslateService) {}
+  constructor(public basket: BasketService, public coins: CoinsService, public topup: TopupService, private t: TranslateService) {}
 
-  ngOnInit() { this.basket.view().subscribe(); }
+  ngOnInit() {
+    this.basket.view().subscribe();
+    // Ensure the Meowcoin balance is loaded so the "pay with Meowcoin" disable check works.
+    this.topup.meowcoinsMe().subscribe({ error: () => {} });
+  }
 
   close() { this.basket.setOpen(false); }
   inc(it: BasketItem) { this.basket.setQty(it.item_id, it.qty + 1, it.kind).subscribe(); }
   dec(it: BasketItem) { this.basket.setQty(it.item_id, it.qty - 1, it.kind).subscribe(); }
   remove(it: BasketItem) { this.basket.remove(it.item_id, it.kind).subscribe(); }
 
-  checkout() {
+  checkout(currency: 'coin' | 'meowcoin' = 'coin') {
     this.loading = true; this.error = null;
-    this.basket.checkout().subscribe({
+    this.basket.checkout(currency).subscribe({
       next: (r: CheckoutResult) => {
         this.loading = false;
         if (r.ok) {
           this.result = { code: r.code, total: r.total, items: r.items };
-          this.coins.refreshMe().subscribe();
+          // Refresh whichever balance was spent. For Meowcoin, also re-fetch the basket —
+          // the server kept the ineligible (coin-only) lines.
+          if (currency === 'meowcoin') {
+            this.topup.meowcoinsMe().subscribe({ error: () => {} });
+            this.basket.view().subscribe({ error: () => {} });
+          } else {
+            this.coins.refreshMe().subscribe();
+          }
         } else {
           this.error = this.reasonText(r.reason, r.detail);
         }
@@ -136,6 +166,8 @@ export class BasketDrawerComponent implements OnInit {
       case 'no_item':      return this.t.instant('basket.errors.noItem');
       case 'out_of_stock': return this.t.instant('basket.errors.outOfStock', { name: detail?.name || this.t.instant('basket.errors.itemFallback') });
       case 'insufficient': return this.t.instant('basket.errors.insufficient', { balance: detail?.balance, total: detail?.total });
+      case 'insufficient_meowcoin': return this.t.instant('basket.errors.insufficientMeowcoin', { balance: detail?.balance, total: detail?.total });
+      case 'no_meowcoin_items':     return this.t.instant('basket.errors.noMeowcoinItems');
       default:             return this.t.instant('basket.errors.generic');
     }
   }

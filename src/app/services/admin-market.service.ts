@@ -21,6 +21,7 @@ export interface AdminMarketItem {
   enabled_isforsell: number;   // 1 = shop sells it (Shop page)
   type_id?: number | null;  // from JOIN
   type_name?: string | null;// from JOIN
+  meowcoin_price?: number | null; // null = not Meowcoin-buyable
 }
 
 export interface UpsertPayload {
@@ -31,6 +32,7 @@ export interface UpsertPayload {
   amount: number;
   enabled?: boolean;            // shop buys it
   enabled_isforsell?: boolean;  // shop sells it
+  meowcoin_price?: number | null; // optional; null clears
 }
 
 export interface MarketExportRow {

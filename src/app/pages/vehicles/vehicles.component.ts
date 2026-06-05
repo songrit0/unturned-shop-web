@@ -130,6 +130,7 @@ export class VehiclesComponent implements OnInit {
       image_url: v.image_url,
       type_id: v.type_id ?? null,
       type_name: v.type_name ?? null,
+      meowcoin_price: v.meowcoin_price ?? null,
     };
   }
 

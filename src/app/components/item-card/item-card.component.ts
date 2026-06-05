@@ -37,6 +37,9 @@ import { BasketService, BasketKind } from '../../services/basket.service';
             <div class="item-price-main" [class.discount]="discountPct() > 0" [class.up]="discountPct() < 0">
               {{ item.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt="">
             </div>
+            <div *ngIf="item.meowcoin_price != null" class="item-price-meow muted text-xs row gap-1">
+              {{ item.meowcoin_price | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+            </div>
             <span *ngIf="discountPct() !== 0" class="item-price-old">{{ item.base_price | number }}</span>
             <span class="item-stock">{{ 'shop.stock' | translate:{ n: item.amount } }}</span>
           </div>

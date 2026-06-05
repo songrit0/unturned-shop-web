@@ -10,6 +10,7 @@ interface FormState {
   price: number;
   amount: number;
   enabled: boolean;
+  meowcoin_price: number | null; // optional Meowcoin price; null = not Meowcoin-buyable
 }
 
 @Component({
@@ -151,6 +152,12 @@ interface FormState {
                 <input type="number" class="input mono" [(ngModel)]="form.amount" min="0" style="margin-top:4px">
               </label>
             </div>
+            <div class="row gap-3" style="align-items:stretch">
+              <label style="flex:1;display:block">
+                <span class="muted" style="font-size:12px">{{ 'adminVehicleMarket.form.meowcoinPrice' | translate }}</span>
+                <input type="number" class="input mono" [(ngModel)]="form.meowcoin_price" min="0" step="0.01" style="margin-top:4px" placeholder="—">
+              </label>
+            </div>
 
             <div class="row gap-3">
               <label style="flex:1;display:flex;align-items:center;gap:8px">
@@ -245,7 +252,7 @@ export class AdminVehicleMarketComponent implements OnInit, OnDestroy {
   }
 
   emptyForm(): FormState {
-    return { vehicle_id: null, price: 100, amount: 1, enabled: true };
+    return { vehicle_id: null, price: 100, amount: 1, enabled: true, meowcoin_price: null };
   }
 
   openNew() {
@@ -266,6 +273,7 @@ export class AdminVehicleMarketComponent implements OnInit, OnDestroy {
       price: it.price,
       amount: it.amount,
       enabled: !!it.enabled,
+      meowcoin_price: it.meowcoin_price ?? null,
     };
     this.selectedVehicle = {
       id: it.vehicle_id, name: it.name, description: null,
@@ -313,6 +321,9 @@ export class AdminVehicleMarketComponent implements OnInit, OnDestroy {
       price: Number(this.form.price) || 0,
       amount: Number(this.form.amount) || 0,
       enabled: this.form.enabled !== false,
+      // Empty input → null (clears the Meowcoin price); otherwise the numeric value.
+      meowcoin_price: this.form.meowcoin_price == null || (this.form.meowcoin_price as any) === '' || !Number.isFinite(Number(this.form.meowcoin_price))
+        ? null : Number(this.form.meowcoin_price),
     };
     this.svc.upsert(payload).subscribe({
       next: () => { this.saving = false; this.editing = null; this.reload(); },

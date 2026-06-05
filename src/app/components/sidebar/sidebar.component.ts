@@ -45,7 +45,7 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/coins" routerLinkActive="active" class="nav-item">
           <span class="mi">paid</span>{{ 'coins.title' | translate }}
         </a>
-        <a *ngIf="canTopup(me)" routerLink="/topup" routerLinkActive="active" class="nav-item">
+        <a  routerLink="/topup" routerLinkActive="active" class="nav-item">
           <span class="mi">account_balance_wallet</span>{{ 'topup.title' | translate }}
         </a>
         <a routerLink="/codes" routerLinkActive="active" class="nav-item">
@@ -152,12 +152,10 @@ export class SidebarComponent implements OnInit {
   ) { }
 
   /** Show the Top-up nav item when the user can actually reach the page (matches topupGuard). */
-  canTopup(me: Me | null): boolean {
-    return !!me && (me.is_admin || !this.topupAdminOnly);
-  }
+
 
   ngOnInit() {
-    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => {} });
+    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => { } });
     this.version.fetchApi().subscribe(v => {
       this.apiStatus = v ? `api v${v.version} · online` : 'api · offline';
     });

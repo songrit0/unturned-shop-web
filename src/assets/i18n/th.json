@@ -247,6 +247,7 @@
       "pickVehicleSearch": "ค้นหารถจากชื่อหรือ id...",
       "price": "ราคา",
       "stock": "สต็อกปัจจุบัน",
+      "meowcoinPrice": "ราคา Meowcoin",
       "enabled": "เปิดขาย (แสดงในร้าน)"
     },
     "errors": {
@@ -262,6 +263,10 @@
     "perItem": "ชิ้น",
     "balance": "ยอดเงินคงเหลือ",
     "total": "รวม",
+    "meowcoinTotal": "รวม Meowcoin",
+    "payCoin": "จ่ายด้วย Coin",
+    "payMeowcoin": "จ่ายด้วย Meowcoin",
+    "meowcoinPartial": "จ่าย Meowcoin ได้ {{n}} ชิ้น — รายการที่เหลือยังอยู่ในตะกร้า",
     "checkout": "ยืนยันการสั่งซื้อ",
     "checkoutLoading": "กำลังจ่าย...",
     "successTitle": "สั่งซื้อสำเร็จ!",
@@ -274,6 +279,8 @@
       "noItem": "รายการบางอันถูกลบจากตลาด",
       "outOfStock": "{{name}} สต็อกไม่พอ",
       "insufficient": "Coin ไม่พอ (มี {{balance}}, ต้อง {{total}})",
+      "insufficientMeowcoin": "Meowcoin ไม่พอ (มี {{balance}}, ต้อง {{total}})",
+      "noMeowcoinItems": "ไม่มีรายการในตะกร้าที่จ่ายด้วย Meowcoin ได้",
       "discordRequired": "กรุณาผูกบัญชี Discord เพื่อสั่งซื้อจากร้านค้า",
       "generic": "เกิดข้อผิดพลาด",
       "itemFallback": "รายการบางอัน"
@@ -286,6 +293,10 @@
     "marketHistory": "ประวัติตลาด",
     "rewardLog": "Reward Log",
     "empty": "ยังไม่มีรายการ"
+  },
+  "vip": {
+    "buyCoin": "จ่ายด้วย Coin",
+    "buyMeowcoin": "จ่ายด้วย Meowcoin"
   },
   "topup": {
     "title": "เติม Meowcoins",
@@ -615,6 +626,7 @@
       "targetStockHint": "(ที่ราคา = base)",
       "elasticity": "Elasticity",
       "elasticityHint": "(0=คงที่ • 0.5=กลาง • 1=เต็ม)",
+      "meowcoinPrice": "ราคา Meowcoin",
       "preview": "ตัวอย่างคำนวณ:",
       "previewLine1": "stock = {{amount}} → ราคา ≈ {{price}}",
       "previewLine2": "stock = {{target}} (target) → {{base}} | stock น้อย → แพง | stock เยอะ → ถูก",
@@ -776,6 +788,9 @@
     "unauthorized": "กรุณาเข้าสู่ระบบ",
     "forbidden": "คุณไม่มีสิทธิ์ทำรายการนี้",
     "not_found": "ไม่พบข้อมูล",
+    "insufficient_meowcoin": "Meowcoin ไม่พอ",
+    "no_meowcoin_items": "ไม่มีรายการที่จ่ายด้วย Meowcoin ได้",
+    "no_meowcoin_price": "รายการนี้ไม่มีราคา Meowcoin",
     "unknown": "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง"
   },
   "adminItems": {

@@ -16,6 +16,7 @@ export interface VehicleMarketItem {
   image_url: string | null;
   type_id?: number | null;
   type_name?: string | null;
+  meowcoin_price?: number | null; // null = not Meowcoin-buyable
 }
 
 export interface AdminVehicleMarketItem extends VehicleMarketItem {
@@ -27,6 +28,7 @@ export interface VehicleUpsertPayload {
   price: number;
   amount: number;
   enabled?: boolean;
+  meowcoin_price?: number | null; // optional; null clears
 }
 
 @Injectable({ providedIn: 'root' })

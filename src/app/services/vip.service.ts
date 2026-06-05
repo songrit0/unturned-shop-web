@@ -9,6 +9,7 @@ export interface VipPackage {
   group_id: string;
   days: number;
   price_coins: number;
+  price_meowcoins: number | null; // null = not Meowcoin-buyable
   label: string | null;
   sort: number;
 }
@@ -46,7 +47,7 @@ export class VipService {
   mine(): Observable<VipMine> {
     return this.http.get<VipMine>(`${this.base()}/mine`);
   }
-  buy(packageId: number): Observable<VipBuyResult> {
-    return this.http.post<VipBuyResult>(`${this.base()}/buy`, { package_id: packageId });
+  buy(packageId: number, currency: 'coin' | 'meowcoin' = 'coin'): Observable<VipBuyResult> {
+    return this.http.post<VipBuyResult>(`${this.base()}/buy`, { package_id: packageId, currency });
   }
 }

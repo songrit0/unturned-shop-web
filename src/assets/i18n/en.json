@@ -247,6 +247,7 @@
       "pickVehicleSearch": "Search vehicles by name or id...",
       "price": "Price",
       "stock": "Current stock",
+      "meowcoinPrice": "Meowcoin price",
       "enabled": "Enabled (shows in shop)"
     },
     "errors": {
@@ -262,6 +263,10 @@
     "perItem": "each",
     "balance": "Balance",
     "total": "Total",
+    "meowcoinTotal": "Meowcoin total",
+    "payCoin": "Pay with Coin",
+    "payMeowcoin": "Pay with Meowcoin",
+    "meowcoinPartial": "{{n}} item(s) payable with Meowcoin — the rest stay in your cart",
     "checkout": "Confirm order",
     "checkoutLoading": "Paying...",
     "successTitle": "Order successful!",
@@ -274,6 +279,8 @@
       "noItem": "Some items were removed from the market",
       "outOfStock": "{{name}} out of stock",
       "insufficient": "Not enough Coin (have {{balance}}, need {{total}})",
+      "insufficientMeowcoin": "Not enough Meowcoin (have {{balance}}, need {{total}})",
+      "noMeowcoinItems": "No items in your cart can be paid with Meowcoin.",
       "discordRequired": "Link your Discord account to check out from the shop.",
       "generic": "Something went wrong",
       "itemFallback": "Some item"
@@ -286,6 +293,10 @@
     "marketHistory": "Market history",
     "rewardLog": "Reward Log",
     "empty": "No items"
+  },
+  "vip": {
+    "buyCoin": "Pay with Coin",
+    "buyMeowcoin": "Pay with Meowcoin"
   },
   "topup": {
     "title": "Top up Meowcoins",
@@ -583,6 +594,7 @@
       "targetStockHint": "(price = base at this stock)",
       "elasticity": "Elasticity",
       "elasticityHint": "(0=fixed • 0.5=mid • 1=full)",
+      "meowcoinPrice": "Meowcoin price",
       "preview": "Example:",
       "previewLine1": "stock = {{amount}} → price ≈ {{price}}",
       "previewLine2": "stock = {{target}} (target) → {{base}} | low stock → expensive | high stock → cheap",
@@ -744,6 +756,9 @@
     "unauthorized": "Please sign in.",
     "forbidden": "You don't have permission to do that.",
     "not_found": "Not found.",
+    "insufficient_meowcoin": "You don't have enough Meowcoin.",
+    "no_meowcoin_items": "None of these items can be paid with Meowcoin.",
+    "no_meowcoin_price": "This item has no Meowcoin price.",
     "unknown": "Something went wrong. Try again."
   },
   "adminItems": {

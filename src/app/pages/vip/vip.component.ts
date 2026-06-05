@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vip.service';
+import { TopupService } from '../../services/topup.service';
 
 @Component({
   selector: 'app-vip',
@@ -52,10 +53,16 @@ import { VipBuyResult, VipMine, VipPackage, VipService } from '../../services/vi
             </div>
             <div style="font-weight:700;font-size:15px">{{ p.label || (p.tier + ' ' + p.days + ' วัน') }}</div>
             <div class="coin-amt lg" style="color:var(--accent-hi)"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ p.price_coins | number }}</div>
+            <div *ngIf="p.price_meowcoins != null" class="coin-amt" style="color:var(--accent-hi)"><img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">{{ p.price_meowcoins | number }}</div>
             <button (click)="buy(p)" [disabled]="!mine?.linked || buyingId === p.id"
                     class="btn emerald" style="margin-top:auto">
               <span class="mi sm">shopping_cart</span>
-              {{ buyingId === p.id ? 'กำลังซื้อ…' : 'ซื้อด้วย Coin' }}
+              {{ buyingId === p.id ? 'กำลังซื้อ…' : 'จ่ายด้วย Coin' }}
+            </button>
+            <button *ngIf="p.price_meowcoins != null" (click)="buyMeow(p)" [disabled]="!mine?.linked || buyingId === p.id"
+                    class="btn secondary">
+              <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+              {{ buyingId === p.id ? 'กำลังซื้อ…' : 'จ่ายด้วย Meowcoin' }}
             </button>
           </div>
         </div>
@@ -84,7 +91,7 @@ export class VipComponent implements OnInit {
   error: string | null = null;
   okMsg: string | null = null;
 
-  constructor(private vip: VipService) {}
+  constructor(private vip: VipService, private topup: TopupService) {}
 
   ngOnInit() {
     if (this.maintenance) { this.loading = false; return; }
@@ -108,6 +115,21 @@ export class VipComponent implements OnInit {
         this.buyingId = null;
         this.okMsg = `ซื้อ ${r.tier} สำเร็จ (+${r.days} วัน) · คงเหลือ ${r.balance} Coin · สิทธิ์เข้าเกมภายใน ~1 นาที`;
         this.loadMine();
+      },
+      error: e => { this.buyingId = null; this.error = e?.error?.message || 'ซื้อไม่สำเร็จ'; },
+    });
+  }
+
+  buyMeow(p: VipPackage) {
+    if (!this.mine?.linked || p.price_meowcoins == null) return;
+    if (!confirm(`ซื้อ ${p.label || p.tier} (${p.days} วัน) ราคา ${p.price_meowcoins} Meowcoin ?`)) return;
+    this.error = null; this.okMsg = null; this.buyingId = p.id;
+    this.vip.buy(p.id, 'meowcoin').subscribe({
+      next: (r: VipBuyResult) => {
+        this.buyingId = null;
+        this.okMsg = `ซื้อ ${r.tier} สำเร็จ (+${r.days} วัน) · คงเหลือ ${r.balance} Meowcoin · สิทธิ์เข้าเกมภายใน ~1 นาที`;
+        this.loadMine();
+        this.topup.meowcoinsMe().subscribe({ error: () => {} });
       },
       error: e => { this.buyingId = null; this.error = e?.error?.message || 'ซื้อไม่สำเร็จ'; },
     });
