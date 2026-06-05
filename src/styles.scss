@@ -309,7 +309,7 @@ app-header {
   align-items: center;
   gap: 8px;
   height: 38px;
-  padding: 0 14px 0 12px;
+  padding: 0 14px 0 0px;
   background: linear-gradient(135deg, rgb(245 158 11 / 0.12), rgb(245 158 11 / 0.04));
   border: 1px solid rgb(245 158 11 / 0.35);
   border-radius: var(--radius);
@@ -330,17 +330,34 @@ app-header {
 /* PNG currency icons (replace the Material `paid`/`toll` glyphs at currency render sites).
    Base size matches the inline `.mi` glyph it stands in for; .lg/.xl track the .coin-amt scale. */
 .coin-img {
-  width: 18px;
-  height: 18px;
+  width: 59px;
+  height: 59px;
   object-fit: contain;
   vertical-align: middle;
   display: inline-block;
 }
 
-.coin-img.lg { width: 22px; height: 22px; }
-.coin-img.xl { width: 40px; height: 40px; }
+/* Meowcoin artwork is portrait (cat holding the coin) — narrower + its own height. */
+.coin-img.meow {
+  width: 29px;
+  height: 54px;
+}
+
+.coin-img.lg {
+  width: 22px;
+  height: 22px;
+}
+
+.coin-img.xl {
+  width: 100px;
+  height: 100px;
+}
+
 /* Sidebar nav entry: match the 20px Material glyph it replaces. */
-.coin-img.nav-coin { width: 20px; height: 20px; }
+.coin-img.nav-coin {
+  width: 20px;
+  height: 20px;
+}
 
 .coin-pill .coin-amount {
   font-family: var(--font-mono);
