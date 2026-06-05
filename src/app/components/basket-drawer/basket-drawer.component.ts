@@ -77,7 +77,7 @@ import { TopupService } from '../../services/topup.service';
             <span class="coin-amt">{{ b.meowcoin_total | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt=""></span>
           </div>
           <button class="btn primary lg full" (click)="checkout('coin')" [disabled]="b.items.length === 0 || loading">
-            <span *ngIf="!loading" class="mi">payments</span>
+            <img class="coin-img" src="assets/coins/coin.png" alt="">
             <span *ngIf="loading" class="spinner sm"></span>
             {{ (loading ? 'basket.checkoutLoading' : 'basket.payCoin') | translate }}
           </button>
@@ -123,12 +123,12 @@ export class BasketDrawerComponent implements OnInit {
   result: { code: string; total: number; items: any[] } | null = null;
   copied = false;
 
-  constructor(public basket: BasketService, public coins: CoinsService, public topup: TopupService, private t: TranslateService) {}
+  constructor(public basket: BasketService, public coins: CoinsService, public topup: TopupService, private t: TranslateService) { }
 
   ngOnInit() {
     this.basket.view().subscribe();
     // Ensure the Meowcoin balance is loaded so the "pay with Meowcoin" disable check works.
-    this.topup.meowcoinsMe().subscribe({ error: () => {} });
+    this.topup.meowcoinsMe().subscribe({ error: () => { } });
   }
 
   close() { this.basket.setOpen(false); }
@@ -146,8 +146,8 @@ export class BasketDrawerComponent implements OnInit {
           // Refresh whichever balance was spent. For Meowcoin, also re-fetch the basket —
           // the server kept the ineligible (coin-only) lines.
           if (currency === 'meowcoin') {
-            this.topup.meowcoinsMe().subscribe({ error: () => {} });
-            this.basket.view().subscribe({ error: () => {} });
+            this.topup.meowcoinsMe().subscribe({ error: () => { } });
+            this.basket.view().subscribe({ error: () => { } });
           } else {
             this.coins.refreshMe().subscribe();
           }
@@ -179,14 +179,14 @@ export class BasketDrawerComponent implements OnInit {
 
   private reasonText(reason: string, detail?: any): string {
     switch (reason) {
-      case 'not_linked':   return this.t.instant('basket.errors.notLinked');
-      case 'empty':        return this.t.instant('basket.errors.empty');
-      case 'no_item':      return this.t.instant('basket.errors.noItem');
+      case 'not_linked': return this.t.instant('basket.errors.notLinked');
+      case 'empty': return this.t.instant('basket.errors.empty');
+      case 'no_item': return this.t.instant('basket.errors.noItem');
       case 'out_of_stock': return this.t.instant('basket.errors.outOfStock', { name: detail?.name || this.t.instant('basket.errors.itemFallback') });
       case 'insufficient': return this.t.instant('basket.errors.insufficient', { balance: detail?.balance, total: detail?.total });
       case 'insufficient_meowcoin': return this.t.instant('basket.errors.insufficientMeowcoin', { balance: detail?.balance, total: detail?.total });
-      case 'no_meowcoin_items':     return this.t.instant('basket.errors.noMeowcoinItems');
-      default:             return this.t.instant('basket.errors.generic');
+      case 'no_meowcoin_items': return this.t.instant('basket.errors.noMeowcoinItems');
+      default: return this.t.instant('basket.errors.generic');
     }
   }
 }
