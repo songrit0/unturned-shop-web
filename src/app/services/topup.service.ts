@@ -100,6 +100,50 @@ export interface TopupConfig {
   min_baht: number;
   max_baht: number;
   providers: TopupProviderOption[];   // enabled providers, ordered
+  monthly_cap_baht: number;           // per-user donation cap per month (baht)
+  monthly_goal_baht: number;          // community fundraising goal per month (baht)
+}
+
+// ---- Donate / Battlepass (GET /donate/progress) ----
+// One reward bundled inside a tier (item or vehicle), resolved with display name + image.
+export interface DonateReward {
+  kind: 'item' | 'vehicle';
+  item_id: number;
+  amount: number;
+  quality: number;
+  name: string | null;
+  image_url: string | null;
+}
+
+// One battlepass tier. `unlocked` is server-derived from this month's cumulative donation;
+// `claimed`/`code` reflect whether the user has already claimed the reward code.
+export interface DonateTier {
+  id: number;
+  threshold_baht: number;
+  name: string;
+  sort: number;
+  rewards: DonateReward[];
+  unlocked: boolean;
+  claimed: boolean;
+  code: string | null;
+}
+
+// GET /donate/progress (auth): this month's user + community totals and the tier track.
+export interface DonateProgress {
+  period: string;                 // 'YYYY-MM'
+  user_donated: number;
+  user_cap: number;
+  user_remaining: number;
+  community_total: number;
+  community_goal: number;
+  tiers: DonateTier[];
+}
+
+// POST /donate/claim response: the minted redeem code + (informational) the rewards granted.
+export interface DonateClaimResult {
+  code: string;
+  code_expires_at: string | null;
+  rewards: DonateReward[];
 }
 
 // Conservative fallback if /config/topup is unreachable: stay locked (admin_only true) so a
@@ -110,6 +154,8 @@ const TOPUP_CONFIG_FALLBACK: TopupConfig = {
   min_baht: 1,
   max_baht: 100000,
   providers: [],
+  monthly_cap_baht: 150,
+  monthly_goal_baht: 1200,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -140,6 +186,8 @@ export class TopupService {
           providers: Array.isArray(r?.providers)
             ? r!.providers!.filter((p): p is TopupProviderOption => !!p && !!p.key).map(p => ({ key: p.key, label: p.label || p.key }))
             : [],
+          monthly_cap_baht: Number(r?.monthly_cap_baht) > 0 ? Number(r!.monthly_cap_baht) : TOPUP_CONFIG_FALLBACK.monthly_cap_baht,
+          monthly_goal_baht: Number(r?.monthly_goal_baht) > 0 ? Number(r!.monthly_goal_baht) : TOPUP_CONFIG_FALLBACK.monthly_goal_baht,
         } as TopupConfig)),
         catchError(() => of(TOPUP_CONFIG_FALLBACK)),
         shareReplay({ bufferSize: 1, refCount: false }),
@@ -173,5 +221,16 @@ export class TopupService {
     const params = buildPagedParams(page, limit);
     return this.http.get<unknown>(`${this.apiUrl.get()}/topup/me`, { params })
       .pipe(map(r => normalizePaginated<TopupRow>(r, limit)));
+  }
+
+  // ---- Donate / Battlepass ----
+  /** This month's user + community donation totals and the battlepass tier track. */
+  donateProgress(): Observable<DonateProgress> {
+    return this.http.get<DonateProgress>(`${this.apiUrl.get()}/donate/progress`);
+  }
+
+  /** Claim an unlocked tier's reward — mints (or returns the existing) redeem code. Idempotent. */
+  claimTier(tierId: number): Observable<DonateClaimResult> {
+    return this.http.post<DonateClaimResult>(`${this.apiUrl.get()}/donate/claim`, { tier_id: tierId });
   }
 }

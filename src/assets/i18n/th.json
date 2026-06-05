@@ -40,7 +40,8 @@
       "p2p": "P2P",
       "admin": "ADMIN"
     },
-    "adminCodes": "จัดการโค้ด"
+    "adminCodes": "จัดการโค้ด",
+    "adminDonate": "จัดการโดเนต"
   },
   "header": {
     "search": "ค้นหาไอเทม..."
@@ -260,6 +261,9 @@
   "basket": {
     "title": "ตะกร้า",
     "empty": "ตะกร้าว่าง",
+    "keepShopping": "เลือกซื้อต่อ",
+    "remove": "ลบออกจากตะกร้า",
+    "maxStock": "เลือกครบจำนวนในสต็อกแล้ว ({{n}})",
     "perItem": "ชิ้น",
     "balance": "ยอดเงินคงเหลือ",
     "total": "รวม",
@@ -299,11 +303,11 @@
     "buyMeowcoin": "จ่ายด้วย Meowcoin"
   },
   "topup": {
-    "title": "เติม Meowcoins",
+    "title": "โดเนต",
     "meowcoins": "Meowcoins",
     "baht": "บาท",
     "meowcoinsTip": "Meowcoins เป็นสกุลเงินแยกต่างหากจาก coins ในเกม",
-    "intro": "เติม Meowcoins ด้วยเงินจริงผ่าน PromptPay QR — Meowcoins เป็นสกุลเงินแยกต่างหากจาก coins ในเกม",
+    "intro": "โดเนตสนับสนุนเซิร์ฟเวอร์ด้วยเงินจริงผ่าน PromptPay QR — คุณจะได้รับ Meowcoins ซึ่งเป็นสกุลเงินแยกต่างหากจาก coins ในเกม",
     "formTitle": "เลือกจำนวนเงิน",
     "amountLabel": "จำนวนเงิน (บาท)",
     "amountPlaceholder": "เช่น 100",
@@ -311,7 +315,7 @@
     "createBtn": "สร้าง QR PromptPay",
     "payTitle": "สแกนเพื่อชำระเงิน",
     "exactAmountLabel": "โอนยอดนี้ให้ตรงเป๊ะ",
-    "exactWarn": "ต้องโอนยอดนี้ให้ตรงเป๊ะ มิฉะนั้นระบบจะจับคู่รายการเติมเงินไม่ได้",
+    "exactWarn": "ต้องโอนยอดนี้ให้ตรงเป๊ะ มิฉะนั้นระบบจะจับคู่รายการโดเนตไม่ได้",
     "amountToTransfer": "ยอดที่ต้องโอน",
     "receiver": "ผู้รับเงิน",
     "promptpayId": "PromptPay ID",
@@ -322,20 +326,20 @@
     "statusWaiting": "กำลังรอการชำระเงิน...",
     "statusConfirmed": "ได้รับการชำระเงินแล้ว กำลังเติม Meowcoins...",
     "cancelBtn": "ยกเลิก",
-    "successTitle": "เติมเงินสำเร็จ",
+    "successTitle": "โดเนตสำเร็จ",
     "successBody": "เติม {{meowcoins}} Meowcoins เข้าบัญชีของคุณเรียบร้อยแล้ว",
     "newBalance": "ยอด Meowcoin คงเหลือใหม่",
-    "again": "เติมอีกครั้ง",
+    "again": "โดเนตอีกครั้ง",
     "expiredTitle": "QR หมดอายุ",
-    "expiredBody": "หมดเวลาการเติมเงินนี้แล้วโดยไม่พบการชำระเงินที่ตรงกัน",
+    "expiredBody": "หมดเวลาการโดเนตนี้แล้วโดยไม่พบการชำระเงินที่ตรงกัน",
     "tryAgain": "ลองอีกครั้ง",
-    "historyTitle": "ประวัติการเติมเงิน",
-    "historyEmpty": "ยังไม่มีการเติมเงิน",
+    "historyTitle": "ประวัติการโดเนต",
+    "historyEmpty": "ยังไม่มีการโดเนต",
     "adminOnlyTitle": "เปิดให้เฉพาะแอดมิน",
-    "adminOnlyBody": "การเติม Meowcoin อยู่ในช่วงทดลองเปิดให้บริการแบบจำกัด ขณะนี้เปิดให้เฉพาะแอดมินเท่านั้น และจะเปิดให้ทุกคนเร็ว ๆ นี้",
+    "adminOnlyBody": "การโดเนตอยู่ในช่วงทดลองเปิดให้บริการแบบจำกัด ขณะนี้เปิดให้เฉพาะแอดมินเท่านั้น และจะเปิดให้ทุกคนเร็ว ๆ นี้",
     "adminOnlyHome": "กลับหน้าหลัก",
-    "closedTitle": "ปิดให้บริการเติมเงินชั่วคราว",
-    "closedBody": "ขณะนี้ยังไม่เปิดให้เติม Meowcoin กรุณากลับมาใหม่ภายหลัง",
+    "closedTitle": "ปิดให้บริการโดเนตชั่วคราว",
+    "closedBody": "ขณะนี้ยังไม่เปิดให้โดเนต กรุณากลับมาใหม่ภายหลัง",
     "status": {
       "pending": "รอดำเนินการ",
       "confirmed": "ยืนยันแล้ว",
@@ -365,7 +369,63 @@
       }
     },
     "errors": {
-      "createFail": "สร้างรายการเติมเงินไม่สำเร็จ กรุณาลองใหม่"
+      "createFail": "สร้างรายการโดเนตไม่สำเร็จ กรุณาลองใหม่"
+    }
+  },
+  "donate": {
+    "communityTitle": "ระดมทุนค่าเซิร์ฟเวอร์เดือนนี้",
+    "battlepassTitle": "Battlepass การโดเนต",
+    "userDonated": "คุณโดเนตเดือนนี้ {{donated}}/{{cap}} บาท",
+    "remainingHint": "เหลือโควตาเดือนนี้อีก {{remaining}} บาท",
+    "capReached": "ถึงลิมิตการโดเนตเดือนนี้แล้ว",
+    "claimSuccessTitle": "รับรางวัลแล้ว",
+    "tier": {
+      "locked": "ล็อกอยู่",
+      "unlocked": "ปลดล็อกแล้ว",
+      "claimed": "รับแล้ว",
+      "needMore": "ต้องโดเนตถึง {{threshold}} บาทในเดือนนี้",
+      "claim": "รับรางวัล",
+      "viewCode": "ดูโค้ด"
+    },
+    "errors": {
+      "donate_cap_exceeded": "ยอดนี้จะเกินลิมิตการโดเนตเดือนนี้",
+      "tier_locked": "คุณยังไม่ได้ปลดล็อกระดับนี้",
+      "tier_not_found": "ไม่พบระดับนี้แล้ว"
+    }
+  },
+  "adminDonate": {
+    "title": "ระดับการโดเนต",
+    "create": "เพิ่มระดับ",
+    "createTitle": "เพิ่มระดับการโดเนต",
+    "editTitle": "แก้ไขระดับการโดเนต",
+    "edit": "แก้ไข",
+    "save": "บันทึก",
+    "delete": "ลบ",
+    "deleteConfirm": "ลบระดับนี้?",
+    "empty": "ยังไม่มีระดับการโดเนต",
+    "on": "เปิด",
+    "off": "ปิด",
+    "rewardsCount": "รางวัล",
+    "form": {
+      "threshold": "ยอดขั้นต่ำ (บาท)",
+      "sort": "ลำดับ",
+      "name": "ชื่อ",
+      "nameHint": "เช่น ผู้สนับสนุนระดับบรอนซ์",
+      "enabled": "เปิดใช้งาน",
+      "rewards": "รางวัล",
+      "addReward": "เพิ่มรางวัล",
+      "item": "ไอเทม",
+      "vehicle": "ยานพาหนะ",
+      "pickItem": "ค้นหา id / ชื่อไอเทม...",
+      "pickVehicle": "ค้นหา id / ชื่อยานพาหนะ...",
+      "amount": "จำนวน",
+      "quality": "คุณภาพ"
+    },
+    "errors": {
+      "noRewards": "เพิ่มรางวัลอย่างน้อย 1 รายการ",
+      "noName": "กรอกชื่อระดับ",
+      "saveFail": "บันทึกระดับไม่สำเร็จ กรุณาลองใหม่",
+      "deleteFail": "ลบระดับไม่สำเร็จ กรุณาลองใหม่"
     }
   },
   "codes": {
@@ -791,6 +851,9 @@
     "insufficient_meowcoin": "Meowcoin ไม่พอ",
     "no_meowcoin_items": "ไม่มีรายการที่จ่ายด้วย Meowcoin ได้",
     "no_meowcoin_price": "รายการนี้ไม่มีราคา Meowcoin",
+    "donate_cap_exceeded": "ยอดนี้จะเกินลิมิตการโดเนตเดือนนี้",
+    "tier_locked": "คุณยังไม่ได้ปลดล็อกระดับนี้",
+    "tier_not_found": "ไม่พบระดับนี้แล้ว",
     "unknown": "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง"
   },
   "adminItems": {

@@ -40,7 +40,8 @@
       "p2p": "P2P",
       "admin": "ADMIN"
     },
-    "adminCodes": "Manage Codes"
+    "adminCodes": "Manage Codes",
+    "adminDonate": "Manage Donate"
   },
   "header": {
     "search": "Search items..."
@@ -260,6 +261,9 @@
   "basket": {
     "title": "Basket",
     "empty": "Basket is empty",
+    "keepShopping": "Keep shopping",
+    "remove": "Remove from cart",
+    "maxStock": "Max stock selected ({{n}})",
     "perItem": "each",
     "balance": "Balance",
     "total": "Total",
@@ -299,11 +303,11 @@
     "buyMeowcoin": "Pay with Meowcoin"
   },
   "topup": {
-    "title": "Top up Meowcoins",
+    "title": "Donate",
     "meowcoins": "Meowcoins",
     "baht": "baht",
     "meowcoinsTip": "Meowcoins are a separate currency from in-game coins.",
-    "intro": "Top up Meowcoins with real money via PromptPay QR. Meowcoins are a separate currency from your in-game coins.",
+    "intro": "Donate to support the server with real money via PromptPay QR. You'll receive Meowcoins — a separate currency from your in-game coins.",
     "formTitle": "Choose amount",
     "amountLabel": "Amount (baht)",
     "amountPlaceholder": "e.g. 100",
@@ -311,7 +315,7 @@
     "createBtn": "Generate PromptPay QR",
     "payTitle": "Scan to pay",
     "exactAmountLabel": "Transfer this EXACT amount",
-    "exactWarn": "You must transfer this exact amount, or the top-up will not be matched.",
+    "exactWarn": "You must transfer this exact amount, or the donation will not be matched.",
     "amountToTransfer": "Amount to transfer",
     "receiver": "Receiver",
     "promptpayId": "PromptPay ID",
@@ -322,20 +326,20 @@
     "statusWaiting": "Waiting for payment...",
     "statusConfirmed": "Payment received, crediting Meowcoins...",
     "cancelBtn": "Cancel",
-    "successTitle": "Top-up complete",
+    "successTitle": "Donation complete",
     "successBody": "{{meowcoins}} Meowcoins have been credited to your account.",
     "newBalance": "New Meowcoin balance",
-    "again": "Top up again",
+    "again": "Donate again",
     "expiredTitle": "QR expired",
-    "expiredBody": "This top-up window has closed without a matching payment.",
+    "expiredBody": "This donation window has closed without a matching payment.",
     "tryAgain": "Try again",
-    "historyTitle": "Top-up history",
-    "historyEmpty": "No top-ups yet.",
+    "historyTitle": "Donation history",
+    "historyEmpty": "No donations yet.",
     "adminOnlyTitle": "Available to admins only",
-    "adminOnlyBody": "Meowcoin top-up is in a limited soft launch and is currently available to admins only. It will open to everyone soon.",
+    "adminOnlyBody": "Donations are in a limited soft launch and are currently available to admins only. They will open to everyone soon.",
     "adminOnlyHome": "Back to home",
-    "closedTitle": "Top-up temporarily closed",
-    "closedBody": "Meowcoin top-up is temporarily unavailable. Please check back later.",
+    "closedTitle": "Donations temporarily closed",
+    "closedBody": "Donations are temporarily unavailable. Please check back later.",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -365,7 +369,63 @@
       }
     },
     "errors": {
-      "createFail": "Couldn't create the top-up. Please try again."
+      "createFail": "Couldn't create the donation. Please try again."
+    }
+  },
+  "donate": {
+    "communityTitle": "Server fundraising this month",
+    "battlepassTitle": "Donation battlepass",
+    "userDonated": "You've donated {{donated}}/{{cap}} baht this month",
+    "remainingHint": "{{remaining}} baht remaining of your monthly cap.",
+    "capReached": "You've reached this month's donation limit.",
+    "claimSuccessTitle": "Reward claimed",
+    "tier": {
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "claimed": "Claimed",
+      "needMore": "Donate {{threshold}} baht this month to unlock",
+      "claim": "Claim reward",
+      "viewCode": "View code"
+    },
+    "errors": {
+      "donate_cap_exceeded": "That would exceed your monthly donation limit.",
+      "tier_locked": "You haven't unlocked this tier yet.",
+      "tier_not_found": "This tier no longer exists."
+    }
+  },
+  "adminDonate": {
+    "title": "Donation Tiers",
+    "create": "Add tier",
+    "createTitle": "Add donation tier",
+    "editTitle": "Edit donation tier",
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this tier?",
+    "empty": "No donation tiers yet.",
+    "on": "Enabled",
+    "off": "Disabled",
+    "rewardsCount": "rewards",
+    "form": {
+      "threshold": "Threshold (baht)",
+      "sort": "Sort",
+      "name": "Name",
+      "nameHint": "e.g. Bronze Supporter",
+      "enabled": "Enabled",
+      "rewards": "Rewards",
+      "addReward": "Add reward",
+      "item": "Item",
+      "vehicle": "Vehicle",
+      "pickItem": "Search item id / name...",
+      "pickVehicle": "Search vehicle id / name...",
+      "amount": "Amount",
+      "quality": "Quality"
+    },
+    "errors": {
+      "noRewards": "Add at least one reward.",
+      "noName": "Enter a tier name.",
+      "saveFail": "Couldn't save the tier. Please try again.",
+      "deleteFail": "Couldn't delete the tier. Please try again."
     }
   },
   "codes": {
@@ -759,6 +819,9 @@
     "insufficient_meowcoin": "You don't have enough Meowcoin.",
     "no_meowcoin_items": "None of these items can be paid with Meowcoin.",
     "no_meowcoin_price": "This item has no Meowcoin price.",
+    "donate_cap_exceeded": "That would exceed your monthly donation limit.",
+    "tier_locked": "You haven't unlocked this tier yet.",
+    "tier_not_found": "This tier no longer exists.",
     "unknown": "Something went wrong. Try again."
   },
   "adminItems": {

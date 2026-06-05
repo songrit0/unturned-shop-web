@@ -53,6 +53,7 @@ import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
 import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins.component';
 import { TopupComponent } from './pages/topup/topup.component';
+import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 
 import { ApiUrlService } from './services/api-url.service';
 import { authInterceptor } from './services/auth.interceptor';
@@ -114,6 +115,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminCodesComponent,
     AdminMeowcoinsComponent,
     TopupComponent,
+    AdminDonateTiersComponent,
   ],
   imports: [
     BrowserModule,

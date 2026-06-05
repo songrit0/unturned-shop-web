@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import {
+  DonateProgress,
+  DonateTier,
   ThunderVerifyReason,
   TopupCreated,
   TopupProvider,
@@ -22,7 +24,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
   template: `
     <div class="page">
       <div class="page-header">
-        <h1><span class="h-icon meow"><span class="mi fill">account_balance_wallet</span></span>{{ 'topup.title' | translate }}</h1>
+        <h1><span class="h-icon meow"><span class="mi fill">volunteer_activism</span></span>{{ 'topup.title' | translate }}</h1>
         <div class="page-actions" *ngIf="hasAccess">
           <div class="meow-pill" [title]="'topup.meowcoinsTip' | translate">
             <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
@@ -34,18 +36,32 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
         </div>
       </div>
 
-      <!-- Single notice card for the two "can't show the form" states (mutually exclusive):
-           - no access (admin_only gate)            -> notice('admin-only')
-           - access but every provider disabled ([]) -> notice('closed') -->
-      <div *ngIf="notice as n" class="card tactical notice">
-        <span class="mi xxl" [style.color]="n === 'closed' ? 'var(--muted)' : 'var(--amber)'">{{ n === 'closed' ? 'pause_circle' : 'lock' }}</span>
-        <h2>{{ (n === 'closed' ? 'topup.closedTitle' : 'topup.adminOnlyTitle') | translate }}</h2>
-        <p class="muted">{{ (n === 'closed' ? 'topup.closedBody' : 'topup.adminOnlyBody') | translate }}</p>
+      <!-- "Closed" notice: donations are open to all now, so the only blocking state left is
+           "no payment providers enabled" (providers: []). -->
+      <div *ngIf="notice" class="card tactical notice">
+        <span class="mi xxl" style="color:var(--muted)">pause_circle</span>
+        <h2>{{ 'topup.closedTitle' | translate }}</h2>
+        <p class="muted">{{ 'topup.closedBody' | translate }}</p>
         <a routerLink="/" class="btn primary"><span class="mi sm">home</span>{{ 'topup.adminOnlyHome' | translate }}</a>
       </div>
 
       <ng-container *ngIf="!notice">
       <p class="muted" style="margin:-4px 0 16px 0;font-size:13px;max-width:560px">{{ 'topup.intro' | translate }}</p>
+
+      <!-- ==== Community fundraising progress ==== -->
+      <div *ngIf="progress" class="card tactical community" style="margin-bottom:16px">
+        <div class="row between wrap" style="align-items:flex-end;gap:8px">
+          <div class="card-title" style="margin:0"><span class="mi">groups</span>{{ 'donate.communityTitle' | translate }}</div>
+          <div class="mono" style="font-size:13px;color:var(--meowcoin);font-weight:700">
+            <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="" style="width:16px;height:16px;vertical-align:-3px">
+            {{ progress.community_total | number }} / {{ progress.community_goal | number }} {{ 'topup.baht' | translate }}
+          </div>
+        </div>
+        <div class="bar" style="margin-top:10px"><div class="bar-fill" [style.width.%]="communityPct"></div></div>
+        <div class="muted" style="font-size:12px;margin-top:6px">
+          {{ 'donate.userDonated' | translate:{ donated: (progress.user_donated | number), cap: (progress.user_cap | number) } }}
+        </div>
+      </div>
 
       <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
         <!-- ==== Left: form / QR / result ==== -->
@@ -65,15 +81,25 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
               </div>
             </div>
 
+            <!-- Cap reached: monthly per-user limit hit; block input + the create button. -->
+            <div *ngIf="capReached" class="cap-note">
+              <span class="mi sm">block</span> {{ 'donate.capReached' | translate }}
+            </div>
+
             <label style="display:block;margin-top:12px">
               <span class="muted" style="font-size:12px">{{ 'topup.amountLabel' | translate }}</span>
-              <input type="number" min="1" step="1" class="input mono" style="margin-top:4px"
+              <input type="number" min="1" step="1" [max]="maxAllowed" class="input mono" style="margin-top:4px"
+                     [disabled]="capReached"
                      [(ngModel)]="baht" (ngModelChange)="onAmountChange()" [placeholder]="'topup.amountPlaceholder' | translate">
             </label>
+            <div *ngIf="!capReached && remaining !== null" class="muted" style="font-size:11px;margin-top:4px">
+              {{ 'donate.remainingHint' | translate:{ remaining: (remaining | number) } }}
+            </div>
             <div class="convert mono">
               <span class="mi sm">swap_horiz</span>
               <span>= {{ meowcoinPreview | number }} {{ 'topup.meowcoins' | translate }}</span>
             </div>
+            <p *ngIf="amountError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ amountError | translate }}</p>
             <p *ngIf="createError" style="color:var(--rose);font-size:13px;margin:8px 0 0 0">{{ createError | translate }}</p>
             <button class="btn primary" style="width:100%;margin-top:16px" [disabled]="!canCreate || creating" (click)="create()">
               <span class="mi sm">qr_code_2</span>
@@ -222,7 +248,77 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
           </ng-container>
         </div>
       </div>
+
+      <!-- ==== Battlepass tier track ==== -->
+      <div *ngIf="progress && progress.tiers.length > 0" class="card flush" style="margin-top:16px">
+        <div class="card-title" style="padding:16px 18px 0"><span class="mi">military_tech</span>{{ 'donate.battlepassTitle' | translate }}</div>
+        <div class="tier-track">
+          <div *ngFor="let tier of progress.tiers" class="tier"
+               [class.locked]="!tier.unlocked" [class.claimed]="tier.claimed">
+            <div class="tier-head">
+              <div class="tier-thr mono">
+                <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="" style="width:16px;height:16px;vertical-align:-3px">
+                {{ tier.threshold_baht | number }} {{ 'topup.baht' | translate }}
+              </div>
+              <span class="tier-state badge"
+                    [class.emerald]="tier.unlocked && tier.claimed"
+                    [class.slate]="!tier.unlocked">
+                <span class="mi sm">{{ tier.claimed ? 'check_circle' : (tier.unlocked ? 'lock_open' : 'lock') }}</span>
+                {{ (tier.claimed ? 'donate.tier.claimed' : (tier.unlocked ? 'donate.tier.unlocked' : 'donate.tier.locked')) | translate }}
+              </span>
+            </div>
+            <div class="tier-name">{{ tier.name }}</div>
+
+            <div class="tier-rewards">
+              <div *ngFor="let r of tier.rewards" class="reward-chip" [title]="(r.name || ('#' + r.item_id)) + ' ×' + r.amount">
+                <div class="reward-img">
+                  <img *ngIf="r.image_url; else noRewImg" [src]="r.image_url" alt="">
+                  <ng-template #noRewImg><span class="mi sm faint">{{ r.kind === 'vehicle' ? 'directions_car' : 'inventory_2' }}</span></ng-template>
+                </div>
+                <span class="reward-name">{{ r.name || ('#' + r.item_id) }}</span>
+                <span class="mono faint" style="font-size:11px">×{{ r.amount }}</span>
+              </div>
+            </div>
+
+            <!-- State actions -->
+            <div class="tier-action">
+              <div *ngIf="!tier.unlocked" class="muted" style="font-size:12px">
+                {{ 'donate.tier.needMore' | translate:{ threshold: (tier.threshold_baht | number) } }}
+              </div>
+              <button *ngIf="tier.unlocked && !tier.claimed" class="btn primary sm" style="width:100%"
+                      [disabled]="claimingTierId === tier.id" (click)="claim(tier)">
+                <span *ngIf="claimingTierId !== tier.id" class="mi sm">redeem</span>
+                <span *ngIf="claimingTierId === tier.id" class="spinner sm" style="margin-right:6px"></span>
+                {{ (claimingTierId === tier.id ? 'common.saving' : 'donate.tier.claim') | translate }}
+              </button>
+              <button *ngIf="tier.claimed" class="btn secondary sm" style="width:100%" (click)="revealCode(tier)">
+                <span class="mi sm">qr_code_2</span>{{ 'donate.tier.viewCode' | translate }}
+              </button>
+            </div>
+            <p *ngIf="claimError && claimErrorTierId === tier.id" style="color:var(--rose);font-size:12px;margin:6px 0 0 0">{{ claimError | translate }}</p>
+          </div>
+        </div>
+      </div>
       </ng-container>
+
+      <!-- Tier reward code-reveal modal (reuses the header/inventory code-reveal pattern). -->
+      <div *ngIf="revealedCode" class="modal-backdrop" (click)="closeCode()">
+        <div class="modal-card tactical" style="max-width:480px;text-align:center" (click)="$event.stopPropagation()">
+          <h3 style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 12px 0;font-size:18px;font-weight:700">
+            <span class="mi" style="color:var(--emerald)">military_tech</span>{{ 'donate.claimSuccessTitle' | translate }}
+          </h3>
+          <p *ngIf="revealedTierName" class="muted" style="font-size:13px;margin:0 0 12px 0">{{ revealedTierName }}</p>
+          <div class="code-box mono">{{ revealedCode }}</div>
+          <button class="btn ghost sm" (click)="copyCode(revealedCode)" style="margin-top:8px">
+            <span class="mi sm">{{ codeCopied ? 'check' : 'content_copy' }}</span>
+            {{ (codeCopied ? 'notifications.code.copied' : 'notifications.code.copy') | translate }}
+          </button>
+          <p class="muted" style="font-size:12px;margin-top:10px">
+            {{ 'notifications.code.instruction' | translate:{ code: revealedCode } }}
+          </p>
+          <button class="btn primary" style="margin-top:16px;width:100%" (click)="closeCode()">{{ 'common.ok' | translate }}</button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -265,6 +361,32 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
     .steps { margin:14px 0 0 0; padding-left:20px; font-size:13px; line-height:1.7; color:var(--text); }
     .slip { margin-top:14px; }
     .slip-name { display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12px; color:var(--muted); word-break:break-all; }
+
+    /* Community progress bar */
+    .community .bar { height:12px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; }
+    .community .bar-fill { height:100%; background:linear-gradient(90deg, var(--meowcoin), var(--emerald)); border-radius:999px; transition:width .4s ease; }
+
+    /* Cap-reached note */
+    .cap-note { display:flex; align-items:center; gap:6px; margin-top:12px; padding:10px 12px; font-size:13px; font-weight:600;
+      color:var(--amber); background:rgb(245 158 11 / 0.10); border:1px solid rgb(245 158 11 / 0.3); border-radius:8px; }
+
+    /* Battlepass tier track */
+    .tier-track { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; padding:16px 18px 18px; }
+    .tier { background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+    .tier.locked { opacity:.55; filter:grayscale(.4); }
+    .tier.claimed { border-color:var(--emerald); }
+    .tier-head { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+    .tier-thr { font-weight:700; font-size:14px; color:var(--meowcoin); }
+    .tier-state { display:inline-flex; align-items:center; gap:3px; font-size:10px; }
+    .tier-name { font-weight:600; font-size:14px; }
+    .tier-rewards { display:flex; flex-direction:column; gap:6px; }
+    .reward-chip { display:flex; align-items:center; gap:8px; background:var(--surface-3); border-radius:999px; padding:3px 10px 3px 3px; }
+    .reward-img { width:26px; height:26px; flex:0 0 26px; background:var(--surface); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .reward-img img { width:80%; height:80%; object-fit:contain; }
+    .reward-name { flex:1; min-width:0; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tier-action { margin-top:auto; }
+    .code-box { display:inline-block; padding:12px 20px; background:var(--surface-2); border:1px dashed var(--accent); border-radius:8px;
+      font-size:22px; font-weight:700; letter-spacing:2px; user-select:all; }
   `],
 })
 export class TopupComponent implements OnInit, OnDestroy {
@@ -276,14 +398,11 @@ export class TopupComponent implements OnInit, OnDestroy {
   hasAccess = true;
 
   /**
-   * Which "can't show the form" notice to render (null = show the form):
-   *  - 'admin-only' : failed the admin_only gate.
-   *  - 'closed'     : has access but every provider is disabled (providers: []).
+   * Donations are open to everyone now, so the only "can't show the form" state left is
+   * "closed" — access but every provider disabled (providers: []).
    */
-  get notice(): 'admin-only' | 'closed' | null {
-    if (!this.hasAccess) return 'admin-only';
-    if (this.providers.length === 0) return 'closed';
-    return null;
+  get notice(): boolean {
+    return this.hasAccess && this.providers.length === 0;
   }
 
   phase: Phase = 'form';
@@ -291,6 +410,19 @@ export class TopupComponent implements OnInit, OnDestroy {
   meowcoinPreview = 0;
   creating = false;
   createError: string | null = null;
+  amountError: string | null = null;
+
+  // ---- Donate / battlepass state ----
+  progress: DonateProgress | null = null;
+  maxBaht = 100000;                         // from config (max single donation)
+  claimingTierId: number | null = null;
+  claimError: string | null = null;
+  claimErrorTierId: number | null = null;
+
+  // Tier code-reveal modal.
+  revealedCode: string | null = null;
+  revealedTierName: string | null = null;
+  codeCopied = false;
 
   // Providers (enabled, from /config/topup). `provider` is the selected one.
   providers: TopupProviderOption[] = [];
@@ -324,10 +456,12 @@ export class TopupComponent implements OnInit, OnDestroy {
       next: cfg => {
         this.hasAccess = !!me && (me.is_admin || !cfg.admin_only);
         this.providers = cfg.providers;
+        this.maxBaht = cfg.max_baht;
         // Auto-select: single provider -> use it; multiple -> default to the first enabled one.
         if (this.providers.length > 0) this.provider = this.providers[0].key;
         if (this.hasAccess) {
           this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
+          this.loadProgress();
           this.loadHistory();
         } else {
           this.historyLoading = false;
@@ -342,13 +476,34 @@ export class TopupComponent implements OnInit, OnDestroy {
   }
 
   // ---- Form ----
+  /** This month's remaining per-user cap (baht), or null if progress hasn't loaded. */
+  get remaining(): number | null {
+    return this.progress ? Math.max(0, this.progress.user_remaining) : null;
+  }
+
+  /** True when the user has hit their monthly donation cap. */
+  get capReached(): boolean {
+    return this.remaining !== null && this.remaining <= 0;
+  }
+
+  /** Max baht the user may donate now = min(config max, remaining cap). */
+  get maxAllowed(): number {
+    return this.remaining === null ? this.maxBaht : Math.min(this.maxBaht, this.remaining);
+  }
+
   get canCreate(): boolean {
-    return !!this.baht && Number.isFinite(this.baht) && this.baht >= 1;
+    if (this.capReached) return false;
+    if (!this.baht || !Number.isFinite(this.baht) || this.baht < 1) return false;
+    return Math.floor(this.baht) <= this.maxAllowed;
   }
 
   onAmountChange() {
     const v = Math.floor(Number(this.baht) || 0);
     this.meowcoinPreview = v >= 1 ? v * TopupComponent.RATE : 0;
+    // Validate the typed amount against the remaining monthly cap.
+    this.amountError = (v >= 1 && this.remaining !== null && v > this.maxAllowed)
+      ? 'donate.errors.donate_cap_exceeded'
+      : null;
   }
 
   providerIcon(key: TopupProvider): string {
@@ -373,7 +528,14 @@ export class TopupComponent implements OnInit, OnDestroy {
       },
       error: e => {
         this.creating = false;
-        this.createError = e?.error?.message || 'topup.errors.createFail';
+        const code = e?.error?.message;
+        if (code === 'donate_cap_exceeded') {
+          this.createError = 'donate.errors.donate_cap_exceeded';
+          // Refresh so the cap/remaining reflects reality.
+          this.loadProgress();
+        } else {
+          this.createError = e?.error?.message || 'topup.errors.createFail';
+        }
       },
     });
   }
@@ -417,6 +579,7 @@ export class TopupComponent implements OnInit, OnDestroy {
         this.stopTimers();
         // Refresh shared balance (header + page); fall back to the returned balance.
         this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
+        this.loadProgress();
         this.loadHistory();
       },
       error: e => {
@@ -456,6 +619,7 @@ export class TopupComponent implements OnInit, OnDestroy {
       this.stopTimers();
       // Refresh the shared balance so the header + this page update.
       this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
+      this.loadProgress();
       this.loadHistory();
     } else if (s.status === 'expired' || s.status === 'cancelled') {
       this.phase = 'expired';
@@ -493,6 +657,80 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.tickSub = undefined;
   }
 
+  // ---- Donate progress + battlepass ----
+  get communityPct(): number {
+    if (!this.progress || this.progress.community_goal <= 0) return 0;
+    return Math.min(100, (this.progress.community_total / this.progress.community_goal) * 100);
+  }
+
+  private loadProgress() {
+    this.topup.donateProgress().subscribe({
+      next: p => {
+        this.progress = p;
+        // Re-validate the typed amount against the freshly loaded cap.
+        this.onAmountChange();
+      },
+      error: () => {},
+    });
+  }
+
+  /** Claim an unlocked tier -> mint/return a redeem code -> reveal it; refresh progress. */
+  claim(tier: DonateTier) {
+    if (!tier.unlocked || tier.claimed || this.claimingTierId === tier.id) return;
+    this.claimingTierId = tier.id;
+    this.claimError = null;
+    this.claimErrorTierId = null;
+    this.topup.claimTier(tier.id).subscribe({
+      next: res => {
+        this.claimingTierId = null;
+        this.openCode(res.code, tier.name);
+        this.loadProgress();
+      },
+      error: e => {
+        this.claimingTierId = null;
+        const code = e?.error?.message;
+        this.claimErrorTierId = tier.id;
+        this.claimError = (code === 'tier_locked' || code === 'tier_not_found')
+          ? `donate.errors.${code}`
+          : 'topup.errors.createFail';
+        // A locked/not-found error likely means our view is stale — refresh.
+        this.loadProgress();
+      },
+    });
+  }
+
+  /** Re-reveal a previously claimed tier's stored code. */
+  revealCode(tier: DonateTier) {
+    if (tier.code) this.openCode(tier.code, tier.name);
+  }
+
+  private openCode(code: string, tierName: string) {
+    this.revealedCode = code;
+    this.revealedTierName = tierName;
+    this.codeCopied = false;
+  }
+
+  closeCode() {
+    this.revealedCode = null;
+    this.revealedTierName = null;
+    this.codeCopied = false;
+  }
+
+  copyCode(code: string) {
+    if (!code) return;
+    const text = `/code ${code}`;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => { this.codeCopied = true; }, () => {});
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); this.codeCopied = true; } catch {}
+      document.body.removeChild(ta);
+    }
+  }
+
   // ---- History ----
   private loadHistory() {
     this.historyLoading = true;
@@ -520,6 +758,7 @@ export class TopupComponent implements OnInit, OnDestroy {
     this.currentStatus = 'pending';
     this.creditedMeowcoins = 0;
     this.createError = null;
+    this.amountError = null;
     this.baht = null;
     this.meowcoinPreview = 0;
     this.resetSlip();

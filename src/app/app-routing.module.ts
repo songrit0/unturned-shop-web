@@ -35,6 +35,7 @@ import { AdminVehicleMarketComponent } from './pages/admin-vehicle-market/admin-
 import { AdminCodesComponent } from './pages/admin-codes/admin-codes.component';
 import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins.component';
 import { TopupComponent } from './pages/topup/topup.component';
+import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 import { adminGuard } from './guards/admin.guard';
 import { topupGuard } from './guards/topup.guard';
 
@@ -64,6 +65,7 @@ const routes: Routes = [
   { path: 'admin/vehicles', component: AdminVehiclesComponent, canActivate: [adminGuard] },
   { path: 'admin/vehicle-market', component: AdminVehicleMarketComponent, canActivate: [adminGuard] },
   { path: 'admin/codes', component: AdminCodesComponent, canActivate: [adminGuard] },
+  { path: 'admin/donate-tiers', component: AdminDonateTiersComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },

@@ -12,14 +12,18 @@ import { TopupService } from '../../services/topup.service';
 
       <aside class="drawer">
         <header class="drawer-head">
-          <h2><span class="mi">shopping_cart</span>{{ 'basket.title' | translate }}</h2>
+          <h2>
+            <span class="mi">shopping_cart</span>{{ 'basket.title' | translate }}
+            <span *ngIf="(basket.basket$ | async)?.items?.length as n" class="basket-count">{{ n }}</span>
+          </h2>
           <button class="icon-btn" (click)="close()"><span class="mi">close</span></button>
         </header>
 
         <div class="basket-body" *ngIf="basket.basket$ | async as b">
-          <div *ngIf="b.items.length === 0" class="empty" style="padding:48px 16px;">
+          <div *ngIf="b.items.length === 0" class="empty basket-empty">
             <span class="mi xxl">remove_shopping_cart</span>
             <div class="empty-title">{{ 'basket.empty' | translate }}</div>
+            <button class="btn secondary" (click)="close()">{{ 'basket.keepShopping' | translate }}</button>
           </div>
 
           <div *ngFor="let it of b.items" class="basket-line">
@@ -27,21 +31,30 @@ import { TopupService } from '../../services/topup.service';
               <img *ngIf="it.image_url; else noImg" [src]="it.image_url" [alt]="it.name">
               <ng-template #noImg><span class="mi md faint">inventory_2</span></ng-template>
             </div>
-            <div class="grow" style="min-width:0;">
-              <div class="fw-6" style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ it.name }}</div>
-              <div class="muted text-xs row gap-1">
+            <div class="basket-line-main">
+              <div class="basket-line-top">
+                <div class="basket-line-name" [title]="it.name">{{ it.name }}</div>
+                <button class="basket-del" (click)="remove(it)"
+                        [attr.aria-label]="'basket.remove' | translate"><span class="mi sm">delete</span></button>
+              </div>
+              <div class="basket-line-unit muted text-xs">
                 {{ it.price | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""> / {{ 'basket.perItem' | translate }}
-                <span *ngIf="it.meowcoin_price != null" class="row gap-1" style="margin-left:6px;">
-                  · {{ it.meowcoin_price | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                <span *ngIf="it.meowcoin_price != null" class="basket-meow-tag">
+                  {{ it.meowcoin_price | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
                 </span>
               </div>
+              <div class="basket-line-bottom">
+                <div class="qty-stepper">
+                  <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
+                  <span>{{ it.qty }}</span>
+                  <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail"><span class="mi sm">add</span></button>
+                </div>
+                <div class="basket-line-sub coin-amt">{{ it.price * it.qty | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></div>
+              </div>
+              <div *ngIf="it.qty >= it.amount_avail" class="basket-line-max muted text-xs">
+                {{ 'basket.maxStock' | translate:{ n: it.amount_avail } }}
+              </div>
             </div>
-            <div class="qty-stepper">
-              <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
-              <span>{{ it.qty }}</span>
-              <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail"><span class="mi sm">add</span></button>
-            </div>
-            <button class="icon-btn" (click)="remove(it)" style="width:30px; height:30px;"><span class="mi sm">delete</span></button>
           </div>
         </div>
 
