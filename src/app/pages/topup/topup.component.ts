@@ -46,6 +46,58 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
       </div>
 
       <ng-container *ngIf="!notice">
+
+      <!-- ==== Battlepass tier track (top) ==== -->
+      <div *ngIf="progress && progress.tiers.length > 0" class="card flush" style="margin-bottom:16px">
+        <div class="card-title" style="padding:16px 18px 0"><span class="mi">military_tech</span>{{ 'donate.battlepassTitle' | translate }}</div>
+        <div class="tier-track">
+          <div *ngFor="let tier of progress.tiers" class="tier"
+               [class.locked]="!tier.unlocked" [class.claimed]="tier.claimed">
+            <div class="tier-head">
+              <div class="tier-thr mono">
+                <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="" style="width:16px;height:16px;vertical-align:-3px">
+                {{ tier.threshold_baht | number }} {{ 'topup.baht' | translate }}
+              </div>
+              <span class="tier-state badge"
+                    [class.emerald]="tier.unlocked && tier.claimed"
+                    [class.slate]="!tier.unlocked">
+                <span class="mi sm">{{ tier.claimed ? 'check_circle' : (tier.unlocked ? 'lock_open' : 'lock') }}</span>
+                {{ (tier.claimed ? 'donate.tier.claimed' : (tier.unlocked ? 'donate.tier.unlocked' : 'donate.tier.locked')) | translate }}
+              </span>
+            </div>
+            <div class="tier-name">{{ tier.name }}</div>
+
+            <div class="tier-rewards">
+              <div *ngFor="let r of tier.rewards" class="reward-chip" [title]="(r.name || ('#' + r.item_id)) + ' ×' + r.amount">
+                <div class="reward-img">
+                  <img *ngIf="r.image_url; else noRewImg" [src]="r.image_url" alt="">
+                  <ng-template #noRewImg><span class="mi sm faint">{{ r.kind === 'vehicle' ? 'directions_car' : 'inventory_2' }}</span></ng-template>
+                </div>
+                <span class="reward-name">{{ r.name || ('#' + r.item_id) }}</span>
+                <span class="mono faint" style="font-size:11px">×{{ r.amount }}</span>
+              </div>
+            </div>
+
+            <!-- State actions -->
+            <div class="tier-action">
+              <div *ngIf="!tier.unlocked" class="muted" style="font-size:12px">
+                {{ 'donate.tier.needMore' | translate:{ threshold: (tier.threshold_baht | number) } }}
+              </div>
+              <button *ngIf="tier.unlocked && !tier.claimed" class="btn primary sm" style="width:100%"
+                      [disabled]="claimingTierId === tier.id" (click)="claim(tier)">
+                <span *ngIf="claimingTierId !== tier.id" class="mi sm">redeem</span>
+                <span *ngIf="claimingTierId === tier.id" class="spinner sm" style="margin-right:6px"></span>
+                {{ (claimingTierId === tier.id ? 'common.saving' : 'donate.tier.claim') | translate }}
+              </button>
+              <button *ngIf="tier.claimed" class="btn secondary sm" style="width:100%" (click)="revealCode(tier)">
+                <span class="mi sm">qr_code_2</span>{{ 'donate.tier.viewCode' | translate }}
+              </button>
+            </div>
+            <p *ngIf="claimError && claimErrorTierId === tier.id" style="color:var(--rose);font-size:12px;margin:6px 0 0 0">{{ claimError | translate }}</p>
+          </div>
+        </div>
+      </div>
+
       <p class="muted" style="margin:-4px 0 16px 0;font-size:13px;max-width:560px">{{ 'topup.intro' | translate }}</p>
 
       <!-- ==== Community fundraising progress ==== -->
@@ -249,56 +301,6 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
         </div>
       </div>
 
-      <!-- ==== Battlepass tier track ==== -->
-      <div *ngIf="progress && progress.tiers.length > 0" class="card flush" style="margin-top:16px">
-        <div class="card-title" style="padding:16px 18px 0"><span class="mi">military_tech</span>{{ 'donate.battlepassTitle' | translate }}</div>
-        <div class="tier-track">
-          <div *ngFor="let tier of progress.tiers" class="tier"
-               [class.locked]="!tier.unlocked" [class.claimed]="tier.claimed">
-            <div class="tier-head">
-              <div class="tier-thr mono">
-                <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="" style="width:16px;height:16px;vertical-align:-3px">
-                {{ tier.threshold_baht | number }} {{ 'topup.baht' | translate }}
-              </div>
-              <span class="tier-state badge"
-                    [class.emerald]="tier.unlocked && tier.claimed"
-                    [class.slate]="!tier.unlocked">
-                <span class="mi sm">{{ tier.claimed ? 'check_circle' : (tier.unlocked ? 'lock_open' : 'lock') }}</span>
-                {{ (tier.claimed ? 'donate.tier.claimed' : (tier.unlocked ? 'donate.tier.unlocked' : 'donate.tier.locked')) | translate }}
-              </span>
-            </div>
-            <div class="tier-name">{{ tier.name }}</div>
-
-            <div class="tier-rewards">
-              <div *ngFor="let r of tier.rewards" class="reward-chip" [title]="(r.name || ('#' + r.item_id)) + ' ×' + r.amount">
-                <div class="reward-img">
-                  <img *ngIf="r.image_url; else noRewImg" [src]="r.image_url" alt="">
-                  <ng-template #noRewImg><span class="mi sm faint">{{ r.kind === 'vehicle' ? 'directions_car' : 'inventory_2' }}</span></ng-template>
-                </div>
-                <span class="reward-name">{{ r.name || ('#' + r.item_id) }}</span>
-                <span class="mono faint" style="font-size:11px">×{{ r.amount }}</span>
-              </div>
-            </div>
-
-            <!-- State actions -->
-            <div class="tier-action">
-              <div *ngIf="!tier.unlocked" class="muted" style="font-size:12px">
-                {{ 'donate.tier.needMore' | translate:{ threshold: (tier.threshold_baht | number) } }}
-              </div>
-              <button *ngIf="tier.unlocked && !tier.claimed" class="btn primary sm" style="width:100%"
-                      [disabled]="claimingTierId === tier.id" (click)="claim(tier)">
-                <span *ngIf="claimingTierId !== tier.id" class="mi sm">redeem</span>
-                <span *ngIf="claimingTierId === tier.id" class="spinner sm" style="margin-right:6px"></span>
-                {{ (claimingTierId === tier.id ? 'common.saving' : 'donate.tier.claim') | translate }}
-              </button>
-              <button *ngIf="tier.claimed" class="btn secondary sm" style="width:100%" (click)="revealCode(tier)">
-                <span class="mi sm">qr_code_2</span>{{ 'donate.tier.viewCode' | translate }}
-              </button>
-            </div>
-            <p *ngIf="claimError && claimErrorTierId === tier.id" style="color:var(--rose);font-size:12px;margin:6px 0 0 0">{{ claimError | translate }}</p>
-          </div>
-        </div>
-      </div>
       </ng-container>
 
       <!-- Tier reward code-reveal modal (reuses the header/inventory code-reveal pattern). -->

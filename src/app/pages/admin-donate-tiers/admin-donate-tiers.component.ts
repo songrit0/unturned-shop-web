@@ -121,6 +121,7 @@ interface RewardRow {
                 <button type="button" (click)="addRow()" class="btn ghost sm"><span class="mi sm">add</span> {{ 'adminDonate.form.addReward' | translate }}</button>
               </div>
 
+              <div class="reward-scroll">
               <div *ngFor="let r of rewards; let i = index" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px">
                 <div class="row gap-2" style="align-items:flex-start">
                   <select class="select" [ngModel]="r.type" (ngModelChange)="onTypeChange(r, $event)" style="width:110px;flex-shrink:0">
@@ -173,6 +174,7 @@ interface RewardRow {
 
                   <button type="button" (click)="removeRow(i)" class="btn ghost sm" style="color:var(--rose);margin-top:2px"><span class="mi sm">delete</span></button>
                 </div>
+              </div>
               </div>
             </div>
           </div>

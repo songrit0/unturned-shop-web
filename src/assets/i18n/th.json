@@ -296,7 +296,44 @@
     "needLink": "ยังไม่ผูก Steam",
     "marketHistory": "ประวัติตลาด",
     "rewardLog": "Reward Log",
-    "empty": "ยังไม่มีรายการ"
+    "empty": "ยังไม่มีรายการ",
+    "history": {
+      "title": "ประวัติ Coin",
+      "empty": "ยังไม่มีรายการเคลื่อนไหว",
+      "source": {
+        "shop": "ร้านค้า",
+        "p2p": "P2P",
+        "admin": "แอดมิน",
+        "tax": "ค่าธรรมเนียม",
+        "transfer": "โอน"
+      },
+      "label": {
+        "buy": "ซื้อไอเทม",
+        "sell": "ขายไอเทม",
+        "p2p_buy": "ซื้อแบบ P2P",
+        "p2p_sell": "ขายแบบ P2P",
+        "admin_grant": "แอดมินเพิ่มให้",
+        "admin_take": "แอดมินหักออก",
+        "tax": "ค่าธรรมเนียมการโอน",
+        "transfer_in": "ได้รับ Coin",
+        "transfer_out": "โอน Coin ออก"
+      }
+    },
+    "transfer": {
+      "title": "โอน Coin",
+      "bySteam": "Steam ID",
+      "byDiscord": "Discord ID",
+      "targetPlaceholder": "กรอก ID ผู้รับ",
+      "amount": "จำนวน",
+      "fee": "ค่าธรรมเนียมการโอน",
+      "total": "ยอดที่ถูกหักทั้งหมด",
+      "lookup": "ตรวจสอบผู้รับ",
+      "recipientIs": "ผู้รับ",
+      "confirm": "ยืนยันโอน {{total}}",
+      "success": "โอนสำเร็จ",
+      "minHint": "ขั้นต่ำ {{min}} Coin",
+      "disclaimer": "ผู้ดูแลไม่รับผิดชอบต่อความเสียหายทุกกรณีหากโอนผิด โปรดตรวจสอบผู้รับให้แน่ใจก่อนยืนยัน"
+    }
   },
   "vip": {
     "buyCoin": "จ่ายด้วย Coin",
@@ -834,6 +871,9 @@
     "listing_no_longer_active": "ประกาศนี้ไม่สามารถใช้งานได้แล้ว — อาจมีคนซื้อไปแล้ว",
     "cannot_buy_own_listing": "ไม่สามารถซื้อประกาศของตัวเองได้",
     "insufficient_funds": "Coin ไม่พอ",
+    "target_not_found": "ไม่พบผู้รับ",
+    "cannot_transfer_self": "ไม่สามารถโอนให้ตัวเองได้",
+    "amount_too_low": "จำนวนต่ำกว่าขั้นต่ำที่กำหนด",
     "not_listing_owner": "เฉพาะผู้ขายเท่านั้นที่แก้ไขประกาศนี้ได้",
     "vault_full": "คลังปลายทางเต็มแล้ว",
     "already_submitted": "คุณมีคำขอแก้ไขไอเทมนี้ที่รอตรวจอยู่แล้ว",

@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPage, Paginated } from '../../services/admin-coins.service';
+import { AdjustResult, AdminCoinsService, CoinUserRow, CoinUsersPage, HistoryRow, Paginated } from '../../services/admin-coins.service';
+
+const SOURCE_ICON: Record<string, string> = {
+  shop: 'shopping_cart',
+  p2p: 'swap_horiz',
+  admin: 'shield',
+  tax: 'percent',
+  transfer: 'send',
+};
 
 @Component({
   selector: 'app-admin-coins',
@@ -122,17 +130,29 @@ import { AdjustResult, AdminCoinsService, ActivityRow, CoinUserRow, CoinUsersPag
           <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ showHistory.steam_id }}</p>
           <div style="max-height:360px;overflow-y:auto">
             <p *ngIf="historyPage && historyPage.items.length === 0" class="muted" style="text-align:center;padding:32px 0">{{ 'adminCoins.noHistory' | translate }}</p>
-            <ul *ngIf="historyPage" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
-              <li *ngFor="let h of historyPage.items" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:8px 0;font-size:13px">
-                <span>
-                  <span class="mono" style="font-size:11px">{{ h.kind }}</span>
-                  <span class="faint mono" style="font-size:11px;margin-left:8px">{{ h.at | date:'short' }}</span>
+            <div *ngIf="historyPage">
+              <div *ngFor="let h of historyPage.items" class="activity-row">
+                <div class="ico"
+                     [class.rose]="h.direction === 'out'"
+                     [class.emerald]="h.direction === 'in'">
+                  <span class="mi sm">{{ iconFor(h.source) }}</span>
+                </div>
+                <div class="grow" style="min-width:0;">
+                  <div class="a-name">{{ ('coins.history.label.' + h.label) | translate }}</div>
+                  <div class="a-src" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+                    <span class="badge">{{ ('coins.history.source.' + h.source) | translate }}</span>
+                    <span *ngIf="h.item_name" class="faint" style="font-size:12px;">{{ h.item_name }}<span *ngIf="h.amount"> × {{ h.amount }}</span></span>
+                    <span *ngIf="h.counterparty" class="faint mono" style="font-size:11px;">{{ h.counterparty }}</span>
+                    <span class="faint mono" style="font-size:11px;">{{ h.at | date:'short' }}</span>
+                  </div>
+                </div>
+                <span class="a-amount" [class.down]="h.coins < 0"
+                      [style.color]="h.coins >= 0 ? 'var(--emerald)' : 'var(--rose)'">
+                  {{ h.coins >= 0 ? '+' : '−' }}{{ absCoins(h.coins) | number }}
+                  <img class="coin-img" src="assets/coins/coin.png" alt="">
                 </span>
-                <span class="mono" [style.color]="h.coins > 0 ? 'var(--emerald)' : (h.coins < 0 ? 'var(--rose)' : null)">
-                  {{ h.coins > 0 ? '+' : '' }}{{ h.coins | number }}
-                </span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
           <app-pager *ngIf="historyPage && showHistory"
             [page]="historyPage.page" [pages]="historyPage.pages"
@@ -158,9 +178,12 @@ export class AdminCoinsComponent implements OnInit {
   error: string | null = null;
 
   showHistory: CoinUserRow | null = null;
-  historyPage: Paginated<ActivityRow> | null = null;
+  historyPage: Paginated<HistoryRow> | null = null;
 
   constructor(private svc: AdminCoinsService, private t: TranslateService) {}
+
+  iconFor(source: string): string { return SOURCE_ICON[source] || 'paid'; }
+  absCoins(n: number): number { return Math.abs(n); }
 
   ngOnInit() { this.load(1, 20); }
 
@@ -209,6 +232,6 @@ export class AdminCoinsComponent implements OnInit {
   }
 
   loadHistory(steamId: string, page: number, limit: number) {
-    this.svc.history(steamId, page, limit).subscribe(p => this.historyPage = p);
+    this.svc.historyAll(steamId, page, limit).subscribe(p => this.historyPage = p);
   }
 }

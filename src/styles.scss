@@ -359,6 +359,16 @@ app-header {
   height: 20px;
 }
 
+/* Scrollable reward list inside admin modals (codes / donate tiers) so that
+   many rewards don't push the modal's buttons past the bottom of the screen. */
+.reward-scroll {
+  max-height: 42vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  margin-right: -6px;
+}
+
 /* ===== Floating decorative mascots =====
    Cosmetic only: fixed to the viewport, click-through, gently bobbing.
    Tweak left/bottom/width per mascot to reposition. */

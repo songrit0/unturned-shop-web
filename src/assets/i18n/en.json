@@ -296,7 +296,44 @@
     "needLink": "Steam not linked",
     "marketHistory": "Market history",
     "rewardLog": "Reward Log",
-    "empty": "No items"
+    "empty": "No items",
+    "history": {
+      "title": "Coin history",
+      "empty": "No transactions yet",
+      "source": {
+        "shop": "Shop",
+        "p2p": "P2P",
+        "admin": "Admin",
+        "tax": "Tax",
+        "transfer": "Transfer"
+      },
+      "label": {
+        "buy": "Bought item",
+        "sell": "Sold item",
+        "p2p_buy": "P2P purchase",
+        "p2p_sell": "P2P sale",
+        "admin_grant": "Admin grant",
+        "admin_take": "Admin deduction",
+        "tax": "Transfer tax",
+        "transfer_in": "Coin received",
+        "transfer_out": "Coin sent"
+      }
+    },
+    "transfer": {
+      "title": "Transfer Coin",
+      "bySteam": "Steam ID",
+      "byDiscord": "Discord ID",
+      "targetPlaceholder": "Enter recipient ID",
+      "amount": "Amount",
+      "fee": "Transfer fee",
+      "total": "Total deducted",
+      "lookup": "Check recipient",
+      "recipientIs": "Recipient",
+      "confirm": "Confirm transfer {{total}}",
+      "success": "Transfer complete",
+      "minHint": "Minimum {{min}} Coin",
+      "disclaimer": "Admins are not responsible for any loss if you transfer to the wrong person. Please double-check the recipient before confirming."
+    }
   },
   "vip": {
     "buyCoin": "Pay with Coin",
@@ -802,6 +839,9 @@
     "listing_no_longer_active": "This listing is no longer available — someone may have already bought it.",
     "cannot_buy_own_listing": "You can't buy your own listing.",
     "insufficient_funds": "You don't have enough coins.",
+    "target_not_found": "Recipient not found.",
+    "cannot_transfer_self": "You can't transfer to yourself.",
+    "amount_too_low": "The amount is below the minimum.",
     "not_listing_owner": "Only the seller can change this listing.",
     "vault_full": "The destination vault is full.",
     "already_submitted": "You already have a pending submission for this item.",

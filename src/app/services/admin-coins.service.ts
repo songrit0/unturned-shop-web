@@ -5,8 +5,10 @@ import { map } from 'rxjs/operators';
 import { ApiUrlService } from './api-url.service';
 import { Paginated } from '../models/paginated';
 import { buildPagedParams, normalizePaginated } from './paged-http';
+import { HistoryRow } from './coins.service';
 
 export { Paginated };
+export { HistoryRow };
 
 export interface CoinUserRow {
   steam_id: string;
@@ -36,5 +38,11 @@ export class AdminCoinsService {
     const params = buildPagedParams(page, limit);
     return this.http.get<unknown>(`${this.apiUrl.get()}/admin/coins/${steamId}/history`, { params })
       .pipe(map(r => normalizePaginated<ActivityRow>(r, limit)));
+  }
+
+  historyAll(steamId: string, page = 1, limit = 20): Observable<Paginated<HistoryRow>> {
+    const params = buildPagedParams(page, limit);
+    return this.http.get<unknown>(`${this.apiUrl.get()}/admin/coins/${steamId}/history/all`, { params })
+      .pipe(map(r => normalizePaginated<HistoryRow>(r, limit)));
   }
 }
