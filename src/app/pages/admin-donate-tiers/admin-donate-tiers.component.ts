@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   AdminDonateReward,
   AdminDonateService,
@@ -30,12 +32,18 @@ interface RewardRow {
         <div class="h-icon rose"><span class="mi lg">military_tech</span></div>
         <h1>{{ 'adminDonate.title' | translate }}</h1>
         <span class="badge rose"><span class="mi sm">shield</span>ADMIN</span>
-        <div class="page-actions">
+        <div class="page-actions row gap-2">
+          <button (click)="exportTiers()" class="btn ghost sm"><span class="mi sm">download</span> {{ 'adminDonate.export' | translate }}</button>
+          <button (click)="fileInput.click()" [disabled]="importing" class="btn ghost sm"><span class="mi sm">upload</span> {{ 'adminDonate.import' | translate }}</button>
+          <input #fileInput type="file" accept="application/json,.json" (change)="onImportFile($event)" hidden>
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminDonate.create' | translate }}
           </button>
         </div>
       </div>
+
+      <p *ngIf="importMsg" class="muted" style="font-size:13px;margin:0 0 8px 0">{{ importMsg }}</p>
+      <p *ngIf="importError" style="color:var(--rose);font-size:13px;margin:0 0 8px 0">{{ importError }}</p>
 
       <ng-container *ngIf="!loading; else loadingTpl">
         <div class="col gap-3">
@@ -210,6 +218,10 @@ export class AdminDonateTiersComponent implements OnInit {
   deletingBusy = false;
   deleteError: string | null = null;
 
+  importing = false;
+  importMsg: string | null = null;
+  importError: string | null = null;
+
   constructor(
     private svc: AdminDonateService,
     private t: TranslateService,
@@ -224,6 +236,73 @@ export class AdminDonateTiersComponent implements OnInit {
     this.svc.listTiers().subscribe({
       next: list => { this.tiers = (list || []).slice().sort((a, b) => a.sort - b.sort || a.threshold_baht - b.threshold_baht); this.loading = false; },
       error: () => { this.loading = false; },
+    });
+  }
+
+  // ---- Export / Import ----
+  exportTiers() {
+    const rows = this.tiers.map(t => ({
+      threshold_baht: t.threshold_baht,
+      name: t.name,
+      enabled: t.enabled,
+      sort: t.sort,
+      rewards: (t.rewards || []).map(r => ({ kind: r.kind, item_id: r.item_id, amount: r.amount, quality: r.quality })),
+    }));
+    const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'donation-tiers.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  onImportFile(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    this.importMsg = null;
+    this.importError = null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        if (!Array.isArray(data)) throw new Error('not an array');
+        this.runImport(data);
+      } catch {
+        this.importError = this.t.instant('adminDonate.errors.importBadFile');
+      }
+      input.value = '';
+    };
+    reader.onerror = () => { this.importError = this.t.instant('adminDonate.errors.importBadFile'); input.value = ''; };
+    reader.readAsText(file);
+  }
+
+  private runImport(rows: any[]) {
+    const payloads: AdminDonateTierPayload[] = rows.map(r => ({
+      threshold_baht: Math.max(1, Number(r?.threshold_baht) || 1),
+      name: String(r?.name || '').trim(),
+      enabled: r?.enabled !== false,
+      sort: Math.max(0, Number(r?.sort) || 0),
+      rewards: (Array.isArray(r?.rewards) ? r.rewards : []).map((x: any) => ({
+        kind: x?.kind === 'vehicle' ? 'vehicle' : 'item',
+        item_id: Number(x?.item_id),
+        amount: Math.max(1, Number(x?.amount) || 1),
+        quality: x?.kind === 'vehicle' ? 0 : Math.min(100, Math.max(0, Number(x?.quality) || 0)),
+      })).filter((x: AdminDonateReward) => x.item_id > 0),
+    })).filter(p => p.name && p.rewards.length > 0);
+
+    if (payloads.length === 0) {
+      this.importError = this.t.instant('adminDonate.errors.importEmpty');
+      return;
+    }
+
+    this.importing = true;
+    forkJoin(payloads.map(p => this.svc.createTier(p).pipe(catchError(() => of(null))))).subscribe(results => {
+      const ok = results.filter(Boolean).length;
+      this.importing = false;
+      this.importMsg = this.t.instant('adminDonate.importResult', { ok, total: payloads.length });
+      this.reload();
     });
   }
 
@@ -310,8 +389,17 @@ export class AdminDonateTiersComponent implements OnInit {
     r.pickerResults = [];
   }
 
+  /** A row's effective id: a picked search result, or a directly typed numeric id. */
+  private rowItemId(r: RewardRow): number | null {
+    if (r.id != null) return r.id;
+    const q = (r.pickerQ || '').trim();
+    return /^\d+$/.test(q) ? Number(q) : null;
+  }
+
   save() {
-    const filled = this.rewards.filter(r => r.id != null);
+    const filled = this.rewards
+      .map(r => ({ r, id: this.rowItemId(r) }))
+      .filter((x): x is { r: RewardRow; id: number } => x.id != null);
     if (filled.length === 0) {
       this.error = this.t.instant('adminDonate.errors.noRewards');
       return;
@@ -320,9 +408,9 @@ export class AdminDonateTiersComponent implements OnInit {
       this.error = this.t.instant('adminDonate.errors.noName');
       return;
     }
-    const rewards: AdminDonateReward[] = filled.map(r => ({
+    const rewards: AdminDonateReward[] = filled.map(({ r, id }) => ({
       kind: r.type,
-      item_id: Number(r.id),
+      item_id: id,
       amount: Math.max(1, Number(r.amount) || 1),
       quality: r.type === 'item' ? Math.min(100, Math.max(0, Number(r.quality) || 0)) : 0,
     }));

@@ -375,16 +375,25 @@ export class AdminCodesComponent implements OnInit, OnDestroy {
     r.pickerResults = [];
   }
 
+  /** A row's effective id: a picked search result, or a directly typed numeric id. */
+  private rowItemId(r: RewardRow): number | null {
+    if (r.id != null) return r.id;
+    const q = (r.pickerQ || '').trim();
+    return /^\d+$/.test(q) ? Number(q) : null;
+  }
+
   save() {
-    const filled = this.rewards.filter(r => r.id != null);
+    const filled = this.rewards
+      .map(r => ({ r, id: this.rowItemId(r) }))
+      .filter((x): x is { r: RewardRow; id: number } => x.id != null);
     if (filled.length === 0) {
       this.error = this.t.instant('adminCodes.errors.noRewards');
       return;
     }
-    const rewards: CodeRewardPayload[] = filled.map(r => {
+    const rewards: CodeRewardPayload[] = filled.map(({ r, id }) => {
       const reward: CodeRewardPayload = {
         kind: r.type,
-        id: Number(r.id),
+        id,
         amount: Math.max(1, Number(r.amount) || 1),
       };
       if (r.type === 'item') reward.quality = Math.min(100, Math.max(0, Number(r.quality) || 0));

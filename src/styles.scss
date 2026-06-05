@@ -1709,10 +1709,6 @@ table.tbl tbody tr.clickable {
   align-items: center;
   gap: 4px;
   margin-left: 4px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--surface-3);
-  border: 1px solid var(--border);
 }
 
 .basket-line-bottom {
@@ -1724,8 +1720,19 @@ table.tbl tbody tr.clickable {
 }
 
 .basket-line-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
   font-weight: 700;
   font-size: 14px;
+  text-align: right;
+}
+
+.basket-sub-meow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted, var(--text-faint));
 }
 
 .basket-line-max {
@@ -1750,6 +1757,9 @@ table.tbl tbody tr.clickable {
   background: transparent;
   border: none;
   color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;

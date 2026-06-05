@@ -406,6 +406,9 @@
     "on": "Enabled",
     "off": "Disabled",
     "rewardsCount": "rewards",
+    "export": "Export",
+    "import": "Import",
+    "importResult": "Imported {{ok}}/{{total}} tier(s)",
     "form": {
       "threshold": "Threshold (baht)",
       "sort": "Sort",
@@ -416,8 +419,8 @@
       "addReward": "Add reward",
       "item": "Item",
       "vehicle": "Vehicle",
-      "pickItem": "Search item id / name...",
-      "pickVehicle": "Search vehicle id / name...",
+      "pickItem": "Type an item id, or search by name...",
+      "pickVehicle": "Type a vehicle id, or search by name...",
       "amount": "Amount",
       "quality": "Quality"
     },
@@ -425,7 +428,9 @@
       "noRewards": "Add at least one reward.",
       "noName": "Enter a tier name.",
       "saveFail": "Couldn't save the tier. Please try again.",
-      "deleteFail": "Couldn't delete the tier. Please try again."
+      "deleteFail": "Couldn't delete the tier. Please try again.",
+      "importBadFile": "Could not read the file — expected a JSON array of tiers.",
+      "importEmpty": "No valid tiers found in the file."
     }
   },
   "codes": {

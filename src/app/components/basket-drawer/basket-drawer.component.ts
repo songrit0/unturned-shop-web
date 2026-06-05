@@ -45,11 +45,16 @@ import { TopupService } from '../../services/topup.service';
               </div>
               <div class="basket-line-bottom">
                 <div class="qty-stepper">
-                  <button (click)="dec(it)" [disabled]="it.qty <= 1"><span class="mi sm">remove</span></button>
+                  <button (click)="dec(it)" [disabled]="it.qty <= 1">−</button>
                   <span>{{ it.qty }}</span>
-                  <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail"><span class="mi sm">add</span></button>
+                  <button (click)="inc(it)" [disabled]="it.qty >= it.amount_avail">+</button>
                 </div>
-                <div class="basket-line-sub coin-amt">{{ it.price * it.qty | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></div>
+                <div class="basket-line-sub">
+                  <span class="coin-amt">{{ it.price * it.qty | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></span>
+                  <span *ngIf="it.meowcoin_price != null" class="coin-amt basket-sub-meow">
+                    {{ it.meowcoin_price * it.qty | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                  </span>
+                </div>
               </div>
               <div *ngIf="it.qty >= it.amount_avail" class="basket-line-max muted text-xs">
                 {{ 'basket.maxStock' | translate:{ n: it.amount_avail } }}
