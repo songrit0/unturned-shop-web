@@ -16,6 +16,10 @@ import { AuthService } from './services/auth.service';
         <main class="app-main">
           <router-outlet></router-outlet>
         </main>
+
+        <!-- Floating decorative mascots (purely cosmetic, click-through) -->
+        <img class="float-mascot coin" src="assets/coins/coin.png" alt="" aria-hidden="true">
+        <img class="float-mascot meow" src="assets/coins/meowcoin.png" alt="" aria-hidden="true">
       </div>
       <app-basket-drawer></app-basket-drawer>
     </ng-template>

@@ -359,6 +359,46 @@ app-header {
   height: 20px;
 }
 
+/* ===== Floating decorative mascots =====
+   Cosmetic only: fixed to the viewport, click-through, gently bobbing.
+   Tweak left/bottom/width per mascot to reposition. */
+.float-mascot {
+  position: fixed;
+  z-index: 5;
+  pointer-events: none;
+  user-select: none;
+  object-fit: contain;
+  opacity: 0.9;
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.25));
+  animation: mascot-bob 4s ease-in-out infinite;
+}
+
+/* In-game Coin mascot — big, in the very bottom-left corner. */
+.float-mascot.coin {
+  left: 24px;
+  bottom: 16px;
+  width: 120px;
+  animation-delay: 0s;
+}
+
+/* Meowcoin mascot (portrait cat) — slightly higher and to the right. */
+.float-mascot.meow {
+  left: 150px;
+  bottom: 80px;
+  width: 70px;
+  animation-delay: 1.2s;
+}
+
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+
+@media (max-width: 900px) {
+  /* Avoid clutter on narrow screens. */
+  .float-mascot { display: none; }
+}
+
 .coin-pill .coin-amount {
   font-family: var(--font-mono);
   font-weight: 700;
