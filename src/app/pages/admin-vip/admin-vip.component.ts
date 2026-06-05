@@ -279,9 +279,18 @@ export class AdminVipComponent implements OnInit {
     if (!this.editingPkg) return;
     this.saving = true;
     const id = (this.editingPkg as VipPackage).id;
+    // Coerce numeric fields — number inputs can hold strings when populated from the API.
+    const mc = this.pkgForm.price_meowcoins;
+    const body: VipPackageInput = {
+      ...this.pkgForm,
+      days: Number(this.pkgForm.days),
+      price_coins: Number(this.pkgForm.price_coins) || 0,
+      price_meowcoins: mc === null || mc === undefined || (mc as any) === '' ? null : Number(mc),
+      sort: this.pkgForm.sort === undefined || (this.pkgForm.sort as any) === '' ? 0 : Number(this.pkgForm.sort),
+    };
     const obs = id
-      ? this.svc.updatePackage(id, this.pkgForm)
-      : this.svc.createPackage(this.pkgForm);
+      ? this.svc.updatePackage(id, body)
+      : this.svc.createPackage(body);
     obs.subscribe({
       next: () => { this.saving = false; this.editingPkg = null; this.loadPackages(); },
       error: e => { this.saving = false; this.error = e?.error?.message || 'บันทึกไม่สำเร็จ'; },
