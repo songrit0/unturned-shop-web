@@ -412,6 +412,8 @@
   "donate": {
     "communityTitle": "ระดมทุนค่าเซิร์ฟเวอร์เดือนนี้",
     "battlepassTitle": "Battlepass การโดเนต",
+    "collapse": "ย่อ",
+    "expand": "ขยาย",
     "userDonated": "คุณโดเนตเดือนนี้ {{donated}}/{{cap}} บาท",
     "remainingHint": "เหลือโควตาเดือนนี้อีก {{remaining}} บาท",
     "capReached": "ถึงลิมิตการโดเนตเดือนนี้แล้ว",

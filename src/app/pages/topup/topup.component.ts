@@ -49,8 +49,13 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
 
       <!-- ==== Battlepass tier track (top) ==== -->
       <div *ngIf="progress && progress.tiers.length > 0" class="card flush" style="margin-bottom:16px">
-        <div class="card-title" style="padding:16px 18px 0"><span class="mi">military_tech</span>{{ 'donate.battlepassTitle' | translate }}</div>
-        <div class="tier-track">
+        <button type="button" class="bp-toggle" (click)="toggleBattlepass()"
+                [attr.aria-expanded]="!battlepassCollapsed"
+                [title]="(battlepassCollapsed ? 'donate.expand' : 'donate.collapse') | translate">
+          <span class="card-title" style="margin:0"><span class="mi">military_tech</span>{{ 'donate.battlepassTitle' | translate }}</span>
+          <span class="mi bp-chevron" [class.collapsed]="battlepassCollapsed">expand_more</span>
+        </button>
+        <div class="tier-track" *ngIf="!battlepassCollapsed">
           <div *ngFor="let tier of progress.tiers" class="tier"
                [class.locked]="!tier.unlocked" [class.claimed]="tier.claimed">
             <div class="tier-head">
@@ -372,6 +377,12 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
     .cap-note { display:flex; align-items:center; gap:6px; margin-top:12px; padding:10px 12px; font-size:13px; font-weight:600;
       color:var(--amber); background:rgb(245 158 11 / 0.10); border:1px solid rgb(245 158 11 / 0.3); border-radius:8px; }
 
+    /* Battlepass collapse toggle */
+    .bp-toggle { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%;
+      padding:16px 18px; background:none; border:0; cursor:pointer; color:var(--text); text-align:left; }
+    .bp-chevron { color:var(--muted); transition:transform .2s ease; }
+    .bp-chevron.collapsed { transform:rotate(-90deg); }
+
     /* Battlepass tier track */
     .tier-track { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; padding:16px 18px 18px; }
     .tier { background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px; }
@@ -416,6 +427,8 @@ export class TopupComponent implements OnInit, OnDestroy {
 
   // ---- Donate / battlepass state ----
   progress: DonateProgress | null = null;
+  // Collapsed state for the battlepass tier track; persisted across reloads.
+  battlepassCollapsed = localStorage.getItem('donate.battlepassCollapsed') === '1';
   maxBaht = 100000;                         // from config (max single donation)
   claimingTierId: number | null = null;
   claimError: string | null = null;
@@ -660,6 +673,11 @@ export class TopupComponent implements OnInit, OnDestroy {
   }
 
   // ---- Donate progress + battlepass ----
+  toggleBattlepass() {
+    this.battlepassCollapsed = !this.battlepassCollapsed;
+    localStorage.setItem('donate.battlepassCollapsed', this.battlepassCollapsed ? '1' : '0');
+  }
+
   get communityPct(): number {
     if (!this.progress || this.progress.community_goal <= 0) return 0;
     return Math.min(100, (this.progress.community_total / this.progress.community_goal) * 100);

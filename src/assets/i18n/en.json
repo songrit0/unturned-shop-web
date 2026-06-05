@@ -412,6 +412,8 @@
   "donate": {
     "communityTitle": "Server fundraising this month",
     "battlepassTitle": "Donation battlepass",
+    "collapse": "Collapse",
+    "expand": "Expand",
     "userDonated": "You've donated {{donated}}/{{cap}} baht this month",
     "remainingHint": "{{remaining}} baht remaining of your monthly cap.",
     "capReached": "You've reached this month's donation limit.",
