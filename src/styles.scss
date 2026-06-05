@@ -375,28 +375,38 @@ app-header {
 
 /* In-game Coin mascot — big, in the very bottom-left corner. */
 .float-mascot.coin {
-  left: 24px;
-  bottom: 16px;
+  left: 173px;
+  bottom: -10px;
   width: 120px;
   animation-delay: 0s;
 }
 
 /* Meowcoin mascot (portrait cat) — slightly higher and to the right. */
 .float-mascot.meow {
-  left: 150px;
-  bottom: 80px;
+  left: 204px;
+  bottom: 118px;
   width: 70px;
   animation-delay: 1.2s;
 }
 
 @keyframes mascot-bob {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50%      { transform: translateY(-10px) rotate(2deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
 }
 
 @media (max-width: 900px) {
+
   /* Avoid clutter on narrow screens. */
-  .float-mascot { display: none; }
+  .float-mascot {
+    display: none;
+  }
 }
 
 .coin-pill .coin-amount {
