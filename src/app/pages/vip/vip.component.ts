@@ -83,7 +83,7 @@ import { TopupService } from '../../services/topup.service';
 })
 export class VipComponent implements OnInit {
   /** Temporary: show a "VIP under maintenance" notice on the user page. Set to false to reopen. */
-  maintenance = true;
+  maintenance = false;
   loading = true;
   packages: VipPackage[] = [];
   mine: VipMine | null = null;
