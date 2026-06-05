@@ -36,6 +36,10 @@ interface FormState {
             <span class="mi sm">upload</span> {{ 'adminMarket.import' | translate }}
           </button>
           <input #fileInput type="file" accept="application/json,.json" hidden (change)="onImportFile($event)">
+          <button (click)="toggleShowAll()" class="btn ghost" [class.primary]="showAll" [title]="'adminMarket.showAllHint' | translate">
+            <span class="mi sm">{{ showAll ? 'unfold_less' : 'unfold_more' }}</span>
+            {{ (showAll ? 'adminMarket.showPaged' : 'adminMarket.showAll') | translate }}
+          </button>
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminMarket.add' | translate }}
           </button>
@@ -152,11 +156,15 @@ interface FormState {
           </div>
         </div>
 
-        <app-pager *ngIf="page"
+        <app-pager *ngIf="page && !showAll"
           [page]="page.page" [pages]="page.pages"
           [total]="page.total" [limit]="page.limit"
           (pageChange)="goPage($event, page.limit)"
           (limitChange)="goPage(1, $event)"></app-pager>
+
+        <div *ngIf="showAll" class="muted" style="text-align:center;padding:12px;font-size:13px">
+          {{ 'adminMarket.showingAll' | translate:{ n: items.length } }}
+        </div>
       </ng-container>
       <ng-template #loadingTpl>
         <div style="text-align:center;padding:48px 0"><div class="spinner"></div></div>
@@ -343,6 +351,10 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   pageNum = 1;
   pageLimit = 20;
   q = '';
+  showAll = false;
+
+  /** Limit used when "Show all" is active — big enough to pull the whole catalog in one page. */
+  private static readonly ALL_LIMIT = 100000;
 
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -387,10 +399,17 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() { this.searchSub?.unsubscribe(); }
 
+  toggleShowAll() {
+    this.showAll = !this.showAll;
+    this.pageNum = 1;
+    this.reload();
+  }
+
   reload() {
     this.loading = true;
     this.clearSelection();
-    this.svc.list(this.pageNum, this.pageLimit).subscribe({
+    const limit = this.showAll ? AdminMarketComponent.ALL_LIMIT : this.pageLimit;
+    this.svc.list(this.pageNum, limit).subscribe({
       next: p => { this.page = p; this.items = this.applyClientFilter(p.items); this.loading = false; },
       error: () => { this.loading = false; },
     });
