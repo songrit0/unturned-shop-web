@@ -177,18 +177,41 @@ interface InfoCard {
         </section>
 
         <div class="landing-grid">
-          <!-- Donation total -->
-          <section class="card donate-card">
-            <div class="card-head">
-              <span class="mi" style="color:var(--amber)">volunteer_activism</span>
-              <span class="fw-7">{{ 'landing.donateTitle' | translate }}</span>
-            </div>
-            <div class="donate-amount">
-              {{ (donate?.communityTotal ?? 0) | number }} <span class="muted">/ {{ (donate?.communityGoal ?? 0) | number }} ฿</span>
-            </div>
-            <div class="donate-bar"><div class="donate-fill" [style.width.%]="donatePct"></div></div>
-            <p class="muted text-xs" style="margin-top:6px;">{{ 'landing.donateThisMonth' | translate }} · {{ donate?.period }}</p>
-          </section>
+          <!-- Left column: donations + latest P2P market, stacked to balance the tall leaderboard -->
+          <div class="landing-col">
+            <!-- Donation total -->
+            <section class="card donate-card">
+              <div class="card-head">
+                <span class="mi" style="color:var(--amber)">volunteer_activism</span>
+                <span class="fw-7">{{ 'landing.donateTitle' | translate }}</span>
+              </div>
+              <div class="donate-amount">
+                {{ (donate?.communityTotal ?? 0) | number }} <span class="muted">/ {{ (donate?.communityGoal ?? 0) | number }} ฿</span>
+              </div>
+              <div class="donate-bar"><div class="donate-fill" [style.width.%]="donatePct"></div></div>
+              <p class="muted text-xs" style="margin-top:6px;">{{ 'landing.donateThisMonth' | translate }} · {{ donate?.period }}</p>
+            </section>
+
+            <!-- Latest P2P market -->
+            <section class="card market-card">
+              <div class="card-head">
+                <span class="mi" style="color:var(--violet, #a78bfa)">storefront</span>
+                <span class="fw-7">{{ 'landing.latestMarket' | translate }}</span>
+              </div>
+              <div *ngIf="loading" class="card-empty"><span class="spinner"></span></div>
+              <div *ngIf="!loading && p2pLatest.length === 0" class="card-empty muted text-sm">{{ 'landing.noListings' | translate }}</div>
+              <div class="market-grid" *ngIf="p2pLatest.length">
+                <div class="market-mini" *ngFor="let l of p2pLatest">
+                  <div class="market-thumb">
+                    <img *ngIf="l.imageUrl; else noImg" [src]="l.imageUrl" alt="">
+                    <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+                  </div>
+                  <div class="market-name">{{ l.itemName || ('#' + l.itemId) }}</div>
+                  <div class="market-price mono">{{ l.price | number }} <span class="muted">coins</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
 
           <!-- Top players -->
           <section class="card top-card">
@@ -208,26 +231,6 @@ interface InfoCard {
             </ol>
           </section>
         </div>
-
-        <!-- Latest P2P market -->
-        <section class="card market-card">
-          <div class="card-head">
-            <span class="mi" style="color:var(--violet, #a78bfa)">storefront</span>
-            <span class="fw-7">{{ 'landing.latestMarket' | translate }}</span>
-          </div>
-          <div *ngIf="loading" class="card-empty"><span class="spinner"></span></div>
-          <div *ngIf="!loading && p2pLatest.length === 0" class="card-empty muted text-sm">{{ 'landing.noListings' | translate }}</div>
-          <div class="market-grid" *ngIf="p2pLatest.length">
-            <div class="market-mini" *ngFor="let l of p2pLatest">
-              <div class="market-thumb">
-                <img *ngIf="l.imageUrl; else noImg" [src]="l.imageUrl" alt="">
-                <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
-              </div>
-              <div class="market-name">{{ l.itemName || ('#' + l.itemId) }}</div>
-              <div class="market-price mono">{{ l.price | number }} <span class="muted">coins</span></div>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
 
@@ -339,7 +342,8 @@ interface InfoCard {
     .srv-stat-val.sm { font-size: 13px; }
     .srv-stat-lbl { font-size: 11px; color: var(--muted); }
 
-    .landing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .landing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    .landing-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
     @media (max-width: 640px) { .landing-grid { grid-template-columns: 1fr; } }
 
     /* Donate */
