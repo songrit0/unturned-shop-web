@@ -353,8 +353,8 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   q = '';
   showAll = false;
 
-  /** Limit used when "Show all" is active — big enough to pull the whole catalog in one page. */
-  private static readonly ALL_LIMIT = 100000;
+  /** Backend caps the page size at 100, so "Show all" fetches every page at this size and concatenates. */
+  private static readonly MAX_PAGE = 100;
 
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -408,9 +408,37 @@ export class AdminMarketComponent implements OnInit, OnDestroy {
   reload() {
     this.loading = true;
     this.clearSelection();
-    const limit = this.showAll ? AdminMarketComponent.ALL_LIMIT : this.pageLimit;
-    this.svc.list(this.pageNum, limit).subscribe({
+    if (this.showAll) { this.loadAll(); return; }
+    this.svc.list(this.pageNum, this.pageLimit).subscribe({
       next: p => { this.page = p; this.items = this.applyClientFilter(p.items); this.loading = false; },
+      error: () => { this.loading = false; },
+    });
+  }
+
+  /** Fetch every page (backend caps each at MAX_PAGE) and concatenate into one list. */
+  private loadAll() {
+    const size = AdminMarketComponent.MAX_PAGE;
+    this.svc.list(1, size).subscribe({
+      next: first => {
+        const pages = Math.max(1, first.pages);
+        if (pages <= 1) {
+          this.page = first;
+          this.items = this.applyClientFilter(first.items);
+          this.loading = false;
+          return;
+        }
+        const rest = [];
+        for (let p = 2; p <= pages; p++) rest.push(this.svc.list(p, size));
+        forkJoin(rest).subscribe({
+          next: others => {
+            const all = first.items.concat(...others.map(o => o.items));
+            this.page = { ...first, items: all, page: 1, limit: all.length, pages: 1 };
+            this.items = this.applyClientFilter(all);
+            this.loading = false;
+          },
+          error: () => { this.loading = false; },
+        });
+      },
       error: () => { this.loading = false; },
     });
   }
