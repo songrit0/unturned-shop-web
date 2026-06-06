@@ -330,7 +330,8 @@ interface InfoCard {
     .srv-pill.on .dot { background: var(--emerald); box-shadow: 0 0 0 3px color-mix(in srgb, var(--emerald) 30%, transparent); }
     .srv-pill.off { color: var(--rose); background: color-mix(in srgb, var(--rose) 14%, transparent); }
     .srv-pill.off .dot { background: var(--rose); }
-    .srv-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 18px; }
+    .srv-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    @media (max-width: 520px) { .srv-stats { grid-template-columns: 1fr; } }
     .srv-stat { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; background: var(--surface-2); }
     .srv-stat-icon { width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto;
       display: flex; align-items: center; justify-content: center; background: var(--surface); color: var(--accent); }
@@ -388,8 +389,10 @@ interface InfoCard {
     .cmdref-section { width: 100%; max-width: 900px; margin: 40px auto 0; }
     .cmdref-head { text-align: center; margin-bottom: 20px; }
     .cmdref-head h2 { font-size: 20px; font-weight: 700; }
-    .cmdref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-    .cmdref-card { padding: 18px; }
+    /* Masonry-style packing so short cards (Kits, ToolCupboard) don't leave gaps next to tall ones (MoreHomes). */
+    .cmdref-grid { columns: 2; column-gap: 16px; }
+    @media (max-width: 700px) { .cmdref-grid { columns: 1; } }
+    .cmdref-card { padding: 18px; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 16px; width: 100%; }
     .cmdref-card-head { display: flex; align-items: center; gap: 10px; padding-bottom: 12px;
       margin-bottom: 12px; border-bottom: 1px solid var(--border); font-size: 15px; }
     .cmdref-icon { font-size: 20px; line-height: 1; }
@@ -534,7 +537,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private t: TranslateService,
     private pub: PublicService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Second login path: meowpow.shop/login?id=<SteamID64>. Only a 17-digit numeric id flips
