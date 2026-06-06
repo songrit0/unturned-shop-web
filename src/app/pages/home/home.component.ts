@@ -157,7 +157,7 @@ import { P2pListing } from '../../models/vault';
           <div class="tile-desc">{{ 'home.helpLink' | translate }}</div>
         </a>
       </div> -->
-
+<section class="hero">
       <div class="mt-6">
         <div class="tab-bar">
           <button class="tab-btn" [class.active]="statsTab === 'my'" (click)="statsTab = 'my'">
@@ -255,6 +255,7 @@ import { P2pListing } from '../../models/vault';
         </ng-container>
       </div>
 
+  </section>
       <div *ngIf="p2pListings.length > 0" class="mt-6">
         <h2 class="mb-3 row gap-2" style="justify-content:space-between">
           <span class="row gap-2"><span class="mi" style="color:var(--accent)">storefront</span>{{ 'home.p2pLatest' | translate }}</span>
