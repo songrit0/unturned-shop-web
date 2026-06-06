@@ -94,11 +94,23 @@ interface RankRow { rank: number; spins: number; }
             <span *ngIf="weightsMsg" class="text-emerald">· {{ weightsMsg }}</span>
           </p>
 
+          <!-- Bulk action bar -->
+          <div *ngIf="selected.size > 0" class="bulk-bar">
+            <span class="fw-7">{{ selected.size }} selected</span>
+            <button class="btn ghost sm" (click)="bulkEnable(true)" [disabled]="bulkBusy"><span class="mi sm">check_circle</span>Enable</button>
+            <button class="btn ghost sm" (click)="bulkEnable(false)" [disabled]="bulkBusy"><span class="mi sm">cancel</span>Disable</button>
+            <button class="btn ghost sm" (click)="bulkDelete()" [disabled]="bulkBusy" style="color:var(--rose)"><span class="mi sm">delete</span>Delete</button>
+            <button class="btn ghost sm" (click)="clearSel()">Clear</button>
+            <span *ngIf="bulkBusy" class="spinner sm"></span>
+          </div>
+
           <div class="prize-table">
             <div class="prize-row prize-head">
+              <span><input type="checkbox" [checked]="allSelected" [indeterminate]="someSelected" (change)="toggleAll($event)"></span>
               <span>Type</span><span>Prize</span><span>ref_id</span><span>Amount</span><span>Qual</span><span>Weight</span><span>Chance</span><span>On</span><span></span>
             </div>
-            <div class="prize-row" *ngFor="let p of prizes">
+            <div class="prize-row" *ngFor="let p of prizes" [class.sel]="selected.has(p.id)">
+              <span><input type="checkbox" [checked]="selected.has(p.id)" (change)="toggleSel(p.id)"></span>
               <span class="badge" [class]="badgeClass(p.type)">{{ p.type }}</span>
               <span class="prize-label">
                 <img *ngIf="p.image_url" [src]="p.image_url" class="prize-thumb" alt="">
@@ -188,8 +200,11 @@ interface RankRow { rank: number; spins: number; }
     .rank-rows { display:flex; flex-direction:column; gap:6px; }
     .rank-row { display:flex; align-items:center; gap:6px; }
     .prize-table { display:flex; flex-direction:column; }
-    .prize-row { display:grid; grid-template-columns:90px 1fr 70px 80px 56px 64px 64px 44px 88px; gap:8px; align-items:center;
+    .prize-row { display:grid; grid-template-columns:32px 90px 1fr 70px 80px 56px 64px 64px 44px 88px; gap:8px; align-items:center;
       padding:8px 6px; border-bottom:1px solid var(--border); font-size:13px; }
+    .prize-row.sel { background:color-mix(in srgb, var(--accent) 8%, transparent); }
+    .bulk-bar { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 12px;
+      border:1px solid var(--accent); border-radius:10px; background:color-mix(in srgb, var(--accent) 8%, var(--surface)); font-size:13px; }
     .prize-head { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:700; }
     .prize-label { display:flex; align-items:center; gap:6px; overflow:hidden; }
     .prize-thumb { width:24px; height:24px; object-fit:contain; border-radius:4px; background:var(--surface-2); }
@@ -228,7 +243,47 @@ export class AdminGachaComponent implements OnInit {
   importMsg: string | null = null;
   importError: string | null = null;
 
+  selected = new Set<number>();
+  bulkBusy = false;
+
   constructor(private gacha: GachaService) {}
+
+  // ---- bulk selection ----
+  get allSelected(): boolean {
+    return this.prizes.length > 0 && this.prizes.every(p => this.selected.has(p.id));
+  }
+  get someSelected(): boolean {
+    return this.selected.size > 0 && !this.allSelected;
+  }
+  toggleSel(id: number) {
+    if (this.selected.has(id)) this.selected.delete(id); else this.selected.add(id);
+  }
+  toggleAll(ev: Event) {
+    const on = (ev.target as HTMLInputElement).checked;
+    this.selected = on ? new Set(this.prizes.map(p => p.id)) : new Set();
+  }
+  clearSel() { this.selected = new Set(); }
+
+  private selectedPrizes(): GachaPrize[] {
+    return this.prizes.filter(p => this.selected.has(p.id));
+  }
+
+  bulkEnable(enabled: boolean) {
+    const targets = this.selectedPrizes().filter(p => p.enabled !== enabled);
+    if (targets.length === 0 || this.bulkBusy) { this.clearSel(); return; }
+    this.bulkBusy = true;
+    forkJoin(targets.map(p => this.gacha.updatePrize(p.id, { ...p, enabled }).pipe(catchError(() => of(null)))))
+      .subscribe(() => { this.bulkBusy = false; this.clearSel(); this.loadPrizes(); });
+  }
+
+  bulkDelete() {
+    const ids = [...this.selected];
+    if (ids.length === 0 || this.bulkBusy) return;
+    if (!confirm(`Delete ${ids.length} selected prize(s)?`)) return;
+    this.bulkBusy = true;
+    forkJoin(ids.map(id => this.gacha.deletePrize(id).pipe(catchError(() => of(null)))))
+      .subscribe(() => { this.bulkBusy = false; this.clearSel(); this.loadPrizes(); });
+  }
 
   // ---- export / import ----
   exportPrizes() {
