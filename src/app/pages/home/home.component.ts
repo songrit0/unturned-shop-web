@@ -83,7 +83,7 @@ import { P2pListing } from '../../models/vault';
         </div>
       </section>
 
-      <div class="tile-grid">
+      <!-- <div class="tile-grid">
         <a routerLink="/p2p-market" class="tile violet">
           <span class="mi arrow">arrow_outward</span>
           <div class="tile-icon"><span class="mi fill">handshake</span></div>
@@ -156,7 +156,7 @@ import { P2pListing } from '../../models/vault';
           <div class="tile-title">{{ 'nav.help' | translate }}</div>
           <div class="tile-desc">{{ 'home.helpLink' | translate }}</div>
         </a>
-      </div>
+      </div> -->
 
       <div class="mt-6">
         <div class="tab-bar">
@@ -335,7 +335,7 @@ export class HomeComponent implements OnInit {
     private p2p: P2pService,
     private playerStats: PlayerStatsService,
     private t: TranslateService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
