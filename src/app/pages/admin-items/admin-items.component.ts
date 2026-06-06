@@ -272,9 +272,26 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
     this.loadTypes();
   }
 
-  /** Load ALL types (big limit) so the category chips + dropdowns are complete. */
+  /** Load ALL types so the category chips + dropdowns are complete.
+   *  The API caps limit at 100, so page through and concatenate. */
   private loadTypes() {
-    this.typesSvc.list(1, 1000).subscribe({ next: p => this.types = p.items, error: () => { } });
+    const LIMIT = 100;
+    this.typesSvc.list(1, LIMIT).subscribe({
+      next: first => {
+        const pages = first.pages || Math.max(1, Math.ceil((first.total || 0) / LIMIT));
+        if (pages <= 1) { this.types = first.items; return; }
+        const rest = [];
+        for (let pg = 2; pg <= pages; pg++) {
+          rest.push(this.typesSvc.list(pg, LIMIT).pipe(catchError(() => of(null))));
+        }
+        forkJoin(rest).subscribe(results => {
+          let all = [...first.items];
+          results.forEach(r => { if (r) all = all.concat(r.items); });
+          this.types = all;
+        });
+      },
+      error: () => { },
+    });
   }
 
   ngOnDestroy() { this.searchSub?.unsubscribe(); }
