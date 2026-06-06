@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { GachaService, GachaPrize, GachaConfig, GachaPrizeType } from '../../services/gacha.service';
 
 interface RankRow { rank: number; spins: number; }
@@ -73,12 +74,18 @@ interface RankRow { rank: number; spins: number; }
           <div class="card-head row" style="justify-content:space-between">
             <span class="row gap-2"><span class="mi" style="color:var(--amber)">redeem</span><span class="fw-7">Prize pool ({{ prizes.length }})</span></span>
             <div class="row gap-2">
+              <button class="btn ghost sm" (click)="exportPrizes()" [disabled]="prizes.length === 0"><span class="mi sm">download</span>Export</button>
+              <button class="btn ghost sm" (click)="fileInput.click()" [disabled]="importing"><span class="mi sm">upload</span>Import</button>
+              <input #fileInput type="file" accept="application/json,.json" (change)="onImportFile($event)" hidden>
               <button class="btn secondary sm" (click)="saveWeights()" [disabled]="!weightsDirty || savingWeights">
                 <span *ngIf="savingWeights" class="spinner sm"></span><span class="mi sm">percent</span>Save chances
               </button>
               <button class="btn primary sm" (click)="openNew()"><span class="mi sm">add</span>Add prize</button>
             </div>
           </div>
+
+          <p *ngIf="importMsg" class="text-emerald text-xs" style="margin:0 0 6px">{{ importMsg }}</p>
+          <p *ngIf="importError" class="text-rose text-xs" style="margin:0 0 6px">{{ importError }}</p>
 
           <p class="muted text-xs" style="margin-bottom:10px">
             Edit the <b>Weight</b> column to tune drop chances. Chance = weight ÷ total.
@@ -217,7 +224,84 @@ export class AdminGachaComponent implements OnInit {
   savingWeights = false;
   weightsMsg = '';
 
+  importing = false;
+  importMsg: string | null = null;
+  importError: string | null = null;
+
   constructor(private gacha: GachaService) {}
+
+  // ---- export / import ----
+  exportPrizes() {
+    const rows = this.prizes.map(p => ({
+      type: p.type, ref_id: p.ref_id, amount: p.amount, quality: p.quality,
+      weight: p.weight, label: p.label, image_url: p.image_url, rarity: p.rarity,
+      enabled: p.enabled, sort: p.sort,
+    }));
+    const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gacha-prizes.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  onImportFile(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    this.importMsg = null;
+    this.importError = null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        if (!Array.isArray(data)) throw new Error('not an array');
+        this.runImport(data);
+      } catch {
+        this.importError = 'Invalid JSON file.';
+      }
+      input.value = '';
+    };
+    reader.onerror = () => { this.importError = 'Could not read file.'; input.value = ''; };
+    reader.readAsText(file);
+  }
+
+  private runImport(rows: any[]) {
+    const types: GachaPrizeType[] = ['coins', 'meowcoins', 'item', 'vehicle', 'vip'];
+    const payloads: Partial<GachaPrize>[] = rows.map(r => {
+      const type = types.includes(r?.type) ? r.type as GachaPrizeType : null;
+      if (!type) return null;
+      const needsRef = type === 'item' || type === 'vehicle' || type === 'vip';
+      const ref_id = r?.ref_id == null ? null : Number(r.ref_id);
+      if (needsRef && !(ref_id && ref_id > 0)) return null;
+      return {
+        type,
+        ref_id: needsRef ? ref_id : null,
+        amount: Math.max(0, Number(r?.amount) || 0),
+        quality: Math.min(100, Math.max(0, Number(r?.quality ?? 100))),
+        weight: Math.max(0, Number(r?.weight ?? 1)),
+        label: r?.label ? String(r.label) : null,
+        image_url: r?.image_url ? String(r.image_url) : null,
+        rarity: r?.rarity ? String(r.rarity) : null,
+        enabled: r?.enabled !== false,
+        sort: Math.max(0, Number(r?.sort) || 0),
+      } as Partial<GachaPrize>;
+    }).filter((p): p is Partial<GachaPrize> => p !== null);
+
+    if (payloads.length === 0) {
+      this.importError = 'No valid prizes found in the file.';
+      return;
+    }
+
+    this.importing = true;
+    forkJoin(payloads.map(p => this.gacha.createPrize(p).pipe(catchError(() => of(null))))).subscribe(results => {
+      const ok = results.filter(Boolean).length;
+      this.importing = false;
+      this.importMsg = `Imported ${ok}/${payloads.length} prizes.`;
+      this.loadPrizes();
+    });
+  }
 
   totalWeight(): number {
     return Math.round(this.prizes.filter(p => p.enabled).reduce((s, p) => s + (Number(p.weight) || 0), 0) * 10) / 10;
