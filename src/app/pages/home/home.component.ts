@@ -5,6 +5,7 @@ import { LinkService, WelcomeResult } from '../../services/link.service';
 import { CoinsService } from '../../services/coins.service';
 import { BasketService } from '../../services/basket.service';
 import { P2pService } from '../../services/p2p.service';
+import { PlayerStatsService, PlayerStatEntry } from '../../services/player-stats.service';
 import { P2pListing } from '../../models/vault';
 
 @Component({
@@ -156,6 +157,27 @@ import { P2pListing } from '../../models/vault';
         </a>
       </div>
 
+      <div class="mt-6">
+        <h2 class="mb-3 row gap-2">
+          <span class="mi" style="color:var(--accent)">leaderboard</span>Top Players
+        </h2>
+        <div *ngIf="statsLoading" class="muted text-sm">Loading...</div>
+        <div *ngIf="!statsLoading && leaderboard.length === 0" class="muted text-sm">No data yet.</div>
+        <div *ngIf="leaderboard.length > 0" class="stats-table">
+          <div class="stats-row stats-header">
+            <span>#</span><span>Name</span><span>Kills</span><span>K/D</span><span>HS</span><span>Playtime</span>
+          </div>
+          <div class="stats-row" *ngFor="let p of leaderboard; let i = index">
+            <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">{{ i + 1 }}</span>
+            <span class="player-name">{{ p.name }}</span>
+            <span class="mono">{{ p.kills | number }}</span>
+            <span class="mono" [class.kd-good]="p.kdRatio >= 1">{{ p.kdRatio | number:'1.2-2' }}</span>
+            <span class="mono">{{ p.headshots | number }}</span>
+            <span class="mono muted">{{ formatPlaytime(p.playtime) }}</span>
+          </div>
+        </div>
+      </div>
+
       <div *ngIf="p2pListings.length > 0" class="mt-6">
         <h2 class="mb-3 row gap-2" style="justify-content:space-between">
           <span class="row gap-2"><span class="mi" style="color:var(--accent)">storefront</span>{{ 'home.p2pLatest' | translate }}</span>
@@ -175,6 +197,19 @@ import { P2pListing } from '../../models/vault';
     </div>
   `,
   styles: [`
+    .stats-table { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .stats-row { display: grid; grid-template-columns: 36px 1fr 80px 70px 70px 90px; gap: 0; align-items: center;
+                 padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .stats-row:last-child { border-bottom: none; }
+    .stats-header { background: var(--surface-2); font-size: 11px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .06em; color: var(--muted); }
+    .stats-row:not(.stats-header):hover { background: var(--surface-2); }
+    .rank { font-weight: 700; font-size: 13px; text-align: center; }
+    .rank.gold   { color: #f5c518; }
+    .rank.silver { color: #aaa; }
+    .rank.bronze { color: #cd7f32; }
+    .player-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .kd-good { color: var(--emerald); }
     .p2p-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
     .p2p-mini { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
                 text-decoration: none; color: var(--text); transition: border-color .12s ease, transform .12s ease; }
@@ -193,6 +228,8 @@ export class HomeComponent implements OnInit {
   copied = false;
   recentGain = 0;
   p2pListings: P2pListing[] = [];
+  leaderboard: PlayerStatEntry[] = [];
+  statsLoading = true;
 
   constructor(
     public auth: AuthService,
@@ -200,6 +237,7 @@ export class HomeComponent implements OnInit {
     public basket: BasketService,
     private link: LinkService,
     private p2p: P2pService,
+    private playerStats: PlayerStatsService,
     private t: TranslateService,
   ) {}
 
@@ -212,6 +250,16 @@ export class HomeComponent implements OnInit {
       next: s => { this.recentGain = s.net_change; },
       error: () => { this.recentGain = 0; },
     });
+    this.playerStats.leaderboard(10).subscribe({
+      next: res => { this.leaderboard = res.players; this.statsLoading = false; },
+      error: () => { this.statsLoading = false; },
+    });
+  }
+
+  formatPlaytime(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }
 
   generate() {
