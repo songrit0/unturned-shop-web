@@ -11,6 +11,13 @@ export interface PlayerStatEntry {
   pvpDeaths: number;
   pveDeaths: number;
   zombies: number;
+  megaZombies: number;
+  animals: number;
+  resources: number;
+  harvests: number;
+  fish: number;
+  structures: number;
+  barricades: number;
   playtime: number;
   kdRatio: number;
 }
@@ -22,6 +29,12 @@ export class PlayerStatsService {
   leaderboard(limit = 10): Observable<{ players: PlayerStatEntry[] }> {
     return this.http.get<{ players: PlayerStatEntry[] }>(
       `${this.apiUrl.get()}/player-stats/leaderboard?limit=${limit}`,
+    );
+  }
+
+  getById(steamId: string): Observable<PlayerStatEntry> {
+    return this.http.get<PlayerStatEntry>(
+      `${this.apiUrl.get()}/player-stats/${steamId}`,
     );
   }
 }

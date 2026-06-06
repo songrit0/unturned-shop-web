@@ -211,6 +211,37 @@ button {
   min-height: 100vh;
   position: relative;
 }
+.app-shell.header-collapsed {
+  grid-template-rows: 0 1fr;
+}
+.app-shell.header-collapsed .app-header {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+}
+.header-peek {
+  position: fixed;
+  top: 0;
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .12s, background .12s;
+  box-shadow: 0 4px 12px rgb(0 0 0 / .15);
+}
+.header-peek:hover { color: var(--text); background: var(--surface-2); }
 
 /* Host elements are display:contents so the inner .sidebar / .app-header
    become the real grid items and their grid-area placement applies. */

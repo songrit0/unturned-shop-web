@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { LinkService, WelcomeResult } from '../../services/link.service';
@@ -158,24 +159,100 @@ import { P2pListing } from '../../models/vault';
       </div>
 
       <div class="mt-6">
-        <h2 class="mb-3 row gap-2">
-          <span class="mi" style="color:var(--accent)">leaderboard</span>Top Players
-        </h2>
-        <div *ngIf="statsLoading" class="muted text-sm">Loading...</div>
-        <div *ngIf="!statsLoading && leaderboard.length === 0" class="muted text-sm">No data yet.</div>
-        <div *ngIf="leaderboard.length > 0" class="stats-table">
-          <div class="stats-row stats-header">
-            <span>#</span><span>Name</span><span>Kills</span><span>K/D</span><span>HS</span><span>Playtime</span>
-          </div>
-          <div class="stats-row" *ngFor="let p of leaderboard; let i = index">
-            <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">{{ i + 1 }}</span>
-            <span class="player-name">{{ p.name }}</span>
-            <span class="mono">{{ p.kills | number }}</span>
-            <span class="mono" [class.kd-good]="p.kdRatio >= 1">{{ p.kdRatio | number:'1.2-2' }}</span>
-            <span class="mono">{{ p.headshots | number }}</span>
-            <span class="mono muted">{{ formatPlaytime(p.playtime) }}</span>
-          </div>
+        <div class="tab-bar">
+          <button class="tab-btn" [class.active]="statsTab === 'my'" (click)="statsTab = 'my'">
+            <span class="mi">person</span>My Stats
+          </button>
+          <button class="tab-btn" [class.active]="statsTab === 'top'" (click)="statsTab = 'top'">
+            <span class="mi">leaderboard</span>Top Players
+          </button>
         </div>
+
+        <!-- My Stats -->
+        <ng-container *ngIf="statsTab === 'my'">
+          <ng-container *ngIf="!me.linked">
+            <div class="tab-empty">
+              <span class="mi xl muted">link_off</span>
+              <p class="muted text-sm mt-2">Link your Steam account to see your stats.</p>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="me.linked">
+            <div *ngIf="myStatsLoading" class="tab-empty"><span class="spinner"></span></div>
+            <div *ngIf="!myStatsLoading && !myStats" class="tab-empty">
+              <span class="mi xl muted">sports_score</span>
+              <p class="muted text-sm mt-2">No stats found. Play on the server to start tracking.</p>
+            </div>
+            <div *ngIf="myStats" class="my-stats-grid">
+              <div class="my-stat-card accent">
+                <span class="my-stat-label">KILLS</span>
+                <span class="my-stat-value">{{ myStats.kills | number }}</span>
+              </div>
+              <div class="my-stat-card" [class.kd-good-card]="myStats.kdRatio >= 1">
+                <span class="my-stat-label">K/D</span>
+                <span class="my-stat-value">{{ myStats.kdRatio | number:'1.2-2' }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">HEADSHOTS</span>
+                <span class="my-stat-value">{{ myStats.headshots | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">PLAYTIME</span>
+                <span class="my-stat-value">{{ formatPlaytime(myStats.playtime) }}</span>
+              </div>
+              <div class="my-stat-card rose">
+                <span class="my-stat-label">PvP DEATHS</span>
+                <span class="my-stat-value">{{ myStats.pvpDeaths | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">PvE DEATHS</span>
+                <span class="my-stat-value">{{ myStats.pveDeaths | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">ZOMBIES</span>
+                <span class="my-stat-value">{{ myStats.zombies | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">MEGA ZOMBIES</span>
+                <span class="my-stat-value">{{ myStats.megaZombies | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">ANIMALS</span>
+                <span class="my-stat-value">{{ myStats.animals | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">RESOURCES</span>
+                <span class="my-stat-value">{{ myStats.resources | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">STRUCTURES</span>
+                <span class="my-stat-value">{{ myStats.structures | number }}</span>
+              </div>
+              <div class="my-stat-card">
+                <span class="my-stat-label">BARRICADES</span>
+                <span class="my-stat-value">{{ myStats.barricades | number }}</span>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <!-- Top Players -->
+        <ng-container *ngIf="statsTab === 'top'">
+          <div *ngIf="statsLoading" class="tab-empty"><span class="spinner"></span></div>
+          <div *ngIf="!statsLoading && leaderboard.length === 0" class="tab-empty muted text-sm">No data yet.</div>
+          <div *ngIf="leaderboard.length > 0" class="stats-table">
+            <div class="stats-row stats-header">
+              <span>#</span><span>Name</span><span>Kills</span><span>K/D</span><span>HS</span><span>Playtime</span>
+            </div>
+            <div class="stats-row" *ngFor="let p of leaderboard; let i = index">
+              <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">{{ i + 1 }}</span>
+              <span class="player-name">{{ p.name }}</span>
+              <span class="mono">{{ p.kills | number }}</span>
+              <span class="mono" [class.kd-good]="p.kdRatio >= 1">{{ p.kdRatio | number:'1.2-2' }}</span>
+              <span class="mono">{{ p.headshots | number }}</span>
+              <span class="mono muted">{{ formatPlaytime(p.playtime) }}</span>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
       <div *ngIf="p2pListings.length > 0" class="mt-6">
@@ -197,6 +274,22 @@ import { P2pListing } from '../../models/vault';
     </div>
   `,
   styles: [`
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .tab-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: none; border: none;
+               border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
+               color: var(--muted); font-size: 13px; font-weight: 600; transition: color .12s, border-color .12s; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+                 padding: 40px 0; text-align: center; }
+    .my-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .my-stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+                    padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .my-stat-card.accent { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+    .my-stat-card.rose   { border-color: var(--rose);   background: color-mix(in srgb, var(--rose)   8%, var(--surface)); }
+    .my-stat-card.kd-good-card { border-color: var(--emerald); background: color-mix(in srgb, var(--emerald) 8%, var(--surface)); }
+    .my-stat-label { font-size: 10px; font-weight: 700; letter-spacing: .07em; color: var(--muted); text-transform: uppercase; }
+    .my-stat-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
     .stats-table { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .stats-row { display: grid; grid-template-columns: 36px 1fr 80px 70px 70px 90px; gap: 0; align-items: center;
                  padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
@@ -230,6 +323,9 @@ export class HomeComponent implements OnInit {
   p2pListings: P2pListing[] = [];
   leaderboard: PlayerStatEntry[] = [];
   statsLoading = true;
+  myStats: PlayerStatEntry | null = null;
+  myStatsLoading = true;
+  statsTab: 'my' | 'top' = 'my';
 
   constructor(
     public auth: AuthService,
@@ -253,6 +349,16 @@ export class HomeComponent implements OnInit {
     this.playerStats.leaderboard(10).subscribe({
       next: res => { this.leaderboard = res.players; this.statsLoading = false; },
       error: () => { this.statsLoading = false; },
+    });
+    this.auth.me$.pipe(take(1)).subscribe(me => {
+      if (me?.steam_id) {
+        this.playerStats.getById(me.steam_id).subscribe({
+          next: entry => { this.myStats = entry; this.myStatsLoading = false; },
+          error: () => { this.myStatsLoading = false; },
+        });
+      } else {
+        this.myStatsLoading = false;
+      }
     });
   }
 

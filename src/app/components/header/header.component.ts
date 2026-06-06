@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService, Me } from '../../services/auth.service';
@@ -13,6 +13,10 @@ import { daysUntil } from '../../services/expiry';
 @Component({
   selector: 'app-header',
   template: `
+    <button class="header-peek" *ngIf="collapsed" (click)="toggle()">
+      <span class="mi sm">expand_more</span>Menu
+    </button>
+
     <header class="app-header">
       <!-- <div class="app-header-search">
         <span class="mi lead">search</span>
@@ -91,6 +95,10 @@ import { daysUntil } from '../../services/expiry';
               </ng-container>
             </div>
           </div>
+
+          <button class="icon-btn" (click)="toggle()" title="Hide header" style="opacity:.5">
+            <span class="mi">expand_less</span>
+          </button>
 
           <div class="h-divider"></div>
 
@@ -179,6 +187,11 @@ import { daysUntil } from '../../services/expiry';
   `],
 })
 export class HeaderComponent implements OnInit {
+  @Output() toggleCollapse = new EventEmitter<void>();
+  collapsed = false;
+
+  toggle() { this.collapsed = !this.collapsed; this.toggleCollapse.emit(); }
+
   q = '';
 
   inboxOpen = false;

@@ -11,9 +11,9 @@ import { VersionService } from './services/version.service';
       <router-outlet></router-outlet>
     </ng-container>
     <ng-template #withShell>
-      <div class="app-shell">
+      <div class="app-shell" [class.header-collapsed]="headerCollapsed">
         <app-sidebar></app-sidebar>
-        <app-header></app-header>
+        <app-header (toggleCollapse)="headerCollapsed = !headerCollapsed"></app-header>
         <main class="app-main">
           <router-outlet></router-outlet>
         </main>
@@ -27,6 +27,7 @@ import { VersionService } from './services/version.service';
   `,
 })
 export class AppComponent implements OnInit {
+  headerCollapsed = false;
   fullscreen$ = this.router.events.pipe(
     filter(e => e instanceof NavigationEnd),
     map(() => this.isFullscreen(this.router.url)),
