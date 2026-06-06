@@ -118,7 +118,8 @@ export class ListOnMarketModalComponent implements OnInit {
       error: () => (this.config = { commission: 0, commission_pct: 0, ttl_days: 7, cancel_penalty_pct: 0 }),
     });
     // Pull the shop market price for this item as a reference / default.
-    this.market.get(this.item.Id).subscribe({
+    // include_unlisted=1 so buy-only items (enabled_isforsell=0) still return a price.
+    this.market.get(this.item.Id, true).subscribe({
       next: m => {
         this.marketItem = m;
         if (this.price <= 0) this.price = this.marketBase;

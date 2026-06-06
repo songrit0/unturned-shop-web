@@ -56,8 +56,14 @@ export class MarketService {
       .pipe(map(r => normalizePaginated<MarketItem>(r, limit)));
   }
 
-  get(id: number): Observable<MarketItem> {
-    return this.http.get<MarketItem>(`${this.apiUrl.get()}/market/${id}`);
+  /**
+   * Fetch a single market row.
+   * By default the API 404s on buy-only items (enabled_isforsell=0) so the Shop page
+   * doesn't show them; pass includeUnlisted=true to get the price/stock anyway.
+   */
+  get(id: number, includeUnlisted = false): Observable<MarketItem> {
+    const url = `${this.apiUrl.get()}/market/${id}${includeUnlisted ? '?include_unlisted=1' : ''}`;
+    return this.http.get<MarketItem>(url);
   }
 
   types(): Observable<MarketTypeOption[]> {
