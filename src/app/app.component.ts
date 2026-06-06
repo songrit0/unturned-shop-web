@@ -50,11 +50,13 @@ export class AppComponent implements OnInit {
       this.router.navigate(['/api-error']);
       return;
     }
-    if (!this.auth.token) {
-      this.router.navigate(['/login']);
-      return;
+    // Don't eagerly redirect here: on /auth/callback the token still lives in the URL and hasn't
+    // been stored yet, so an early !token check would hijack the callback and bounce to /login.
+    // The NavigationEnd subscription (runs after each navigation resolves, respects noAuthPaths)
+    // handles "no token on a protected route → /login". Here we only warm the profile if signed in.
+    if (this.auth.token) {
+      this.auth.refreshMe().subscribe();
     }
-    this.auth.refreshMe().subscribe();
   }
 
   private isFullscreen(url: string): boolean {
