@@ -16,8 +16,8 @@ const SERVER_INFO = {
   // NOTE: name / connect / map are NOT in Config.txt (they live in Commands.dat @Name/@Map and
   // your host's IP). Edit the three placeholders below to match your server.
   name: 'Meowpow Unturned',                 // <-- EDIT: server name (Commands.dat @Name)
-  connect: 'play.meowpow.shop:27015',       // <-- EDIT: real IP / DNS : port
-  map: 'Washington',                        // <-- EDIT: map name (Commands.dat @Map)
+  connect: '169.254.189.53:62512',       // <-- EDIT: real IP / DNS : port
+  map: 'California 2',                        // <-- EDIT: map name (Commands.dat @Map)
   // The rest are pulled from Config.txt (Browser block).
   tagline: 'Generator Base Protection · Virtual Garage · Survival x3 · EN/TH',
   mode: 'Survival x3',
@@ -166,11 +166,11 @@ interface InfoCard {
                 <div class="srv-stat-lbl">{{ srv.mode }}</div>
               </div>
             </div>
-            <div class="srv-stat" *ngIf="server?.nextRestart">
+            <div class="srv-stat">
               <span class="srv-stat-icon"><span class="mi">restart_alt</span></span>
               <div>
-                <div class="srv-stat-val">{{ formatTime(server!.nextRestart) }}</div>
-                <div class="srv-stat-lbl">{{ 'landing.nextRestart' | translate }}</div>
+                <div class="srv-stat-val">{{ nextRestartCountdown }}</div>
+                <div class="srv-stat-lbl">{{ 'landing.nextRestart' | translate }} · 06:00</div>
               </div>
             </div>
           </div>
@@ -511,6 +511,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   topPlayers: PlayerStatEntry[] = [];
   loading = true;
 
+  /** Countdown to the next daily restart — fixed at 06:00 Thailand time (UTC+7). */
+  nextRestartCountdown = '';
+  private restartTimer: ReturnType<typeof setInterval> | null = null;
+
   // --- Steam + PIN login (active only when ?id=<steamid> is present or entered) ---
   steamId: string | null = null;
   steamIdInput = '';
@@ -538,6 +542,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     const id = this.route.snapshot.queryParamMap.get('id');
     if (id && /^\d{17}$/.test(id)) this.steamId = id;
 
+    // Fixed daily restart at 06:00 Thai time — tick the countdown once a minute.
+    this.updateNextRestart();
+    this.restartTimer = setInterval(() => this.updateNextRestart(), 60_000);
+
     // Public landing data — degrade silently if the API is unreachable (login still works).
     this.pub.landing(8, 10).subscribe({
       next: d => {
@@ -551,9 +559,33 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() { this.clearLockTimer(); }
+  ngOnDestroy() {
+    this.clearLockTimer();
+    if (this.restartTimer) { clearInterval(this.restartTimer); this.restartTimer = null; }
+  }
 
   login() { this.auth.startLogin(); }
+
+  /** Real UTC instant of the next 06:00 Asia/Bangkok (UTC+7), regardless of the viewer's timezone. */
+  private nextRestartThai(): Date {
+    const THAI_MS = 7 * 60 * 60 * 1000;
+    const now = Date.now();
+    const thaiNow = new Date(now + THAI_MS); // shift so UTC getters read Thai wall-clock
+    let targetThai = Date.UTC(
+      thaiNow.getUTCFullYear(), thaiNow.getUTCMonth(), thaiNow.getUTCDate(), 6, 0, 0,
+    );
+    if (targetThai <= thaiNow.getTime()) targetThai += 86_400_000; // already past 06:00 → tomorrow
+    return new Date(targetThai - THAI_MS); // back to real UTC
+  }
+
+  /** Recompute the "Xh Ym" countdown to the next 06:00 Thai restart. */
+  private updateNextRestart() {
+    const diffMs = this.nextRestartThai().getTime() - Date.now();
+    const totalMin = Math.max(0, Math.floor(diffMs / 60_000));
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    this.nextRestartCountdown = h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
 
   /** Donation progress as a clamped percentage for the bar width. */
   get donatePct(): number {
