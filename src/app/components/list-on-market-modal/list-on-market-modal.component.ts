@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { EnrichedVaultItem, P2pConfig } from '../../models/vault';
 import { P2pService } from '../../services/p2p.service';
+import { MarketItem, MarketService } from '../../services/market.service';
 
 @Component({
   selector: 'app-list-on-market-modal',
@@ -27,9 +28,30 @@ import { P2pService } from '../../services/p2p.service';
           </div>
         </div>
 
+        <!-- Market reference price (base_price shown as a whole number). -->
+        <div *ngIf="marketItem" class="market-ref">
+          <div class="row" style="justify-content:space-between">
+            <span class="muted">{{ 'p2p.list.marketBase' | translate }}</span>
+            <span class="mono"><b>{{ marketBase | number }}</b></span>
+          </div>
+          <button type="button" class="btn ghost sm" style="margin-top:6px;width:100%" (click)="useMarketPrice()">
+            <span class="mi sm">price_check</span> {{ 'p2p.list.useMarket' | translate }}
+          </button>
+        </div>
+
         <label style="display:block;margin-bottom:8px">
           <span class="muted" style="font-size:12px">{{ 'p2p.list.price' | translate }}</span>
-          <input type="number" min="1" step="1" class="input mono" [(ngModel)]="price" style="margin-top:4px">
+          <input type="number" min="1" step="1" class="input mono" [(ngModel)]="price" style="margin-top:4px;text-align:center">
+          <div class="numpad">
+            <button type="button" class="key" *ngFor="let d of [1,2,3,4,5,6,7,8,9]" (click)="digit(d)">{{ d }}</button>
+            <button type="button" class="key act" (click)="clearPrice()" [title]="'common.clear' | translate">
+              <span class="mi">backspace</span>
+            </button>
+            <button type="button" class="key" (click)="digit(0)">0</button>
+            <button type="button" class="key act" (click)="backspace()" aria-label="backspace">
+              <span class="mi">chevron_left</span>
+            </button>
+          </div>
         </label>
 
         <div class="preview" *ngIf="config && price > 0">
@@ -61,6 +83,14 @@ import { P2pService } from '../../services/p2p.service';
   `,
   styles: [`
     .preview { background: var(--surface-2); border-radius: 6px; padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+    .market-ref { background: var(--surface-2); border-radius: 6px; padding: 8px 10px; font-size: 13px; margin-bottom: 10px; }
+    .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+    .key { display: flex; align-items: center; justify-content: center; padding: 12px 0; font-size: 18px; font-weight: 600;
+           background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text);
+           font-family: var(--font-mono, monospace); }
+    .key:hover { background: var(--surface-3); }
+    .key:active { transform: scale(0.96); }
+    .key.act { color: var(--muted); }
     .warn { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; padding: 8px 10px;
             background: color-mix(in srgb, var(--amber) 12%, transparent); border: 1px solid var(--amber);
             border-radius: 6px; font-size: 12px; line-height: 1.5; color: var(--text); }
@@ -78,14 +108,50 @@ export class ListOnMarketModalComponent implements OnInit {
 
   price = 0;
   config: P2pConfig | null = null;
+  marketItem: MarketItem | null = null;
 
-  constructor(private p2p: P2pService) {}
+  constructor(private p2p: P2pService, private market: MarketService) {}
 
   ngOnInit() {
     this.p2p.getConfig().subscribe({
       next: c => (this.config = c),
       error: () => (this.config = { commission: 0, commission_pct: 0, ttl_days: 7, cancel_penalty_pct: 0 }),
     });
+    // Pull the shop market price for this item as a reference / default.
+    this.market.get(this.item.Id).subscribe({
+      next: m => {
+        this.marketItem = m;
+        if (this.price <= 0) this.price = this.marketBase;
+      },
+      error: () => (this.marketItem = null),
+    });
+  }
+
+  /** Market base price as a whole number (decimals dropped). */
+  get marketBase(): number {
+    return Math.trunc(Number(this.marketItem?.base_price) || 0);
+  }
+
+  /** Prefill the price field with the market base price. */
+  useMarketPrice() {
+    if (this.marketBase > 0) this.price = this.marketBase;
+  }
+
+  /** Append a digit to the price (keypad), capped to avoid overflow. */
+  digit(d: number) {
+    const next = (Number(this.price) || 0) * 10 + d;
+    if (next > 1_000_000_000) return;
+    this.price = next;
+  }
+
+  /** Remove the last digit. */
+  backspace() {
+    this.price = Math.floor((Number(this.price) || 0) / 10);
+  }
+
+  /** Reset the price to empty. */
+  clearPrice() {
+    this.price = 0;
   }
 
   get canSubmit(): boolean { return this.price > 0; }

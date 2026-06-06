@@ -838,7 +838,8 @@
     "saving": "Saving...",
     "discard": "Discard",
     "ok": "OK",
-    "done": "Done"
+    "done": "Done",
+    "clear": "Clear"
   },
   "errors": {
     "vault_locked_in_game": "This vault is open in-game. Close it and try again.",
@@ -1153,6 +1154,8 @@
     "list": {
       "title": "List on market",
       "price": "Price (coins)",
+      "marketBase": "Market price (base)",
+      "useMarket": "Use market price",
       "commission": "Commission",
       "youReceive": "You receive",
       "confirm": "List",
