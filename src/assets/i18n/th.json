@@ -32,6 +32,8 @@
     "inventory": "ของที่ซื้อ",
     "mySubmissions": "คำขอของฉัน",
     "quests": "เควส",
+    "draw": "สุ่มรายวัน",
+    "adminGacha": "สุ่มรายวัน",
     "basket": "ตะกร้า",
     "section": {
       "main": "MAIN",
@@ -67,6 +69,34 @@
     "latestMarket": "ของล่าสุดในตลาด P2P",
     "noData": "ยังไม่มีข้อมูล",
     "noListings": "ยังไม่มีรายการขาย"
+  },
+  "draw": {
+    "title": "สุ่มรายวัน",
+    "disabled": "ระบบสุ่มปิดอยู่ชั่วคราว กลับมาเช็คใหม่ภายหลัง!",
+    "spinsLeft": "สิทธิ์หมุน",
+    "free": "ฟรี",
+    "bought": "ซื้อ",
+    "rank": "อันดับ",
+    "resetIn": "สิทธิ์ฟรีรีเซ็ตในอีก",
+    "spin": "หมุนเลย",
+    "noSpins": "หมดสิทธิ์หมุนแล้ว",
+    "buyMore": "สิทธิ์หมด? ซื้อเพิ่ม:",
+    "spinOne": "ครั้ง",
+    "topToday": "รางวัลวันนี้",
+    "noDraws": "ยังไม่มีใครสุ่มได้วันนี้ มาเป็นคนแรกเลย!",
+    "redeemCode": "โค้ดรับของของคุณ",
+    "useInGame": "ใช้ในเกม:",
+    "ok": "เยี่ยม!",
+    "spinError": "หมุนไม่สำเร็จ กรุณาลองใหม่",
+    "buyError": "ซื้อไม่สำเร็จ",
+    "justNow": "เมื่อกี้",
+    "youHave": "คุณมี",
+    "buyErrors": {
+      "insufficient_coins": "Coins ไม่พอ",
+      "insufficient_meowcoin": "Meowcoins ไม่พอ",
+      "buy_currency_disabled": "ช่องทางจ่ายนี้ปิดอยู่",
+      "not_linked": "ผูกบัญชี Steam ก่อน"
+    }
   },
   "pinLogin": {
     "title": "ใส่ PIN ของคุณ",

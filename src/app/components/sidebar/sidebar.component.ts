@@ -57,6 +57,9 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/quests" routerLinkActive="active" class="nav-item">
           <span class="mi">flag</span>{{ 'nav.quests' | translate }}
         </a>
+        <a routerLink="/draw" routerLinkActive="active" class="nav-item">
+          <span class="mi">casino</span>{{ 'nav.draw' | translate }}
+        </a>
         <a routerLink="/vip" routerLinkActive="active" class="nav-item">
           <span class="mi">workspace_premium</span>VIP
         </a>
@@ -112,6 +115,9 @@ import { TopupService } from '../../services/topup.service';
         </a>
         <a routerLink="/admin/vip" routerLinkActive="active" class="nav-item admin">
           <span class="mi">workspace_premium</span>VIP
+        </a>
+        <a routerLink="/admin/gacha" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">casino</span>{{ 'nav.adminGacha' | translate }}
         </a>
         <a routerLink="/admin/quests" routerLinkActive="active" class="nav-item admin">
           <span class="mi">flag</span>{{ 'nav.adminQuests' | translate }}

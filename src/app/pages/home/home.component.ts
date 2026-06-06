@@ -7,6 +7,7 @@ import { CoinsService } from '../../services/coins.service';
 import { BasketService } from '../../services/basket.service';
 import { P2pService } from '../../services/p2p.service';
 import { PlayerStatsService, PlayerStatEntry } from '../../services/player-stats.service';
+import { GachaService, GachaState } from '../../services/gacha.service';
 import { P2pListing } from '../../models/vault';
 
 @Component({
@@ -82,6 +83,18 @@ import { P2pListing } from '../../models/vault';
           </ng-template>
         </div>
       </section>
+
+      <a *ngIf="drawState?.enabled" routerLink="/draw" class="draw-banner">
+        <div class="draw-banner-icon"><span class="mi fill">casino</span></div>
+        <div class="grow">
+          <div class="draw-banner-title">{{ 'draw.title' | translate }}</div>
+          <div class="draw-banner-sub muted text-sm">
+            <span *ngIf="drawState && drawState.totalRemaining > 0">{{ 'draw.youHave' | translate }} <b>{{ drawState.totalRemaining }}</b> {{ 'draw.spinsLeft' | translate }}</span>
+            <span *ngIf="drawState && drawState.totalRemaining <= 0">{{ 'draw.noSpins' | translate }}</span>
+          </div>
+        </div>
+        <span class="draw-banner-cta btn primary sm"><span class="mi sm">casino</span>{{ 'draw.spin' | translate }}</span>
+      </a>
 
       <!-- <div class="tile-grid">
         <a routerLink="/p2p-market" class="tile violet">
@@ -275,6 +288,15 @@ import { P2pListing } from '../../models/vault';
     </div>
   `,
   styles: [`
+    .draw-banner { display:flex; align-items:center; gap:14px; margin:16px 0; padding:16px 18px; text-decoration:none;
+      color:var(--text); border-radius:14px; border:1px solid var(--border);
+      background:linear-gradient(100deg, color-mix(in srgb, var(--violet,#a78bfa) 16%, var(--surface)), var(--surface)); transition:transform .12s ease, border-color .12s ease; }
+    .draw-banner:hover { transform:translateY(-2px); border-color:var(--violet,#a78bfa); }
+    .draw-banner-icon { width:46px; height:46px; border-radius:12px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+      background:color-mix(in srgb, var(--violet,#a78bfa) 22%, var(--surface-2)); color:var(--violet,#a78bfa); }
+    .draw-banner-icon .mi { font-size:26px; }
+    .draw-banner-title { font-weight:800; font-size:16px; }
+    .draw-banner-cta { flex:0 0 auto; }
     .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
     .tab-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: none; border: none;
                border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
@@ -327,6 +349,7 @@ export class HomeComponent implements OnInit {
   myStats: PlayerStatEntry | null = null;
   myStatsLoading = true;
   statsTab: 'my' | 'top' = 'my';
+  drawState: GachaState | null = null;
 
   constructor(
     public auth: AuthService,
@@ -335,10 +358,15 @@ export class HomeComponent implements OnInit {
     private link: LinkService,
     private p2p: P2pService,
     private playerStats: PlayerStatsService,
+    private gacha: GachaService,
     private t: TranslateService,
   ) { }
 
   ngOnInit() {
+    this.gacha.state().subscribe({
+      next: s => { this.drawState = s; },
+      error: () => { this.drawState = null; },
+    });
     this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
       next: p => { this.p2pListings = p.items.slice(0, 6); },
       error: () => this.p2pListings = [],

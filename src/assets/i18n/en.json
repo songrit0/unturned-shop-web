@@ -32,6 +32,8 @@
     "inventory": "My Inventory",
     "mySubmissions": "My Submissions",
     "quests": "Quests",
+    "draw": "Daily Draw",
+    "adminGacha": "Daily Draw",
     "basket": "Basket",
     "section": {
       "main": "MAIN",
@@ -67,6 +69,34 @@
     "latestMarket": "Latest in the P2P market",
     "noData": "No data yet",
     "noListings": "No active listings"
+  },
+  "draw": {
+    "title": "Daily Draw",
+    "disabled": "The daily draw is currently closed. Check back later!",
+    "spinsLeft": "spins left",
+    "free": "Free",
+    "bought": "Bought",
+    "rank": "rank",
+    "resetIn": "Free spins reset in",
+    "spin": "Spin",
+    "noSpins": "No spins left",
+    "buyMore": "Out of spins? Buy more:",
+    "spinOne": "spin",
+    "topToday": "Top Today",
+    "noDraws": "No prizes drawn yet today. Be the first!",
+    "redeemCode": "Your redeem code",
+    "useInGame": "Use in-game:",
+    "ok": "Awesome!",
+    "spinError": "Spin failed. Please try again.",
+    "buyError": "Purchase failed.",
+    "justNow": "just now",
+    "youHave": "You have",
+    "buyErrors": {
+      "insufficient_coins": "Not enough coins.",
+      "insufficient_meowcoin": "Not enough meowcoins.",
+      "buy_currency_disabled": "This payment option is disabled.",
+      "not_linked": "Link your Steam account first."
+    }
   },
   "pinLogin": {
     "title": "Enter your PIN",
