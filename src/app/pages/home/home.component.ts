@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { LinkService, WelcomeResult } from '../../services/link.service';
@@ -350,7 +350,7 @@ export class HomeComponent implements OnInit {
       next: res => { this.leaderboard = res.players; this.statsLoading = false; },
       error: () => { this.statsLoading = false; },
     });
-    this.auth.me$.pipe(take(1)).subscribe(me => {
+    this.auth.me$.pipe(filter(me => me !== null), take(1)).subscribe(me => {
       if (me?.steam_id) {
         this.playerStats.getById(me.steam_id).subscribe({
           next: entry => { this.myStats = entry; this.myStatsLoading = false; },
