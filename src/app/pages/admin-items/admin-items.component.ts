@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { forkJoin, Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { forkJoin, of, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Item, ItemPayload, ItemsService, Paginated } from '../../services/items.service';
 import { ItemType, ItemTypesService } from '../../services/item-types.service';
 import { AdminMarketService } from '../../services/admin-market.service';
@@ -19,15 +19,27 @@ import { TranslateService } from '@ngx-translate/core';
             <span class="mi lead">search</span>
             <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" [placeholder]="'adminItems.search' | translate">
           </div>
-          <select class="select" [(ngModel)]="typeFilter" (ngModelChange)="onTypeChange()">
-            <option [ngValue]="null">{{ 'adminItems.allTypes' | translate }}</option>
-            <option *ngFor="let t of types" [ngValue]="t.id">{{ t.name }}</option>
-          </select>
+          <button (click)="exportItems()" [disabled]="exporting" class="btn ghost"><span class="mi sm">download</span> Export</button>
+          <button (click)="fileInput.click()" [disabled]="importing" class="btn ghost"><span class="mi sm">upload</span> Import</button>
+          <input #fileInput type="file" accept="application/json,.json" (change)="onImportFile($event)" hidden>
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminItems.add' | translate }}
           </button>
         </div>
       </div>
+
+      <!-- Category browser (filter by type, like the item browser) -->
+      <div class="cat-bar">
+        <button class="cat-chip" [class.active]="typeFilter === null" (click)="selectType(null)">
+          <span class="mi sm">apps</span>{{ 'adminItems.allTypes' | translate }}
+        </button>
+        <button *ngFor="let t of types" class="cat-chip" [class.active]="typeFilter === t.id" (click)="selectType(t.id)">
+          {{ t.name }}
+        </button>
+      </div>
+
+      <p *ngIf="importMsg" class="text-emerald" style="font-size:13px;margin:0 0 8px">{{ importMsg }}</p>
+      <p *ngIf="importError" style="color:var(--rose);font-size:13px;margin:0 0 8px">{{ importError }}</p>
 
       <!-- Bulk action bar -->
       <div *ngIf="selected.size > 0" class="card flush" style="padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -194,6 +206,12 @@ import { TranslateService } from '@ngx-translate/core';
   styles: [`
     tr.row-selected td { background: color-mix(in srgb, var(--violet) 12%, transparent); }
     input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color: var(--violet); }
+    .cat-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .cat-chip { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer;
+      font-size:13px; font-weight:600; transition:all .12s ease; }
+    .cat-chip:hover { color:var(--text); border-color:var(--violet); }
+    .cat-chip.active { background:var(--violet); border-color:var(--violet); color:#fff; }
   `],
 })
 export class AdminItemsComponent implements OnInit, OnDestroy {
@@ -215,6 +233,12 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
   bulkBusy = false;
   bulkError: string | null = null;
   buyOnlyMsg: string | null = null;
+
+  // Export / import
+  exporting = false;
+  importing = false;
+  importMsg: string | null = null;
+  importError: string | null = null;
 
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -245,10 +269,21 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
       this.reload();
     });
     this.reload();
-    this.typesSvc.list().subscribe({ next: p => this.types = p.items, error: () => { } });
+    this.loadTypes();
+  }
+
+  /** Load ALL types (big limit) so the category chips + dropdowns are complete. */
+  private loadTypes() {
+    this.typesSvc.list(1, 1000).subscribe({ next: p => this.types = p.items, error: () => { } });
   }
 
   ngOnDestroy() { this.searchSub?.unsubscribe(); }
+
+  /** Category chip click → set the type filter and reload. */
+  selectType(id: number | null) {
+    this.typeFilter = id;
+    this.reload();
+  }
 
   reload() {
     this.loading = true;
@@ -358,6 +393,136 @@ export class AdminItemsComponent implements OnInit, OnDestroy {
         this.bulkBusy = false;
         this.bulkError = e?.error?.message || 'Bulk update failed';
       },
+    });
+  }
+
+  // ---- Export / Import ----
+  /** Export ALL items as JSON, with the type as a NAME (portable across servers).
+   *  The API caps limit at 100, so fetch every page and concatenate. */
+  exportItems() {
+    this.exporting = true;
+    const LIMIT = 100;
+    this.svc.adminList('', null, 1, LIMIT).subscribe({
+      next: first => {
+        const pages = first.pages || Math.max(1, Math.ceil((first.total || 0) / LIMIT));
+        if (pages <= 1) { this.downloadItems(first.items); this.exporting = false; return; }
+        const rest = [];
+        for (let pg = 2; pg <= pages; pg++) {
+          rest.push(this.svc.adminList('', null, pg, LIMIT).pipe(catchError(() => of(null))));
+        }
+        forkJoin(rest).subscribe(results => {
+          let all = [...first.items];
+          results.forEach(r => { if (r) all = all.concat(r.items); });
+          this.downloadItems(all);
+          this.exporting = false;
+        });
+      },
+      error: () => { this.exporting = false; },
+    });
+  }
+
+  private downloadItems(items: Item[]) {
+    const rows = items.map(it => ({
+      id: it.id,
+      name: it.name,
+      description: it.description ?? null,
+      image_url: it.image_url ?? null,
+      type: it.type_name ?? null,
+    }));
+    const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'master-items.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  onImportFile(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    this.importMsg = null;
+    this.importError = null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        if (!Array.isArray(data)) throw new Error('not an array');
+        this.runImport(data);
+      } catch {
+        this.importError = 'Invalid JSON file.';
+      }
+      input.value = '';
+    };
+    reader.onerror = () => { this.importError = 'Could not read file.'; input.value = ''; };
+    reader.readAsText(file);
+  }
+
+  /** Import items. Missing types (referenced by name) are created first, then items are
+   *  created (or updated when the id already exists). */
+  private runImport(rows: any[]) {
+    const parsed = rows.map(r => {
+      const id = Number(r?.id);
+      const name = String(r?.name ?? '').trim();
+      if (!(id > 0) || !name) return null;
+      // Accept either `type` (name) or `type_name`.
+      const typeName = String(r?.type ?? r?.type_name ?? '').trim();
+      return {
+        id, name,
+        description: r?.description != null ? String(r.description) : null,
+        image_url: r?.image_url != null ? String(r.image_url) : null,
+        typeName: typeName || null,
+      };
+    }).filter((x): x is { id: number; name: string; description: string | null; image_url: string | null; typeName: string | null } => x !== null);
+
+    if (parsed.length === 0) { this.importError = 'No valid items found in the file.'; return; }
+
+    // name(lower) -> type id, from the currently-loaded types.
+    const typeMap = new Map<string, number>();
+    this.types.forEach(t => typeMap.set(t.name.toLowerCase(), t.id));
+    const missing = [...new Set(
+      parsed.map(p => p.typeName).filter((n): n is string => !!n && !typeMap.has(n.toLowerCase())),
+    )];
+
+    this.importing = true;
+    if (missing.length === 0) { this.doImportItems(parsed, typeMap, 0); return; }
+
+    // Create the missing types first, then import the items.
+    forkJoin(missing.map(name => this.typesSvc.create({ name }).pipe(catchError(() => of(null))))).subscribe(created => {
+      created.forEach(t => { if (t) typeMap.set(t.name.toLowerCase(), t.id); });
+      const madeTypes = created.filter(Boolean).length;
+      this.loadTypes();
+      this.doImportItems(parsed, typeMap, madeTypes);
+    });
+  }
+
+  private doImportItems(
+    parsed: Array<{ id: number; name: string; description: string | null; image_url: string | null; typeName: string | null }>,
+    typeMap: Map<string, number>,
+    typesCreated: number,
+  ) {
+    const calls = parsed.map(p => {
+      const payload: ItemPayload = {
+        name: p.name,
+        description: p.description,
+        image_url: p.image_url,
+        type_id: p.typeName ? (typeMap.get(p.typeName.toLowerCase()) ?? null) : null,
+      };
+      // Create; if the id already exists (409) update instead. Never reject the whole batch.
+      return this.svc.adminCreate({ ...payload, id: p.id }).pipe(
+        catchError(err => (err?.status === 409
+          ? this.svc.adminUpdate(p.id, payload).pipe(catchError(() => of(null)))
+          : of(null))),
+      );
+    });
+
+    forkJoin(calls).subscribe(results => {
+      const ok = results.filter(Boolean).length;
+      this.importing = false;
+      this.importMsg = `Imported ${ok}/${parsed.length} items`
+        + (typesCreated ? ` · created ${typesCreated} new type${typesCreated > 1 ? 's' : ''}` : '');
+      this.reload();
     });
   }
 
