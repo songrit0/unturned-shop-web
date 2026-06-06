@@ -288,6 +288,7 @@ export class AdminGachaComponent implements OnInit {
   // ---- export / import ----
   exportPrizes() {
     const rows = this.prizes.map(p => ({
+      id: p.id,
       type: p.type, ref_id: p.ref_id, amount: p.amount, quality: p.quality,
       weight: p.weight, label: p.label, image_url: p.image_url, rarity: p.rarity,
       enabled: p.enabled, sort: p.sort,
@@ -324,13 +325,15 @@ export class AdminGachaComponent implements OnInit {
 
   private runImport(rows: any[]) {
     const types: GachaPrizeType[] = ['coins', 'meowcoins', 'item', 'vehicle', 'vip'];
-    const payloads: Partial<GachaPrize>[] = rows.map(r => {
+    const existingIds = new Set(this.prizes.map(p => p.id));
+    const items = rows.map(r => {
       const type = types.includes(r?.type) ? r.type as GachaPrizeType : null;
       if (!type) return null;
       const needsRef = type === 'item' || type === 'vehicle' || type === 'vip';
       const ref_id = r?.ref_id == null ? null : Number(r.ref_id);
       if (needsRef && !(ref_id && ref_id > 0)) return null;
-      return {
+      const id = Number(r?.id) || null;
+      const payload: Partial<GachaPrize> = {
         type,
         ref_id: needsRef ? ref_id : null,
         amount: Math.max(0, Number(r?.amount) || 0),
@@ -341,19 +344,32 @@ export class AdminGachaComponent implements OnInit {
         rarity: r?.rarity ? String(r.rarity) : null,
         enabled: r?.enabled !== false,
         sort: Math.max(0, Number(r?.sort) || 0),
-      } as Partial<GachaPrize>;
-    }).filter((p): p is Partial<GachaPrize> => p !== null);
+      };
+      return { id, payload };
+    }).filter((x): x is { id: number | null; payload: Partial<GachaPrize> } => x !== null);
 
-    if (payloads.length === 0) {
+    if (items.length === 0) {
       this.importError = 'No valid prizes found in the file.';
       return;
     }
 
+    // De-dupe by id: rows whose id already exists are UPDATED in place; the rest are created.
+    // So re-importing the same file won't create duplicates.
+    const toUpdate = items.filter(x => x.id != null && existingIds.has(x.id));
+    const toCreate = items.filter(x => !(x.id != null && existingIds.has(x.id)));
+
+    const calls = [
+      ...toCreate.map(x => this.gacha.createPrize(x.payload).pipe(catchError(() => of(null)))),
+      ...toUpdate.map(x => this.gacha.updatePrize(x.id as number, x.payload).pipe(catchError(() => of(null)))),
+    ];
+
     this.importing = true;
-    forkJoin(payloads.map(p => this.gacha.createPrize(p).pipe(catchError(() => of(null))))).subscribe(results => {
-      const ok = results.filter(Boolean).length;
+    forkJoin(calls).subscribe(results => {
+      const createdOk = results.slice(0, toCreate.length).filter(Boolean).length;
+      const updatedOk = results.slice(toCreate.length).filter(Boolean).length;
       this.importing = false;
-      this.importMsg = `Imported ${ok}/${payloads.length} prizes.`;
+      this.importMsg = `Imported: ${createdOk} created, ${updatedOk} updated`
+        + (toUpdate.length ? ` (${toUpdate.length} duplicate id${toUpdate.length > 1 ? 's' : ''} merged)` : '');
       this.loadPrizes();
     });
   }
