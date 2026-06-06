@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { filter, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
@@ -7,7 +7,7 @@ import { CoinsService } from '../../services/coins.service';
 import { BasketService } from '../../services/basket.service';
 import { P2pService } from '../../services/p2p.service';
 import { PlayerStatsService, PlayerStatEntry } from '../../services/player-stats.service';
-import { GachaService, GachaState } from '../../services/gacha.service';
+import { GachaService, GachaState, RankRewards } from '../../services/gacha.service';
 import { P2pListing } from '../../models/vault';
 
 @Component({
@@ -95,6 +95,23 @@ import { P2pListing } from '../../models/vault';
         </div>
         <span class="draw-banner-cta btn primary sm"><span class="mi sm">casino</span>{{ 'draw.spin' | translate }}</span>
       </a>
+
+      <!-- Free spins by rank -->
+      <section *ngIf="rankRewards?.enabled && rankRewards!.entries.length" class="card rank-reward-card">
+        <div class="rr-head">
+          <span class="row gap-2"><span class="mi" style="color:var(--amber)">emoji_events</span><span class="fw-7">{{ 'draw.rankRewardsTitle' | translate }}</span></span>
+          <span class="rr-reset muted text-xs"><span class="mi sm">restart_alt</span>{{ 'draw.resetIn' | translate }} {{ rankResetCountdown }}</span>
+        </div>
+        <div class="rr-list">
+          <div class="rr-row" *ngFor="let e of rankRewards!.entries">
+            <span class="rr-rank" [class.gold]="e.rank===1" [class.silver]="e.rank===2" [class.bronze]="e.rank===3">{{ e.rank }}</span>
+            <span class="rr-name">{{ e.name }}</span>
+            <span class="rr-kills muted text-xs">{{ e.kills | number }} {{ 'draw.killsShort' | translate }}</span>
+            <span class="rr-spins"><span class="mi sm">casino</span>{{ e.spins }} {{ 'draw.freeShort' | translate }}</span>
+          </div>
+        </div>
+        <p class="muted text-xs rr-foot">{{ 'draw.rankRewardsHint' | translate }}</p>
+      </section>
 
       <!-- <div class="tile-grid">
         <a routerLink="/p2p-market" class="tile violet">
@@ -297,6 +314,18 @@ import { P2pListing } from '../../models/vault';
     .draw-banner-icon .mi { font-size:26px; }
     .draw-banner-title { font-weight:800; font-size:16px; }
     .draw-banner-cta { flex:0 0 auto; }
+    .rank-reward-card { margin:16px 0; padding:16px 18px; }
+    .rr-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .rr-reset { display:inline-flex; align-items:center; gap:4px; }
+    .rr-list { display:flex; flex-direction:column; gap:6px; }
+    .rr-row { display:grid; grid-template-columns:30px 1fr auto auto; gap:10px; align-items:center;
+      padding:8px 10px; border-radius:10px; background:var(--surface-2); }
+    .rr-rank { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:13px; background:var(--surface); color:var(--muted); }
+    .rr-rank.gold { background:#f5c518; color:#3a2e00; } .rr-rank.silver { background:#c4c8cc; color:#26292b; } .rr-rank.bronze { background:#cd7f32; color:#2a1600; }
+    .rr-name { font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .rr-spins { display:inline-flex; align-items:center; gap:4px; font-weight:700; font-size:13px; color:var(--violet,#a78bfa); }
+    .rr-foot { margin-top:10px; }
     .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
     .tab-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: none; border: none;
                border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
@@ -337,7 +366,7 @@ import { P2pListing } from '../../models/vault';
     .p2p-price { font-weight: 700; margin-top: 2px; }
   `],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   code: string | null = null;
@@ -350,6 +379,9 @@ export class HomeComponent implements OnInit {
   myStatsLoading = true;
   statsTab: 'my' | 'top' = 'my';
   drawState: GachaState | null = null;
+  rankRewards: RankRewards | null = null;
+  rankResetCountdown = '';
+  private rankTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     public auth: AuthService,
@@ -367,6 +399,11 @@ export class HomeComponent implements OnInit {
       next: s => { this.drawState = s; },
       error: () => { this.drawState = null; },
     });
+    this.gacha.rankRewards().subscribe({
+      next: r => { this.rankRewards = r; this.tickRankReset(); },
+      error: () => { this.rankRewards = null; },
+    });
+    this.rankTimer = setInterval(() => this.tickRankReset(), 1000);
     this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
       next: p => { this.p2pListings = p.items.slice(0, 6); },
       error: () => this.p2pListings = [],
@@ -389,6 +426,19 @@ export class HomeComponent implements OnInit {
         this.myStatsLoading = false;
       }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.rankTimer) { clearInterval(this.rankTimer); this.rankTimer = null; }
+  }
+
+  private tickRankReset() {
+    if (!this.rankRewards) return;
+    const diff = new Date(this.rankRewards.nextResetAt).getTime() - Date.now();
+    const s = Math.max(0, Math.floor(diff / 1000));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    this.rankResetCountdown = `${h}h ${m}m ${s % 60}s`;
   }
 
   formatPlaytime(seconds: number): string {

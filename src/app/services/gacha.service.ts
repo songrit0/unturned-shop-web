@@ -72,6 +72,19 @@ export interface PoolPrize {
   rarity: string | null;
 }
 
+export interface RankRewardEntry {
+  rank: number;
+  name: string;
+  kills: number;
+  spins: number;
+}
+
+export interface RankRewards {
+  enabled: boolean;
+  nextResetAt: string;
+  entries: RankRewardEntry[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class GachaService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -94,6 +107,9 @@ export class GachaService {
   }
   pool(): Observable<{ prizes: PoolPrize[] }> {
     return this.http.get<{ prizes: PoolPrize[] }>(`${this.base()}/prizes`);
+  }
+  rankRewards(): Observable<RankRewards> {
+    return this.http.get<RankRewards>(`${this.base()}/rank-rewards`);
   }
 
   // ---- admin ----

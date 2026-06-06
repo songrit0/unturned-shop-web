@@ -91,6 +91,10 @@
     "buyError": "Purchase failed.",
     "justNow": "just now",
     "youHave": "You have",
+    "rankRewardsTitle": "Free spins by rank",
+    "rankRewardsHint": "Top players on the leaderboard earn free daily spins. Reset at 06:00 (Thai).",
+    "killsShort": "kills",
+    "freeShort": "free",
     "buyErrors": {
       "insufficient_coins": "Not enough coins.",
       "insufficient_meowcoin": "Not enough meowcoins.",

@@ -91,6 +91,10 @@
     "buyError": "ซื้อไม่สำเร็จ",
     "justNow": "เมื่อกี้",
     "youHave": "คุณมี",
+    "rankRewardsTitle": "หมุนฟรีตามอันดับ",
+    "rankRewardsHint": "ผู้เล่นอันดับต้นบน leaderboard ได้สิทธิ์หมุนฟรีรายวัน รีเซ็ต 06:00 (ไทย)",
+    "killsShort": "คิล",
+    "freeShort": "ฟรี",
     "buyErrors": {
       "insufficient_coins": "Coins ไม่พอ",
       "insufficient_meowcoin": "Meowcoins ไม่พอ",
