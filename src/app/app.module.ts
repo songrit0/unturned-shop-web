@@ -56,6 +56,7 @@ import { TopupComponent } from './pages/topup/topup.component';
 import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 import { DrawComponent } from './pages/draw/draw.component';
 import { AdminGachaComponent } from './pages/admin-gacha/admin-gacha.component';
+import { AdminCodeBuilderComponent } from './pages/admin-code-builder/admin-code-builder.component';
 
 import { ApiErrorComponent } from './pages/api-error/api-error.component';
 import { ApiUrlService } from './services/api-url.service';
@@ -127,6 +128,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminDonateTiersComponent,
     DrawComponent,
     AdminGachaComponent,
+    AdminCodeBuilderComponent,
     ApiErrorComponent,
   ],
   imports: [

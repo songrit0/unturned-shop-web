@@ -43,6 +43,7 @@
       "admin": "ADMIN"
     },
     "adminCodes": "จัดการโค้ด",
+    "adminCreateCode": "สร้างโค้ด",
     "adminDonate": "จัดการโดเนต"
   },
   "header": {

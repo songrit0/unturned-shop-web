@@ -43,6 +43,7 @@
       "admin": "ADMIN"
     },
     "adminCodes": "Manage Codes",
+    "adminCreateCode": "Create Code",
     "adminDonate": "Manage Donate"
   },
   "header": {

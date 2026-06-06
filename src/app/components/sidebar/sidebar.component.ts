@@ -98,8 +98,11 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/admin/vehicle-market" routerLinkActive="active" class="nav-item admin">
           <span class="mi">two_wheeler</span>{{ 'nav.adminVehicleMarket' | translate }}
         </a>
-        <a routerLink="/admin/codes" routerLinkActive="active" class="nav-item admin">
+        <a routerLink="/admin/codes" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-item admin">
           <span class="mi">confirmation_number</span>{{ 'nav.adminCodes' | translate }}
+        </a>
+        <a routerLink="/admin/codes/new" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">bolt</span>{{ 'nav.adminCreateCode' | translate }}
         </a>
         <a routerLink="/admin/item-types" routerLinkActive="active" class="nav-item admin">
           <span class="mi">category</span>{{ 'nav.adminItemTypes' | translate }}

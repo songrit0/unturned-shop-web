@@ -39,6 +39,7 @@ import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-dona
 import { ApiErrorComponent } from './pages/api-error/api-error.component';
 import { DrawComponent } from './pages/draw/draw.component';
 import { AdminGachaComponent } from './pages/admin-gacha/admin-gacha.component';
+import { AdminCodeBuilderComponent } from './pages/admin-code-builder/admin-code-builder.component';
 import { adminGuard } from './guards/admin.guard';
 import { topupGuard } from './guards/topup.guard';
 
@@ -69,6 +70,7 @@ const routes: Routes = [
   { path: 'admin/vehicles', component: AdminVehiclesComponent, canActivate: [adminGuard] },
   { path: 'admin/vehicle-market', component: AdminVehicleMarketComponent, canActivate: [adminGuard] },
   { path: 'admin/codes', component: AdminCodesComponent, canActivate: [adminGuard] },
+  { path: 'admin/codes/new', component: AdminCodeBuilderComponent, canActivate: [adminGuard] },
   { path: 'admin/donate-tiers', component: AdminDonateTiersComponent, canActivate: [adminGuard] },
   { path: 'admin/gacha', component: AdminGachaComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
