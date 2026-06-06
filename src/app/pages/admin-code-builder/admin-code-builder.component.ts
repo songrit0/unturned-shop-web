@@ -208,7 +208,7 @@ export class AdminCodeBuilderComponent implements OnInit, OnDestroy {
   typeFilter: number | null = null;
 
   rewards: BuiltReward[] = [];
-  form = { code: '', max_uses: 0, expires_at: '', enabled: true };
+  form = { code: '', max_uses: 1, expires_at: '', enabled: true };
   saving = false;
   error: string | null = null;
   created: AdminCode | null = null;
@@ -334,7 +334,7 @@ export class AdminCodeBuilderComponent implements OnInit, OnDestroy {
         this.saving = false;
         this.created = c;
         this.rewards = [];
-        this.form = { code: '', max_uses: 0, expires_at: '', enabled: true };
+        this.form = { code: '', max_uses: 1, expires_at: '', enabled: true };
       },
       error: e => { this.saving = false; this.error = e?.error?.message || 'Create failed'; },
     });
