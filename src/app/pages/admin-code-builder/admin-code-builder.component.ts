@@ -3,6 +3,7 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Item, ItemsService } from '../../services/items.service';
 import { Vehicle, VehiclesService } from '../../services/vehicles.service';
+import { ItemType, ItemTypesService } from '../../services/item-types.service';
 import { AdminCodesService, CreateCodePayload, CodeRewardPayload, AdminCode } from '../../services/admin-codes.service';
 import { bangkokInputToIso } from '../../services/thai-time';
 
@@ -117,6 +118,12 @@ interface CatalogEntry {
             <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" placeholder="Search by name or id">
           </div>
 
+          <!-- Filter catalog by type/category -->
+          <div class="type-bar">
+            <button class="type-chip" [class.active]="typeFilter === null" (click)="selectType(null)"><span class="mi sm">apps</span>All</button>
+            <button *ngFor="let t of types" class="type-chip" [class.active]="typeFilter === t.id" (click)="selectType(t.id)">{{ t.name }}</button>
+          </div>
+
           <div *ngIf="loading" class="cat-loading"><span class="spinner"></span></div>
           <div class="catalog-grid" *ngIf="!loading">
             <div class="cat-card" *ngFor="let c of catalog" draggable="true" (dragstart)="onDragStart(c)" (dragend)="dragging = null" (click)="addReward(c)" [title]="c.name + ' (#' + c.id + ')'">
@@ -165,6 +172,10 @@ interface CatalogEntry {
     .set-field { display:flex; flex-direction:column; gap:4px; font-size:12px; }
     .set-field > span { color:var(--muted); }
 
+    .type-bar { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .type-chip { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer; font-size:12px; font-weight:600; }
+    .type-chip:hover { color:var(--text); border-color:var(--violet,#a78bfa); }
+    .type-chip.active { background:var(--violet,#a78bfa); border-color:var(--violet,#a78bfa); color:#fff; }
     .cat-tabs { display:flex; gap:4px; margin-bottom:10px; border-bottom:1px solid var(--border); }
     .tab-btn { display:flex; align-items:center; gap:6px; padding:8px 14px; background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px; cursor:pointer; color:var(--muted); font-size:13px; font-weight:600; }
     .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
@@ -193,6 +204,8 @@ export class AdminCodeBuilderComponent implements OnInit, OnDestroy {
   pageNum = 1;
   pageLimit = 24;
   total = 0;
+  types: ItemType[] = [];
+  typeFilter: number | null = null;
 
   rewards: BuiltReward[] = [];
   form = { code: '', max_uses: 0, expires_at: '', enabled: true };
@@ -210,24 +223,44 @@ export class AdminCodeBuilderComponent implements OnInit, OnDestroy {
   constructor(
     private items: ItemsService,
     private vehicles: VehiclesService,
+    private typesSvc: ItemTypesService,
     private svc: AdminCodesService,
   ) {}
 
   ngOnInit() {
     this.sub = this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => this.reload());
     this.reload();
+    this.loadTypes();
   }
   ngOnDestroy() { this.sub?.unsubscribe(); }
 
+  /** Load ALL types (items + vehicles share sv_item_types). API caps limit at 100 → page through. */
+  private loadTypes() {
+    const LIMIT = 100;
+    this.typesSvc.list(1, LIMIT).subscribe({
+      next: first => {
+        const pages = first.pages || Math.max(1, Math.ceil((first.total || 0) / LIMIT));
+        if (pages <= 1) { this.types = first.items; return; }
+        const rest = [];
+        for (let pg = 2; pg <= pages; pg++) rest.push(this.typesSvc.list(pg, LIMIT));
+        // best-effort: ignore failures of later pages
+        rest.forEach(o => o.subscribe({ next: p => this.types = [...this.types, ...p.items], error: () => {} }));
+        this.types = first.items;
+      },
+      error: () => {},
+    });
+  }
+
   switchTab(k: Kind) { if (k === this.tab) return; this.tab = k; this.q = ''; this.reload(); }
   onSearch(v: string) { this.search$.next(v ?? ''); }
+  selectType(id: number | null) { this.typeFilter = id; this.reload(); }
 
   get hasMore(): boolean { return this.catalog.length < this.total; }
 
   private fetch(page: number) {
     const src = this.tab === 'item'
-      ? this.items.list(this.q.trim(), null, page, this.pageLimit)
-      : this.vehicles.list(this.q.trim(), null, page, this.pageLimit);
+      ? this.items.list(this.q.trim(), this.typeFilter, page, this.pageLimit)
+      : this.vehicles.list(this.q.trim(), this.typeFilter, page, this.pageLimit);
     return src;
   }
 
