@@ -23,6 +23,6 @@ export class AuthCallbackComponent implements OnInit {
       return;
     }
     this.auth.setToken(token);
-    this.auth.refreshMe().subscribe(() => this.router.navigate(['/']));
+    this.auth.refreshMe().subscribe(() => this.router.navigate(['/home']));
   }
 }

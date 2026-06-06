@@ -157,7 +157,7 @@ import { P2pListing } from '../../models/vault';
           <div class="tile-desc">{{ 'home.helpLink' | translate }}</div>
         </a>
       </div> -->
-<section class="hero">
+<section class="hero" style="padding: 0px 28px 32px 28px;">
       <div class="mt-6">
         <div class="tab-bar">
           <button class="tab-btn" [class.active]="statsTab === 'my'" (click)="statsTab = 'my'">

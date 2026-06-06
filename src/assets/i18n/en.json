@@ -50,7 +50,23 @@
     "title": "meowpow Shop",
     "subtitle": "Sign in to buy/sell items and manage coins",
     "button": "Sign in with Discord",
-    "hint": "Use the same Discord account as the bot"
+    "hint": "Use the same Discord account as the bot",
+    "orSteam": "or sign in with Steam ID",
+    "continueSteam": "Continue with Steam ID",
+    "steamIdInvalid": "Enter a valid 17-digit Steam ID"
+  },
+  "landing": {
+    "online": "Online",
+    "offline": "Offline",
+    "playersOnline": "Players online",
+    "connect": "Server address",
+    "nextRestart": "Next restart",
+    "donateTitle": "Community donations",
+    "donateThisMonth": "This month",
+    "topPlayers": "Top players",
+    "latestMarket": "Latest in the P2P market",
+    "noData": "No data yet",
+    "noListings": "No active listings"
   },
   "pinLogin": {
     "title": "Enter your PIN",

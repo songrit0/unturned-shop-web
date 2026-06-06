@@ -34,13 +34,24 @@ export class AppComponent implements OnInit {
     startWith(this.isFullscreen(this.router.url)),
   );
 
-  constructor(private auth: AuthService, private router: Router, private version: VersionService) {}
+  private readonly noAuthPaths = ['/login', '/auth/callback', '/api-error'];
+
+  constructor(private auth: AuthService, private router: Router, private version: VersionService) {
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+      const url = this.router.url.split('?')[0];
+      if (!this.noAuthPaths.some(p => url.startsWith(p)) && !this.auth.token) {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
   ngOnInit() {
-    // The startup probe (APP_INITIALIZER) has already run; if the API is unreachable, send the
-    // user to the offline page instead of letting every request fail silently.
     if (!this.version.online) {
       this.router.navigate(['/api-error']);
+      return;
+    }
+    if (!this.auth.token) {
+      this.router.navigate(['/login']);
       return;
     }
     this.auth.refreshMe().subscribe();

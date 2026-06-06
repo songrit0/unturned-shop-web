@@ -44,8 +44,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'auth/callback', component: AuthCallbackComponent },
   { path: 'api-error', component: ApiErrorComponent },
-  // P2P marketplace is now the landing page; the old dashboard lives at /home.
-  { path: '', redirectTo: 'p2p-market', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
   { path: 'shop', component: ShopComponent, canActivate: [authGuard] },
   { path: 'vehicles', component: VehiclesComponent, canActivate: [authGuard] },

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlService } from '../../services/api-url.service';
 import { VersionService } from '../../services/version.service';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * Fullscreen fallback shown when the API `/version` probe fails at startup.
@@ -50,6 +51,7 @@ export class ApiErrorComponent {
   constructor(
     public apiUrl: ApiUrlService,
     public version: VersionService,
+    private auth: AuthService,
     private router: Router,
   ) {}
 
@@ -60,7 +62,8 @@ export class ApiErrorComponent {
     const ok = await this.version.probe();
     this.busy = false;
     if (ok) {
-      this.router.navigate(['/']);
+      this.auth.clear();
+      this.router.navigate(['/login']);
     } else {
       this.failed = true;
     }

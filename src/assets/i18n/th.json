@@ -50,7 +50,23 @@
     "title": "meowpow Shop",
     "subtitle": "เข้าสู่ระบบเพื่อซื้อ-ขายของ จัดการ coin",
     "button": "เข้าสู่ระบบด้วย Discord",
-    "hint": "ใช้ Discord เดียวกับที่ใช้กับบอท"
+    "hint": "ใช้ Discord เดียวกับที่ใช้กับบอท",
+    "orSteam": "หรือเข้าสู่ระบบด้วย Steam ID",
+    "continueSteam": "ไปต่อด้วย Steam ID",
+    "steamIdInvalid": "กรอก Steam ID 17 หลักให้ถูกต้อง"
+  },
+  "landing": {
+    "online": "ออนไลน์",
+    "offline": "ออฟไลน์",
+    "playersOnline": "ผู้เล่นออนไลน์",
+    "connect": "ที่อยู่เซิร์ฟเวอร์",
+    "nextRestart": "รีสตาร์ทรอบหน้า",
+    "donateTitle": "ยอดโดเนทรวม",
+    "donateThisMonth": "เดือนนี้",
+    "topPlayers": "ผู้เล่นอันดับต้น",
+    "latestMarket": "ของล่าสุดในตลาด P2P",
+    "noData": "ยังไม่มีข้อมูล",
+    "noListings": "ยังไม่มีรายการขาย"
   },
   "pinLogin": {
     "title": "ใส่ PIN ของคุณ",
