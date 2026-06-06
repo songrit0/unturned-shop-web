@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { GachaService, GachaPrize, GachaConfig, GachaPrizeType } from '../../services/gacha.service';
 
 interface RankRow { rank: number; spins: number; }
@@ -71,11 +72,19 @@ interface RankRow { rank: number; spins: number; }
         <section class="card" style="padding:18px">
           <div class="card-head row" style="justify-content:space-between">
             <span class="row gap-2"><span class="mi" style="color:var(--amber)">redeem</span><span class="fw-7">Prize pool ({{ prizes.length }})</span></span>
-            <button class="btn primary sm" (click)="openNew()"><span class="mi sm">add</span>Add prize</button>
+            <div class="row gap-2">
+              <button class="btn secondary sm" (click)="saveWeights()" [disabled]="!weightsDirty || savingWeights">
+                <span *ngIf="savingWeights" class="spinner sm"></span><span class="mi sm">percent</span>Save chances
+              </button>
+              <button class="btn primary sm" (click)="openNew()"><span class="mi sm">add</span>Add prize</button>
+            </div>
           </div>
 
           <p class="muted text-xs" style="margin-bottom:10px">
-            Drop chance = each prize's weight ÷ total weight. ref_id = item id / vehicle id / VIP package id.
+            Edit the <b>Weight</b> column to tune drop chances. Chance = weight ÷ total.
+            Total weight: <b>{{ totalWeight() }}</b><span *ngIf="totalWeight() === 100" class="text-emerald"> (weight = %)</span>.
+            Tip: make weights sum to 100 so each weight equals its %. ref_id = item / vehicle / VIP-package id.
+            <span *ngIf="weightsMsg" class="text-emerald">· {{ weightsMsg }}</span>
           </p>
 
           <div class="prize-table">
@@ -92,8 +101,8 @@ interface RankRow { rank: number; spins: number; }
               <span class="mono">{{ p.ref_id ?? '—' }}</span>
               <span class="mono">{{ p.amount | number }}</span>
               <span class="mono">{{ p.type === 'item' || p.type === 'vehicle' ? p.quality : '—' }}</span>
-              <span class="mono">{{ p.weight }}</span>
-              <span class="mono">{{ chance(p) }}%</span>
+              <span><input class="input sm" type="number" min="0" step="0.1" [(ngModel)]="p.weight" (ngModelChange)="weightsDirty = true" style="width:62px"></span>
+              <span class="mono" [class.text-emerald]="chance(p) !== '0'">{{ chance(p) }}%</span>
               <span><span class="mi sm" [style.color]="p.enabled ? 'var(--emerald)' : 'var(--muted)'">{{ p.enabled ? 'check_circle' : 'cancel' }}</span></span>
               <span class="row gap-1">
                 <button class="btn ghost sm" (click)="edit(p)"><span class="mi sm">edit</span></button>
@@ -204,7 +213,27 @@ export class AdminGachaComponent implements OnInit {
   saving = false;
   editError: string | null = null;
 
+  weightsDirty = false;
+  savingWeights = false;
+  weightsMsg = '';
+
   constructor(private gacha: GachaService) {}
+
+  totalWeight(): number {
+    return Math.round(this.prizes.filter(p => p.enabled).reduce((s, p) => s + (Number(p.weight) || 0), 0) * 10) / 10;
+  }
+
+  /** Persist all prize weights (the inline-edited drop chances). */
+  saveWeights() {
+    if (!this.weightsDirty || this.savingWeights || this.prizes.length === 0) return;
+    this.savingWeights = true;
+    this.weightsMsg = '';
+    const calls = this.prizes.map(p => this.gacha.updatePrize(p.id, p));
+    forkJoin(calls).subscribe({
+      next: () => { this.savingWeights = false; this.weightsDirty = false; this.weightsMsg = 'Saved'; setTimeout(() => this.weightsMsg = '', 2000); },
+      error: () => { this.savingWeights = false; },
+    });
+  }
 
   ngOnInit() { this.load(); }
 

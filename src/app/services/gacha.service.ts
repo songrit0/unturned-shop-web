@@ -63,6 +63,15 @@ export interface GachaTodayEntry {
   at: string;
 }
 
+/** Display-only prize for the spin reel. */
+export interface PoolPrize {
+  type: GachaPrizeType;
+  label: string;
+  amount: number;
+  imageUrl: string | null;
+  rarity: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GachaService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -82,6 +91,9 @@ export class GachaService {
   }
   today(limit = 20): Observable<{ entries: GachaTodayEntry[] }> {
     return this.http.get<{ entries: GachaTodayEntry[] }>(`${this.base()}/today?limit=${limit}`);
+  }
+  pool(): Observable<{ prizes: PoolPrize[] }> {
+    return this.http.get<{ prizes: PoolPrize[] }>(`${this.base()}/prizes`);
   }
 
   // ---- admin ----

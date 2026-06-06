@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { GachaService, GachaState, GachaSpinResult, GachaTodayEntry } from '../../services/gacha.service';
+import { GachaService, GachaState, GachaSpinResult, GachaTodayEntry, PoolPrize } from '../../services/gacha.service';
 import { CoinsService } from '../../services/coins.service';
 import { TopupService } from '../../services/topup.service';
 
@@ -24,8 +24,20 @@ import { TopupService } from '../../services/topup.service';
         <ng-container *ngIf="state.enabled">
           <!-- Spin panel -->
           <section class="card draw-panel">
-            <div class="draw-wheel" [class.spinning]="spinning">
-              <span class="mi">{{ spinning ? 'autorenew' : 'redeem' }}</span>
+            <div class="reel-viewport" #reel>
+              <div class="reel-fade left"></div>
+              <div class="reel-fade right"></div>
+              <div class="reel-pointer"></div>
+              <div class="reel-strip" [class.animating]="reelAnimating" [style.transform]="reelTransform">
+                <div class="reel-card" *ngFor="let it of reelItems" [class]="'rar-' + (it.rarity || 'common')">
+                  <div class="reel-thumb">
+                    <img *ngIf="it.imageUrl; else ri" [src]="it.imageUrl" alt="">
+                    <ng-template #ri><span class="mi">{{ typeIcon(it.type) }}</span></ng-template>
+                  </div>
+                  <div class="reel-label">{{ it.label }}</div>
+                </div>
+                <div *ngIf="reelItems.length === 0" class="reel-empty muted text-sm">{{ 'draw.spin' | translate }}</div>
+              </div>
             </div>
 
             <div class="draw-counts">
@@ -105,13 +117,32 @@ import { TopupService } from '../../services/topup.service';
   `,
   styles: [`
     .card-head { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:15px; }
-    .draw-panel { display:flex; flex-direction:column; align-items:center; gap:16px; padding:32px 20px; text-align:center; }
-    .draw-wheel { width:120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-      background: conic-gradient(from 0deg, var(--accent), var(--violet,#a78bfa), var(--amber), var(--emerald), var(--accent));
-      box-shadow: 0 8px 30px rgb(0 0 0 / .25); }
-    .draw-wheel .mi { font-size:54px; color:#fff; }
-    .draw-wheel.spinning { animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .draw-panel { display:flex; flex-direction:column; align-items:center; gap:16px; padding:28px 16px; text-align:center; }
+    .reel-viewport { position:relative; width:100%; max-width:520px; height:124px; overflow:hidden;
+      border-radius:14px; border:1px solid var(--border); background:var(--surface-2); }
+    .reel-pointer { position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%); z-index:3;
+      background:var(--accent); box-shadow:0 0 12px var(--accent); }
+    .reel-pointer::before, .reel-pointer::after { content:''; position:absolute; left:50%; transform:translateX(-50%);
+      border-left:7px solid transparent; border-right:7px solid transparent; }
+    .reel-pointer::before { top:0; border-top:9px solid var(--accent); }
+    .reel-pointer::after { bottom:0; border-bottom:9px solid var(--accent); }
+    .reel-fade { position:absolute; top:0; bottom:0; width:60px; z-index:2; pointer-events:none; }
+    .reel-fade.left { left:0; background:linear-gradient(90deg, var(--surface-2), transparent); }
+    .reel-fade.right { right:0; background:linear-gradient(270deg, var(--surface-2), transparent); }
+    .reel-strip { display:flex; gap:6px; height:100%; align-items:center; padding:0 6px; will-change:transform; }
+    .reel-strip.animating { transition: transform 3.2s cubic-bezier(.10,.72,.16,1); }
+    .reel-card { flex:0 0 80px; width:80px; height:96px; border-radius:10px; background:var(--surface);
+      border:1px solid var(--border); border-bottom-width:3px; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:5px; padding:6px; }
+    .reel-thumb { width:46px; height:46px; display:flex; align-items:center; justify-content:center; color:var(--text-faint); }
+    .reel-thumb img { max-width:100%; max-height:100%; object-fit:contain; }
+    .reel-thumb .mi { font-size:34px; }
+    .reel-label { font-size:10px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:100%; font-weight:600; }
+    .reel-empty { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+    .reel-card.rar-common { border-bottom-color:#9ca3af; }
+    .reel-card.rar-rare { border-bottom-color:#3b82f6; }
+    .reel-card.rar-epic { border-bottom-color:#a855f7; }
+    .reel-card.rar-legendary { border-bottom-color:#f5c518; }
     .draw-counts { display:flex; flex-direction:column; align-items:center; }
     .draw-big { font-size:44px; font-weight:800; line-height:1; }
     .draw-breakdown { margin-top:6px; }
@@ -163,6 +194,16 @@ export class DrawComponent implements OnInit, OnDestroy {
   resetCountdown = '';
   private resetTimer: ReturnType<typeof setInterval> | null = null;
 
+  // ---- reel ----
+  @ViewChild('reel') reelEl?: ElementRef<HTMLElement>;
+  pool: PoolPrize[] = [];
+  reelItems: PoolPrize[] = [];
+  reelTransform = 'translateX(0px)';
+  reelAnimating = false;
+  private readonly ITEM_W = 86; // 80px card + 6px gap
+  private readonly REEL_LEN = 48;
+  private readonly LANDING = 42;
+
   constructor(
     private gacha: GachaService,
     private coins: CoinsService,
@@ -173,7 +214,19 @@ export class DrawComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.refresh();
     this.loadToday();
+    this.loadPool();
     this.resetTimer = setInterval(() => this.tickReset(), 1000);
+  }
+
+  private loadPool() {
+    this.gacha.pool().subscribe({
+      next: r => {
+        this.pool = r.prizes || [];
+        // Idle strip so the reel isn't empty before the first spin.
+        if (this.pool.length) this.reelItems = this.buildStrip(12, null);
+      },
+      error: () => { this.pool = []; },
+    });
   }
 
   ngOnDestroy() {
@@ -198,22 +251,52 @@ export class DrawComponent implements OnInit, OnDestroy {
     if (!this.state || this.spinning || this.state.totalRemaining <= 0) return;
     this.spinning = true;
     this.buyError = null;
+    // API decides the prize; the reel is purely cosmetic and lands on whatever the API returned.
     this.gacha.spin().subscribe({
-      next: res => {
-        // brief spin animation before revealing
-        setTimeout(() => {
-          this.spinning = false;
-          this.result = res;
-          if (this.state) this.state.totalRemaining = res.remaining;
-          this.refresh();
-          this.loadToday();
-        }, 700);
-      },
+      next: res => this.runReel(res),
       error: e => {
         this.spinning = false;
         this.buyError = e?.error?.message || this.t.instant('draw.spinError');
       },
     });
+  }
+
+  /** Build a strip of `n` random pool items; if `won` is given, place it at LANDING. */
+  private buildStrip(n: number, won: PoolPrize | null): PoolPrize[] {
+    const src = this.pool.length ? this.pool : (won ? [won] : []);
+    const items: PoolPrize[] = [];
+    for (let i = 0; i < n; i++) {
+      items.push(src[Math.floor(Math.random() * src.length)] ?? src[0]);
+    }
+    if (won) items[this.LANDING] = won;
+    return items;
+  }
+
+  /** Animate the reel to land on the API's actual result, then reveal it. */
+  private runReel(res: GachaSpinResult) {
+    const won: PoolPrize = {
+      type: res.prize.type, label: res.prize.label, amount: res.prize.amount,
+      imageUrl: res.prize.imageUrl, rarity: res.prize.rarity,
+    };
+    this.reelItems = this.buildStrip(this.REEL_LEN, won);
+    // reset to start with no animation
+    this.reelAnimating = false;
+    this.reelTransform = 'translateX(0px)';
+    setTimeout(() => {
+      const vw = this.reelEl?.nativeElement.clientWidth ?? 520;
+      const center = this.LANDING * this.ITEM_W + this.ITEM_W / 2; // center of the winning card
+      const jitter = Math.floor(Math.random() * 40) - 20;          // land slightly off dead-center
+      const tx = vw / 2 - center + jitter;
+      this.reelAnimating = true;
+      this.reelTransform = `translateX(${tx}px)`;
+    }, 50);
+    setTimeout(() => {
+      this.spinning = false;
+      this.result = res;
+      if (this.state) this.state.totalRemaining = res.remaining;
+      this.refresh();
+      this.loadToday();
+    }, 3400);
   }
 
   buy(currency: 'coins' | 'meowcoins') {
