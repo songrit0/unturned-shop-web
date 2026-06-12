@@ -341,11 +341,12 @@ export class DrawComponent implements OnInit, OnDestroy {
 
   ago(iso: string): string {
     if (!iso) return '';
-    const diff = Math.max(0, Date.now() - new Date(iso).getTime());
-    const m = Math.floor(diff / 60000);
-    if (m < 1) return this.t.instant('draw.justNow');
-    if (m < 60) return `${m}m`;
-    return `${Math.floor(m / 60)}h`;
+    return new Date(iso).toLocaleTimeString('th-TH', {
+      timeZone: 'Asia/Bangkok',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
   }
 
   private tickReset() {
