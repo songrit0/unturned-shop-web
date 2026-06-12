@@ -55,7 +55,9 @@ import { AdminMeowcoinsComponent } from './pages/admin-meowcoins/admin-meowcoins
 import { TopupComponent } from './pages/topup/topup.component';
 import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 import { DrawComponent } from './pages/draw/draw.component';
+import { DailyComponent } from './pages/daily/daily.component';
 import { AdminGachaComponent } from './pages/admin-gacha/admin-gacha.component';
+import { AdminDailyComponent } from './pages/admin-daily/admin-daily.component';
 import { AdminCodeBuilderComponent } from './pages/admin-code-builder/admin-code-builder.component';
 
 import { ApiErrorComponent } from './pages/api-error/api-error.component';
@@ -127,7 +129,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     TopupComponent,
     AdminDonateTiersComponent,
     DrawComponent,
+    DailyComponent,
     AdminGachaComponent,
+    AdminDailyComponent,
     AdminCodeBuilderComponent,
     ApiErrorComponent,
   ],

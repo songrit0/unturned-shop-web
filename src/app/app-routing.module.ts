@@ -38,7 +38,9 @@ import { TopupComponent } from './pages/topup/topup.component';
 import { AdminDonateTiersComponent } from './pages/admin-donate-tiers/admin-donate-tiers.component';
 import { ApiErrorComponent } from './pages/api-error/api-error.component';
 import { DrawComponent } from './pages/draw/draw.component';
+import { DailyComponent } from './pages/daily/daily.component';
 import { AdminGachaComponent } from './pages/admin-gacha/admin-gacha.component';
+import { AdminDailyComponent } from './pages/admin-daily/admin-daily.component';
 import { AdminCodeBuilderComponent } from './pages/admin-code-builder/admin-code-builder.component';
 import { adminGuard } from './guards/admin.guard';
 import { topupGuard } from './guards/topup.guard';
@@ -60,6 +62,7 @@ const routes: Routes = [
   { path: 'help', component: HelpComponent },
   { path: 'quests', component: QuestsComponent, canActivate: [authGuard] },
   { path: 'draw', component: DrawComponent, canActivate: [authGuard] },
+  { path: 'daily', component: DailyComponent, canActivate: [authGuard] },
   { path: 'admin/market', component: AdminMarketComponent, canActivate: [adminGuard] },
   { path: 'admin/coins', component: AdminCoinsComponent, canActivate: [adminGuard] },
   { path: 'admin/meowcoins', component: AdminMeowcoinsComponent, canActivate: [adminGuard] },
@@ -73,6 +76,7 @@ const routes: Routes = [
   { path: 'admin/codes/new', component: AdminCodeBuilderComponent, canActivate: [adminGuard] },
   { path: 'admin/donate-tiers', component: AdminDonateTiersComponent, canActivate: [adminGuard] },
   { path: 'admin/gacha', component: AdminGachaComponent, canActivate: [adminGuard] },
+  { path: 'admin/daily', component: AdminDailyComponent, canActivate: [adminGuard] },
   { path: 'market/history', component: MarketHistoryComponent, canActivate: [authGuard] },
   { path: 'market/:id', component: MarketDetailComponent, canActivate: [authGuard] },
   { path: 'vaults', component: VaultsComponent, canActivate: [authGuard] },
