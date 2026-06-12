@@ -43,6 +43,27 @@ export interface CreateCodePayload {
   rewards: CodeRewardPayload[];
 }
 
+// GET /admin/codes/export — unowned, still-usable codes only (camelCase, server-shaped).
+export interface ExportCodeReward {
+  itemId: number;
+  kind: 0 | 1;            // 0 = item, 1 = vehicle
+  amount: number;
+  name: string | null;
+}
+
+export interface ExportCode {
+  code: string;
+  maxUses: number;
+  uses: number;
+  expiresAt: string | null;
+  rewards: ExportCodeReward[];
+}
+
+export interface ExportCodesResponse {
+  count: number;
+  codes: ExportCode[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminCodesService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -63,5 +84,10 @@ export class AdminCodesService {
 
   remove(id: number): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${this.apiUrl.get()}/admin/codes/${id}`);
+  }
+
+  /** Unowned, still-usable codes for a Discord-ready text dump. */
+  exportText(): Observable<ExportCodesResponse> {
+    return this.http.get<ExportCodesResponse>(`${this.apiUrl.get()}/admin/codes/export`);
   }
 }

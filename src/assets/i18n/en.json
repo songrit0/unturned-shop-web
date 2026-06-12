@@ -1368,6 +1368,13 @@
   },
   "adminCodes": {
     "title": "Manage Redeem Codes",
+    "export": {
+      "button": "Export text",
+      "title": "Export unowned codes",
+      "count": "{{n}} codes",
+      "copy": "Copy",
+      "empty": "No unowned usable codes to export."
+    },
     "create": "Create code",
     "createTitle": "Create a new code",
     "createdMsg": "Code created:",

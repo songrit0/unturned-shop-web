@@ -7,6 +7,7 @@ import {
   AdminCodesService,
   CodeRewardPayload,
   CreateCodePayload,
+  ExportCode,
   Paginated,
 } from '../../services/admin-codes.service';
 import { Item, ItemsService } from '../../services/items.service';
@@ -39,6 +40,11 @@ interface RewardRow {
             <span class="mi lead">search</span>
             <input type="search" class="input" [(ngModel)]="q" (ngModelChange)="onSearch($event)" [placeholder]="'adminCodes.search' | translate">
           </div>
+          <button (click)="openExport()" [disabled]="exporting" class="btn secondary">
+            <span *ngIf="!exporting" class="mi sm">file_copy</span>
+            <span *ngIf="exporting" class="spinner sm"></span>
+            {{ 'adminCodes.export.button' | translate }}
+          </button>
           <button (click)="openNew()" class="btn primary">
             <span class="mi sm">add</span> {{ 'adminCodes.create' | translate }}
           </button>
@@ -237,6 +243,42 @@ interface RewardRow {
         </div>
       </div>
 
+      <!-- Export text -->
+      <div *ngIf="exportOpen" class="modal-backdrop">
+        <div class="modal-card tactical" style="max-width:620px">
+          <div class="row between" style="align-items:center;margin:0 0 12px 0">
+            <h3 style="display:flex;align-items:center;gap:8px;margin:0;font-size:18px;font-weight:700">
+              <span class="mi">file_copy</span>{{ 'adminCodes.export.title' | translate }}
+            </h3>
+            <button (click)="exportOpen = false" class="btn ghost sm"><span class="mi sm">close</span></button>
+          </div>
+
+          <ng-container *ngIf="exportCount > 0; else exportEmpty">
+            <p class="muted" style="font-size:13px;margin:0 0 8px 0">{{ 'adminCodes.export.count' | translate:{ n: exportCount } }}</p>
+            <textarea class="input mono" readonly [value]="exportText" rows="12"
+                      style="width:100%;resize:vertical;font-size:13px;line-height:1.6"
+                      (click)="$any($event.target).select()"></textarea>
+            <div class="row gap-2" style="margin-top:14px">
+              <button (click)="exportOpen = false" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+              <button (click)="copyExport()" class="btn primary" style="flex:1">
+                <span class="mi sm">{{ exportCopied ? 'check' : 'content_copy' }}</span>
+                {{ (exportCopied ? 'welcome.copied' : 'adminCodes.export.copy') | translate }}
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #exportEmpty>
+            <div class="empty" style="padding:32px 0">
+              <span class="mi xxl">inbox</span>
+              <div class="empty-title">{{ 'adminCodes.export.empty' | translate }}</div>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button (click)="exportOpen = false" class="btn secondary" style="flex:1">{{ 'common.cancel' | translate }}</button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
       <!-- Delete confirm -->
       <div *ngIf="deleting" class="modal-backdrop">
         <div class="modal-card tactical" style="max-width:380px;text-align:center">
@@ -275,6 +317,13 @@ export class AdminCodesComponent implements OnInit, OnDestroy {
   deleting: AdminCode | null = null;
   deletingBusy = false;
   deleteError: string | null = null;
+
+  // ---- Export text ----
+  exporting = false;
+  exportOpen = false;
+  exportText = '';
+  exportCount = 0;
+  exportCopied = false;
 
   constructor(
     private svc: AdminCodesService,
@@ -319,6 +368,43 @@ export class AdminCodesComponent implements OnInit, OnDestroy {
   copy(code: string) {
     navigator.clipboard.writeText(code).then(() => {
       this.copiedCode = code; setTimeout(() => this.copiedCode = null, 2000);
+    });
+  }
+
+  // ---- Export text ----
+  openExport() {
+    if (this.exporting) return;
+    this.exporting = true;
+    this.exportCopied = false;
+    this.svc.exportText().subscribe({
+      next: res => {
+        this.exporting = false;
+        this.exportCount = res.count ?? (res.codes?.length || 0);
+        this.exportText = (res.codes || []).map(c => this.formatExportLine(c)).join('\n');
+        this.exportOpen = true;
+      },
+      error: () => {
+        this.exporting = false;
+        // Surface the failure as an empty modal rather than a silent no-op.
+        this.exportCount = 0;
+        this.exportText = '';
+        this.exportOpen = true;
+      },
+    });
+  }
+
+  /** One Discord-ready line: "CODE — 2x Maple Crate, 1x Medkit" (rewards omitted if none). */
+  private formatExportLine(c: ExportCode): string {
+    const rewards = (c.rewards || [])
+      .map(r => `${r.amount}x ${r.name || ('#' + r.itemId)}`)
+      .join(', ');
+    return rewards ? `${c.code} — ${rewards}` : c.code;
+  }
+
+  copyExport() {
+    if (!this.exportText) return;
+    navigator.clipboard.writeText(this.exportText).then(() => {
+      this.exportCopied = true; setTimeout(() => this.exportCopied = false, 2000);
     });
   }
 
