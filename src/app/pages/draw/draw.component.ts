@@ -104,7 +104,7 @@ import { TopupService } from '../../services/topup.service';
             <span class="muted text-xs">{{ 'draw.redeemCode' | translate }}</span>
             <div class="code-row">
               <code class="mono">{{ result.prize.code }}</code>
-              <button class="btn secondary sm" (click)="copyCode(result.prize.code!)">
+              <button class="btn secondary sm" (click)="copyCode('/code ' + result.prize.code!)">
                 <span class="mi sm">{{ copied ? 'check' : 'content_copy' }}</span>
               </button>
             </div>
