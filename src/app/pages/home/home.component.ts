@@ -8,6 +8,7 @@ import { BasketService } from '../../services/basket.service';
 import { P2pService } from '../../services/p2p.service';
 import { PlayerStatsService, PlayerStatEntry } from '../../services/player-stats.service';
 import { GachaService, GachaState, RankRewards } from '../../services/gacha.service';
+import { DailyService, DailyStatus, DailyReward } from '../../services/daily.service';
 import { P2pListing } from '../../models/vault';
 
 @Component({
@@ -94,6 +95,36 @@ import { P2pListing } from '../../models/vault';
           </div>
         </div>
         <span class="draw-banner-cta btn primary sm"><span class="mi sm">casino</span>{{ 'draw.spin' | translate }}</span>
+      </a>
+
+      <!-- Daily reward — mirrors the draw banner, enriched with the full claimable reward set -->
+      <a *ngIf="dailyStatus?.enabled" routerLink="/daily" class="draw-banner daily-banner">
+        <div class="draw-banner-icon daily"><span class="mi fill">redeem</span></div>
+        <div class="grow">
+          <div class="draw-banner-title">{{ 'daily.title' | translate }}</div>
+
+          <!-- All claimable items + vehicles + coins -->
+          <div class="daily-rewards" *ngIf="dailyStatus as ds">
+            <span class="daily-coins" *ngIf="ds.reward.coins > 0">
+              <img class="coin-img" src="assets/coins/coin.png" alt=""><b>{{ ds.reward.coins | number }}</b>
+            </span>
+            <span class="daily-thumb" *ngFor="let r of dailyRewards(ds)" [title]="r.label">
+              <img *ngIf="r.imageUrl; else dti" [src]="r.imageUrl" [alt]="r.label">
+              <ng-template #dti><span class="mi sm">{{ r.kind === 1 ? 'directions_car' : 'inventory_2' }}</span></ng-template>
+              <span *ngIf="r.amount > 1" class="daily-qty">×{{ r.amount }}</span>
+            </span>
+            <span *ngIf="ds.reward.coins <= 0 && dailyRewards(ds).length === 0" class="muted text-xs">{{ 'daily.noReward' | translate }}</span>
+          </div>
+
+          <div class="draw-banner-sub muted text-xs">
+            <span *ngIf="dailyStatus?.alreadyClaimedToday"><span class="mi sm">restart_alt</span>{{ 'daily.nextIn' | translate }} {{ dailyCountdown }}</span>
+            <span *ngIf="!dailyStatus?.alreadyClaimedToday && dailyStatus?.tier === 'normal'" class="daily-upsell">{{ 'daily.vipUpsell' | translate }}</span>
+          </div>
+        </div>
+        <span class="draw-banner-cta btn sm" [class.primary]="dailyStatus?.canClaim" [class.secondary]="!dailyStatus?.canClaim">
+          <span class="mi sm">{{ dailyStatus?.canClaim ? 'redeem' : 'check' }}</span>
+          {{ (dailyStatus?.canClaim ? 'daily.claimBtn' : 'daily.claimedShort') | translate }}
+        </span>
       </a>
 
       <!-- Free spins by rank -->
@@ -314,6 +345,21 @@ import { P2pListing } from '../../models/vault';
     .draw-banner-icon .mi { font-size:26px; }
     .draw-banner-title { font-weight:800; font-size:16px; }
     .draw-banner-cta { flex:0 0 auto; }
+    /* Daily reward banner — amber accent to distinguish from the violet draw banner */
+    .daily-banner { background:linear-gradient(100deg, color-mix(in srgb, var(--amber,#f5c518) 14%, var(--surface)), var(--surface)); }
+    .daily-banner:hover { border-color:var(--amber,#f5c518); }
+    .draw-banner-icon.daily { background:color-mix(in srgb, var(--amber,#f5c518) 22%, var(--surface-2)); color:var(--amber,#f5c518); }
+    .daily-rewards { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:6px 0 4px; }
+    .daily-coins { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:8px;
+      background:var(--surface-2); border:1px solid var(--border); font-size:13px; }
+    .daily-coins .coin-img { width:15px; height:15px; }
+    .daily-thumb { position:relative; width:34px; height:34px; border-radius:8px; background:var(--surface-2);
+      border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .daily-thumb img { max-width:100%; max-height:100%; object-fit:contain; padding:2px; }
+    .daily-thumb .mi { color:var(--text-faint); }
+    .daily-qty { position:absolute; right:1px; bottom:1px; font-size:9px; font-weight:700; line-height:1;
+      padding:1px 3px; border-radius:4px; background:rgb(0 0 0 / .65); color:#fff; }
+    .daily-upsell { color:var(--amber,#f5c518); }
     .rank-reward-card { margin:16px 0; padding:16px 18px; }
     .rr-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
     .rr-reset { display:inline-flex; align-items:center; gap:4px; }
@@ -381,6 +427,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   drawState: GachaState | null = null;
   rankRewards: RankRewards | null = null;
   rankResetCountdown = '';
+  dailyStatus: DailyStatus | null = null;
+  dailyCountdown = '';
   private rankTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -391,6 +439,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private p2p: P2pService,
     private playerStats: PlayerStatsService,
     private gacha: GachaService,
+    private daily: DailyService,
     private t: TranslateService,
   ) { }
 
@@ -403,7 +452,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: r => { this.rankRewards = r; this.tickRankReset(); },
       error: () => { this.rankRewards = null; },
     });
-    this.rankTimer = setInterval(() => this.tickRankReset(), 1000);
+    // Daily reward banner. On 403 (not linked / disabled) we simply hide the banner.
+    this.daily.status().subscribe({
+      next: s => { this.dailyStatus = s; this.tickDailyReset(); },
+      error: () => { this.dailyStatus = null; },
+    });
+    this.rankTimer = setInterval(() => { this.tickRankReset(); this.tickDailyReset(); }, 1000);
     this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
       next: p => { this.p2pListings = p.items.slice(0, 6); },
       error: () => this.p2pListings = [],
@@ -439,6 +493,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     this.rankResetCountdown = `${h}h ${m}m ${s % 60}s`;
+  }
+
+  private tickDailyReset() {
+    if (!this.dailyStatus?.nextResetAt) { this.dailyCountdown = ''; return; }
+    const diff = new Date(this.dailyStatus.nextResetAt).getTime() - Date.now();
+    const s = Math.max(0, Math.floor(diff / 1000));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    this.dailyCountdown = `${h}h ${m}m ${s % 60}s`;
+  }
+
+  /** Flat list of all claimable items (kind 0) + vehicles (kind 1) for the banner thumbnails. */
+  dailyRewards(s: DailyStatus): DailyReward[] {
+    return [...(s.reward.items || []), ...(s.reward.vehicles || [])];
   }
 
   formatPlaytime(seconds: number): string {

@@ -121,6 +121,7 @@
     "coins": "coins",
     "noReward": "No reward configured for today.",
     "claimBtn": "Claim daily reward",
+    "claimedShort": "Claimed",
     "claimedToday": "Claimed today — come back after the reset.",
     "nextIn": "Resets in",
     "vipUpsell": "VIP members get a bigger daily reward.",
