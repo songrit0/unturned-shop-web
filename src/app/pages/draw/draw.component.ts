@@ -341,7 +341,11 @@ export class DrawComponent implements OnInit, OnDestroy {
 
   ago(iso: string): string {
     if (!iso) return '';
-    return new Date(iso).toLocaleTimeString('th-TH', {
+    // Backend ส่ง timestamp เป็น UTC แต่บางครั้งไม่มี timezone designator (Z/offset)
+    // ถ้าไม่มี ให้ถือว่าเป็น UTC เพื่อกัน JS ตีความเป็นเวลา local
+    const hasTz = /[zZ]|[+-]\d{2}:?\d{2}$/.test(iso);
+    const normalized = hasTz ? iso : iso.replace(' ', 'T') + 'Z';
+    return new Date(normalized).toLocaleTimeString('th-TH', {
       timeZone: 'Asia/Bangkok',
       hour: '2-digit',
       minute: '2-digit',
