@@ -107,6 +107,9 @@
     "errItemId": "Pick an item or vehicle from the catalog.",
     "errAmount": "Enter an amount of at least 1.",
     "errNotInCatalog": "That item is not in the catalog.",
+    "errNotFound": "This reward no longer exists — it may have been deleted.",
+    "errInvalidTier": "Invalid tier.",
+    "errInvalidKind": "Invalid reward kind.",
     "confirmDelete": "Delete reward \"{{label}}\"?"
   },
   "daily": {

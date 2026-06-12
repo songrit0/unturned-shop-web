@@ -404,14 +404,22 @@ export class AdminDailyComponent implements OnInit, OnDestroy {
     const obs = e.id ? this.daily.updateItem(e.id, payload) : this.daily.createItem(payload);
     obs.subscribe({
       next: () => { this.saving = false; this.editing = null; this.resetPicker(); this.load(); },
-      error: err => {
-        this.saving = false;
-        const code = err?.error?.message || err?.error?.error;
-        // Shouldn't happen via the picker, but the backend may reject an id not in the catalog.
-        const key = code === 'item_not_in_catalog' ? 'adminDaily.errNotInCatalog' : null;
-        this.editError = key ? this.t.instant(key) : (code || this.t.instant('adminDaily.saveFailed'));
-      },
+      error: err => { this.saving = false; this.editError = this.mapError(err); },
     });
+  }
+
+  /** Map the backend's locked error codes to friendly inline messages. */
+  private mapError(err: any): string {
+    const code = err?.error?.message || err?.error?.error || '';
+    const known: Record<string, string> = {
+      item_not_in_catalog: 'adminDaily.errNotInCatalog',
+      item_not_found: 'adminDaily.errNotFound',
+      invalid_tier: 'adminDaily.errInvalidTier',
+      item_id_required: 'adminDaily.errItemId',
+      invalid_kind: 'adminDaily.errInvalidKind',
+    };
+    const key = known[code];
+    return key ? this.t.instant(key) : (code || this.t.instant('adminDaily.saveFailed'));
   }
 
   remove(r: DailyItemRow) {
