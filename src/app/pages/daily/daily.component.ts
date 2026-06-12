@@ -115,7 +115,7 @@ import { CoinsService } from '../../services/coins.service';
             <span class="muted text-xs">{{ 'daily.redeemCode' | translate }}</span>
             <div class="code-row">
               <code class="mono">{{ result.redeemCode }}</code>
-              <button class="btn secondary sm" (click)="copyCode(result.redeemCode!)">
+              <button class="btn secondary sm" (click)="copyCode('/code ' + result.redeemCode!)">
                 <span class="mi sm">{{ copied ? 'check' : 'content_copy' }}</span>
               </button>
             </div>
