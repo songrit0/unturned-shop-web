@@ -85,14 +85,14 @@ export interface DailyTierConfigPayload {
 
 // Create/update payload for /admin/daily/items. On create, tier/itemId/amount are required;
 // on update any subset is accepted (omitted keys keep their current value).
+// label/imageUrl are NOT sent — the backend derives them from the Master Items catalog
+// (live-reference) by (kind, itemId). The picker only resolves itemId.
 export interface DailyItemPayload {
   tier?: DailyTier;
   itemId?: number;
   amount?: number;
   quality?: number;
   kind?: 0 | 1;
-  label?: string | null;
-  imageUrl?: string | null;
   sort?: number;
   enabled?: boolean;
 }

@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import {
   DailyService, DailyAdminConfig, DailyTierView, DailyItemRow, DailyTier,
   DailyTierConfigPayload, DailyItemPayload,
 } from '../../services/daily.service';
+import { ItemsService } from '../../services/items.service';
+import { VehiclesService } from '../../services/vehicles.service';
 
 // Per-tier local copy of the editable config fields so the form is decoupled from the
 // last-saved server view until the admin presses Save.
@@ -13,6 +17,13 @@ interface TierForm {
   codeTtlDays: number;
   saving: boolean;
   msg: string;
+}
+
+// A catalog hit from /items or /vehicles — only the fields the picker renders/uses.
+interface PickedOption {
+  id: number;
+  name: string;
+  image_url: string | null;
 }
 
 @Component({
@@ -113,17 +124,45 @@ interface TierForm {
             <!-- item vs vehicle toggle: id spaces overlap, kind disambiguates -->
             <label class="cfg-field full"><span>{{ 'adminDaily.kind' | translate }}</span>
               <div class="kind-toggle">
-                <button type="button" class="kind-btn" [class.on]="editing.kind === 0" (click)="editing.kind = 0">
+                <button type="button" class="kind-btn" [class.on]="editing.kind === 0" (click)="setKind(0)">
                   <span class="mi sm">inventory_2</span>{{ 'adminDaily.item' | translate }}
                 </button>
-                <button type="button" class="kind-btn" [class.on]="editing.kind === 1" (click)="editing.kind = 1">
+                <button type="button" class="kind-btn" [class.on]="editing.kind === 1" (click)="setKind(1)">
                   <span class="mi sm">directions_car</span>{{ 'adminDaily.vehicle' | translate }}
                 </button>
               </div>
             </label>
-            <label class="cfg-field"><span>{{ 'adminDaily.itemId' | translate }}</span>
-              <input class="input" type="number" min="1" [(ngModel)]="editing.itemId">
-            </label>
+            <!-- Master Items picker: scoped to the kind toggle. Resolves itemId only;
+                 label/imageUrl are derived by the backend from the catalog. -->
+            <div class="cfg-field full picker">
+              <span>{{ (editing.kind === 1 ? 'adminDaily.pickVehicle' : 'adminDaily.pickItem') | translate }}</span>
+
+              <!-- Chosen confirmation -->
+              <div *ngIf="chosen" class="chosen">
+                <img *ngIf="chosen.image_url" [src]="chosen.image_url" class="chosen-thumb" alt="">
+                <span class="chosen-name">{{ chosen.name }}</span>
+                <span class="mono muted text-xs">#{{ chosen.id }}</span>
+                <button type="button" class="btn ghost sm" (click)="clearChosen()"><span class="mi sm">close</span></button>
+              </div>
+
+              <!-- Search box -->
+              <div *ngIf="!chosen" class="picker-search">
+                <input class="input" [(ngModel)]="searchText" (ngModelChange)="onSearchChange($event)"
+                       [placeholder]="'adminDaily.searchPlaceholder' | translate" autocomplete="off">
+                <div class="picker-results" *ngIf="searchText.trim()">
+                  <div *ngIf="searching" class="picker-status muted text-xs"><span class="spinner sm"></span> {{ 'adminDaily.searching' | translate }}</div>
+                  <ng-container *ngIf="!searching">
+                    <button type="button" class="picker-row" *ngFor="let o of searchResults" (click)="choose(o)">
+                      <img *ngIf="o.image_url" [src]="o.image_url" class="picker-thumb" alt="">
+                      <span class="picker-name">{{ o.name }}</span>
+                      <span class="mono muted text-xs">#{{ o.id }}</span>
+                    </button>
+                    <div *ngIf="searchResults.length === 0" class="picker-status muted text-xs">{{ 'adminDaily.noResults' | translate }}</div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
             <label class="cfg-field"><span>{{ 'adminDaily.amount' | translate }}</span>
               <input class="input" type="number" min="1" [(ngModel)]="editing.amount">
             </label>
@@ -132,12 +171,6 @@ interface TierForm {
             </label>
             <label class="cfg-field"><span>{{ 'adminDaily.sort' | translate }}</span>
               <input class="input" type="number" [(ngModel)]="editing.sort">
-            </label>
-            <label class="cfg-field full"><span>{{ 'adminDaily.label' | translate }}</span>
-              <input class="input" [(ngModel)]="editing.label" [placeholder]="'adminDaily.labelHint' | translate">
-            </label>
-            <label class="cfg-field full"><span>{{ 'adminDaily.imageUrl' | translate }}</span>
-              <input class="input" [(ngModel)]="editing.imageUrl">
             </label>
             <label class="cfg-field"><span>{{ 'adminDaily.enabled' | translate }}</span>
               <input type="checkbox" [(ngModel)]="editing.enabled">
@@ -174,13 +207,28 @@ interface TierForm {
     .kind-btn { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:8px;
       background:var(--surface-2); border:none; color:var(--muted); font-weight:600; cursor:pointer; font-size:13px; }
     .kind-btn.on { background:var(--accent); color:#fff; }
+    .picker { position:relative; }
+    .picker-search { position:relative; }
+    .picker-results { position:absolute; top:100%; left:0; right:0; z-index:5; margin-top:4px; max-height:240px; overflow-y:auto;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgb(0 0 0 / .18); }
+    .picker-row { display:flex; align-items:center; gap:8px; width:100%; padding:7px 10px; background:none; border:none;
+      border-bottom:1px solid var(--border); cursor:pointer; text-align:left; color:inherit; font-size:13px; }
+    .picker-row:last-child { border-bottom:none; }
+    .picker-row:hover { background:var(--surface-2); }
+    .picker-thumb { width:28px; height:28px; object-fit:contain; border-radius:5px; background:var(--surface-2); flex-shrink:0; }
+    .picker-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .picker-status { padding:10px; display:flex; align-items:center; gap:6px; }
+    .chosen { display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--accent); border-radius:10px;
+      background:color-mix(in srgb, var(--accent) 8%, var(--surface-2)); }
+    .chosen-thumb { width:32px; height:32px; object-fit:contain; border-radius:6px; background:var(--surface); flex-shrink:0; }
+    .chosen-name { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .modal-backdrop { position:fixed; inset:0; background:rgb(0 0 0 / .6); display:flex; align-items:center; justify-content:center; z-index:60; padding:16px; }
     .modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; }
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .form-grid .full { grid-column:1/-1; }
   `],
 })
-export class AdminDailyComponent implements OnInit {
+export class AdminDailyComponent implements OnInit, OnDestroy {
   loading = true;
   config: DailyAdminConfig | null = null;
   tiers: DailyTier[] = ['normal', 'vip'];
@@ -194,9 +242,71 @@ export class AdminDailyComponent implements OnInit {
   saving = false;
   editError: string | null = null;
 
-  constructor(private daily: DailyService, private t: TranslateService) {}
+  // ---- Master Items picker ----
+  chosen: PickedOption | null = null;   // resolved selection (also shown as confirmation)
+  searchText = '';
+  searchResults: PickedOption[] = [];
+  searching = false;
+  private search$ = new Subject<string>();
+  private searchSub?: Subscription;
 
-  ngOnInit() { this.load(); }
+  constructor(
+    private daily: DailyService,
+    private items: ItemsService,
+    private vehicles: VehiclesService,
+    private t: TranslateService,
+  ) {}
+
+  ngOnInit() {
+    this.load();
+    // Debounced search scoped by the current kind toggle (0 = items, 1 = vehicles).
+    this.searchSub = this.search$.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap(q => {
+        const kind = this.editing?.kind === 1 ? 1 : 0;
+        this.searching = true;
+        return kind === 1
+          ? this.vehicles.list(q, null, 1, 12)
+          : this.items.list(q, null, 1, 12);
+      }),
+    ).subscribe({
+      next: page => {
+        this.searching = false;
+        this.searchResults = (page.items || []).map(o => ({ id: o.id, name: o.name, image_url: o.image_url }));
+      },
+      error: () => { this.searching = false; this.searchResults = []; },
+    });
+  }
+
+  ngOnDestroy() { this.searchSub?.unsubscribe(); }
+
+  onSearchChange(q: string) {
+    if (!q.trim()) { this.searchResults = []; this.searching = false; return; }
+    this.search$.next(q.trim());
+  }
+
+  choose(o: PickedOption) {
+    this.chosen = o;
+    if (this.editing) this.editing.itemId = o.id;
+    this.searchText = '';
+    this.searchResults = [];
+    this.editError = null;
+  }
+
+  clearChosen() {
+    this.chosen = null;
+    if (this.editing) this.editing.itemId = undefined;
+    this.searchText = '';
+    this.searchResults = [];
+  }
+
+  /** Kind toggle re-scopes the catalog and clears any prior selection. */
+  setKind(kind: 0 | 1) {
+    if (!this.editing || this.editing.kind === kind) return;
+    this.editing.kind = kind;
+    this.clearChosen();
+  }
 
   private load() {
     this.loading = true;
@@ -248,18 +358,31 @@ export class AdminDailyComponent implements OnInit {
   // ---- row CRUD ----
   openNew(tier: DailyTier) {
     this.editTier = tier;
-    this.editing = { tier, itemId: undefined, amount: 1, quality: 100, kind: 0, label: null, imageUrl: null, sort: 0, enabled: true };
+    this.editing = { tier, itemId: undefined, amount: 1, quality: 100, kind: 0, sort: 0, enabled: true };
+    this.resetPicker();
     this.editError = null;
   }
   edit(r: DailyItemRow) {
     this.editTier = r.tier;
     this.editing = {
       id: r.id, tier: r.tier, itemId: r.itemId, amount: r.amount, quality: r.quality,
-      kind: r.kind, label: r.label, imageUrl: r.imageUrl, sort: r.sort, enabled: r.enabled,
+      kind: r.kind, sort: r.sort, enabled: r.enabled,
     };
+    // Pre-fill the picker confirmation from the row's JOIN-supplied display fields so the
+    // admin sees what's currently selected without re-searching.
+    this.chosen = { id: r.itemId, name: r.label || ('#' + r.itemId), image_url: r.imageUrl };
+    this.searchText = '';
+    this.searchResults = [];
     this.editError = null;
   }
-  cancelEdit() { this.editing = null; }
+  cancelEdit() { this.editing = null; this.resetPicker(); }
+
+  private resetPicker() {
+    this.chosen = null;
+    this.searchText = '';
+    this.searchResults = [];
+    this.searching = false;
+  }
 
   save() {
     if (!this.editing) return;
@@ -268,21 +391,26 @@ export class AdminDailyComponent implements OnInit {
     if (!e.amount || Number(e.amount) < 1) { this.editError = this.t.instant('adminDaily.errAmount'); return; }
     this.saving = true;
     this.editError = null;
+    // label/imageUrl are intentionally NOT sent — backend derives them from the catalog.
     const payload: DailyItemPayload = {
       tier: e.tier,
       itemId: Number(e.itemId),
       amount: Number(e.amount),
       quality: Math.min(100, Math.max(0, Number(e.quality ?? 100))),
       kind: (e.kind === 1 ? 1 : 0),
-      label: e.label ? String(e.label) : null,
-      imageUrl: e.imageUrl ? String(e.imageUrl) : null,
       sort: Number(e.sort) || 0,
       enabled: e.enabled !== false,
     };
     const obs = e.id ? this.daily.updateItem(e.id, payload) : this.daily.createItem(payload);
     obs.subscribe({
-      next: () => { this.saving = false; this.editing = null; this.load(); },
-      error: err => { this.saving = false; this.editError = err?.error?.message || this.t.instant('adminDaily.saveFailed'); },
+      next: () => { this.saving = false; this.editing = null; this.resetPicker(); this.load(); },
+      error: err => {
+        this.saving = false;
+        const code = err?.error?.message || err?.error?.error;
+        // Shouldn't happen via the picker, but the backend may reject an id not in the catalog.
+        const key = code === 'item_not_in_catalog' ? 'adminDaily.errNotInCatalog' : null;
+        this.editError = key ? this.t.instant(key) : (code || this.t.instant('adminDaily.saveFailed'));
+      },
     });
   }
 
