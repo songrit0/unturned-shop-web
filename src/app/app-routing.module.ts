@@ -12,6 +12,7 @@ import { CodesComponent } from './pages/codes/codes.component';
 import { HelpComponent } from './pages/help/help.component';
 import { AdminMarketComponent } from './pages/admin-market/admin-market.component';
 import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
+import { AdminNotificationsComponent } from './pages/admin-notifications/admin-notifications.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
 import { VipComponent } from './pages/vip/vip.component';
 import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
@@ -65,6 +66,7 @@ const routes: Routes = [
   { path: 'daily', component: DailyComponent, canActivate: [authGuard] },
   { path: 'admin/market', component: AdminMarketComponent, canActivate: [adminGuard] },
   { path: 'admin/coins', component: AdminCoinsComponent, canActivate: [adminGuard] },
+  { path: 'admin/notifications', component: AdminNotificationsComponent, canActivate: [adminGuard] },
   { path: 'admin/meowcoins', component: AdminMeowcoinsComponent, canActivate: [adminGuard] },
   { path: 'admin/vip', component: AdminVipComponent, canActivate: [adminGuard] },
   { path: 'admin/quests', component: AdminQuestsComponent, canActivate: [adminGuard] },
