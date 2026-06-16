@@ -599,6 +599,12 @@
     "expiresToday": "Expires today",
     "expiredOn": "Expired {{date}}",
     "noExpiry": "No expiry",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "copySelected": "Copy selected ({{n}})",
+    "copyAll": "Copy all available",
+    "allCopied": "Copied!",
+    "noneAvailable": "No available codes",
     "status": {
       "available": "Available",
       "used": "Used",

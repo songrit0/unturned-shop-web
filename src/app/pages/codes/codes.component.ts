@@ -19,13 +19,40 @@ import { formatBangkok } from '../../services/thai-time';
           <div class="empty-title">{{ 'codes.empty' | translate }}</div>
         </div>
 
+        <!-- Bulk action bar — shown when there are available codes -->
+        <div *ngIf="availableCount > 0" class="row gap-2 wrap" style="margin-bottom:12px;">
+          <button class="btn secondary sm" (click)="toggleSelectAll()">
+            <span class="mi sm">{{ allAvailableSelected ? 'check_box' : 'check_box_outline_blank' }}</span>
+            {{ (allAvailableSelected ? 'codes.deselectAll' : 'codes.selectAll') | translate }}
+          </button>
+          <button class="btn secondary sm" (click)="copySelected()" [disabled]="selected.size === 0">
+            <span class="mi sm">{{ bulkCopied ? 'check' : 'content_copy' }}</span>
+            {{ (bulkCopied ? 'codes.allCopied' : 'codes.copySelected') | translate: { n: selected.size } }}
+          </button>
+          <button class="btn sm" style="background:var(--accent); color:#fff;" (click)="copyAll()" [disabled]="availableCount === 0">
+            <span class="mi sm">{{ allCopied ? 'check' : 'select_all' }}</span>
+            {{ (allCopied ? 'codes.allCopied' : 'codes.copyAll') | translate }}
+          </button>
+        </div>
+
         <div class="col gap-3">
-          <div *ngFor="let c of page?.items" class="card" style="padding:18px;">
+          <div *ngFor="let c of page?.items" class="card" style="padding:18px;"
+            [style.outline]="c.status === 'available' && selected.has(c.code) ? '2px solid var(--accent)' : 'none'"
+            [style.outline-offset]="'-2px'">
             <div class="row gap-3 wrap between">
               <div class="row gap-3">
-                <div style="width:56px; height:56px; background: rgb(245 158 11 / 0.12); border:1px solid rgb(245 158 11 / 0.3); border-radius: var(--radius); display:flex; align-items:center; justify-content:center;">
-                  <span class="mi md" style="color:var(--accent-hi);">qr_code_2</span>
+                <!-- Checkbox for available codes -->
+                <div *ngIf="c.status === 'available'; else iconTpl"
+                  style="width:56px; height:56px; background: rgb(245 158 11 / 0.12); border:1px solid rgb(245 158 11 / 0.3); border-radius: var(--radius); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;"
+                  (click)="toggleSelect(c.code)">
+                  <span class="mi md" style="color:var(--accent-hi);">{{ selected.has(c.code) ? 'check_box' : 'check_box_outline_blank' }}</span>
                 </div>
+                <ng-template #iconTpl>
+                  <div style="width:56px; height:56px; background: var(--surface-2); border:1px solid var(--border); border-radius: var(--radius); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <span class="mi md faint">qr_code_2</span>
+                  </div>
+                </ng-template>
+
                 <div>
                   <code class="mono fw-7" style="font-size:22px; letter-spacing:0.18em;"
                     [style.color]="c.status === 'available' ? 'var(--accent)' : 'var(--text-faint)'"
@@ -59,7 +86,7 @@ import { formatBangkok } from '../../services/thai-time';
                   <ng-template #noImg><span class="mi sm faint">inventory_2</span></ng-template>
                 </div>
                 <span class="text-xs">{{ it.name || ('#' + it.item_id) }}</span>
-                <span class="mono faint text-xs">×{{ it.amount }}</span>
+                <span class="mono faint text-xs">x{{ it.amount }}</span>
               </div>
             </div>
 
@@ -86,6 +113,9 @@ export class CodesComponent implements OnInit {
   loading = true;
   page: Paginated<MyCode> | null = null;
   copiedCode: string | null = null;
+  selected = new Set<string>();
+  bulkCopied = false;
+  allCopied = false;
 
   constructor(private svc: CodesService, private t: TranslateService) {}
 
@@ -93,9 +123,56 @@ export class CodesComponent implements OnInit {
 
   load(page: number, limit: number) {
     this.loading = true;
+    this.selected.clear();
     this.svc.listMine(page, limit).subscribe({
       next: p => { this.page = p; this.loading = false; },
       error: () => this.loading = false,
+    });
+  }
+
+  get availableCodes(): MyCode[] {
+    return this.page?.items.filter(c => c.status === 'available') ?? [];
+  }
+
+  get availableCount(): number { return this.availableCodes.length; }
+
+  get allAvailableSelected(): boolean {
+    const avail = this.availableCodes;
+    return avail.length > 0 && avail.every(c => this.selected.has(c.code));
+  }
+
+  toggleSelect(code: string) {
+    if (this.selected.has(code)) this.selected.delete(code);
+    else this.selected.add(code);
+    this.selected = new Set(this.selected);
+  }
+
+  toggleSelectAll() {
+    if (this.allAvailableSelected) {
+      this.selected.clear();
+    } else {
+      this.availableCodes.forEach(c => this.selected.add(c.code));
+    }
+    this.selected = new Set(this.selected);
+  }
+
+  copySelected() {
+    const codes = [...this.selected];
+    if (!codes.length) return;
+    const text = codes.map(c => `/code ${c}`).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      this.bulkCopied = true;
+      setTimeout(() => this.bulkCopied = false, 2000);
+    });
+  }
+
+  copyAll() {
+    const codes = this.availableCodes.map(c => c.code);
+    if (!codes.length) return;
+    const text = codes.map(c => `/code ${c}`).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      this.allCopied = true;
+      setTimeout(() => this.allCopied = false, 2000);
     });
   }
 
@@ -107,21 +184,14 @@ export class CodesComponent implements OnInit {
 
   statusText(s: MyCode['status']): string { return this.t.instant('codes.status.' + s); }
 
-  /** Days until this code expires (null if no expiry / unparseable). */
   private days(c: MyCode): number | null { return daysUntil(c.expires_at); }
 
-  /** Highlight when an available code expires within 2 days. */
   isExpiringSoon(c: MyCode): boolean {
     if (c.status !== 'available') return false;
     const d = this.days(c);
     return d !== null && d >= 0 && d <= 2;
   }
 
-  /**
-   * Human expiry label. Available codes show a countdown ("expires in N days" / "today");
-   * already-expired codes show the date; no expiry / used / disabled show nothing here
-   * (status badge already conveys it).
-   */
   expiryText(c: MyCode): string | null {
     if (!c.expires_at) return null;
     if (c.status === 'expired') {
