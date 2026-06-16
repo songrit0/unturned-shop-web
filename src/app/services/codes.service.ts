@@ -21,6 +21,12 @@ export interface MyCode {
   items: CodeItem[];
 }
 
+export interface MergeResult {
+  code: string;
+  merged_count: number;
+  items: { item_id: number; kind: number; amount: number; name: string | null; image_url: string | null }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class CodesService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -29,5 +35,9 @@ export class CodesService {
     const params = buildPagedParams(page, limit);
     return this.http.get<unknown>(`${this.apiUrl.get()}/codes`, { params })
       .pipe(map(r => normalizePaginated<MyCode>(r, limit)));
+  }
+
+  merge(ids: number[]): Observable<MergeResult> {
+    return this.http.post<MergeResult>(`${this.apiUrl.get()}/codes/merge`, { ids });
   }
 }
