@@ -14,7 +14,13 @@ export class LangService {
     t.addLangs(['th', 'en']);
     t.setDefaultLang('th');
     const saved = localStorage.getItem(KEY) as Lang | null;
-    this.set(saved === 'en' ? 'en' : 'th');
+    this.set(saved === 'en' || saved === 'th' ? saved : this.detectDeviceLang());
+  }
+
+  /** Picks 'th' or 'en' from the device/browser language when no saved preference exists. */
+  private detectDeviceLang(): Lang {
+    const browserLang = this.t.getBrowserLang();
+    return browserLang === 'th' ? 'th' : 'en';
   }
 
   set(l: Lang) {
