@@ -162,6 +162,16 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
               <span class="mi sm">qr_code_2</span>
               {{ (creating ? 'common.saving' : 'topup.createBtn') | translate }}
             </button>
+
+            <!-- BuyMeACoffee: plain external link, not a create-intent flow like the providers
+                 above. The donor must put their steamID64 in the BMC supporter message
+                 themselves — the API's webhook matches on that and credits the account. -->
+            <div *ngIf="bmcPageUrl" class="card tactical" style="margin-top:16px;padding:12px">
+              <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcHint' | translate }}</p>
+              <a [href]="bmcPageUrl" target="_blank" rel="noopener" class="btn" style="width:100%;display:flex;justify-content:center">
+                <span class="mi sm">favorite</span>&nbsp;{{ 'topup.bmcBtn' | translate }}
+              </a>
+            </div>
           </ng-container>
 
           <!-- Phase: pay — PlernPay (QR + exact amount + countdown + polling) -->
@@ -443,6 +453,10 @@ export class TopupComponent implements OnInit, OnDestroy {
   providers: TopupProviderOption[] = [];
   provider: TopupProvider = 'plernpay';
 
+  // BuyMeACoffee donate link (null hides the section). Not a create-intent provider — just an
+  // external link; the donor puts their steamID64 in the BMC supporter message themselves.
+  bmcPageUrl: string | null = null;
+
   // Thunder slip-upload state.
   slipName: string | null = null;
   slipBase64: string | null = null;
@@ -472,6 +486,7 @@ export class TopupComponent implements OnInit, OnDestroy {
         this.hasAccess = !!me && (me.is_admin || !cfg.admin_only);
         this.providers = cfg.providers;
         this.maxBaht = cfg.max_baht;
+        this.bmcPageUrl = cfg.bmc_page_url;
         // Auto-select: single provider -> use it; multiple -> default to the first enabled one.
         if (this.providers.length > 0) this.provider = this.providers[0].key;
         if (this.hasAccess) {

@@ -102,6 +102,10 @@ export interface TopupConfig {
   providers: TopupProviderOption[];   // enabled providers, ordered
   monthly_cap_baht: number;           // per-user donation cap per month (baht)
   monthly_goal_baht: number;          // community fundraising goal per month (baht)
+  // BuyMeACoffee donate link — null when the admin hasn't set BMC_PAGE_URL. Unlike the providers
+  // above this is NOT a create-intent flow: it's a plain external link. The donor must put their
+  // steamID64 in the BMC supporter message; the API's webhook credits that account automatically.
+  bmc_page_url: string | null;
 }
 
 // ---- Donate / Battlepass (GET /donate/progress) ----
@@ -156,6 +160,7 @@ const TOPUP_CONFIG_FALLBACK: TopupConfig = {
   providers: [],
   monthly_cap_baht: 150,
   monthly_goal_baht: 1200,
+  bmc_page_url: null,
 };
 
 @Injectable({ providedIn: 'root' })

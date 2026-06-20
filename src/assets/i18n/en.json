@@ -468,6 +468,8 @@
     "amountPlaceholder": "e.g. 100",
     "providerLabel": "Payment method",
     "createBtn": "Generate PromptPay QR",
+    "bmcHint": "Or donate via Buy Me a Coffee (card / international) — please put your Steam ID in the message. Meowcoins are credited automatically.",
+    "bmcBtn": "Buy Me a Coffee",
     "payTitle": "Scan to pay",
     "exactAmountLabel": "Transfer this EXACT amount",
     "exactWarn": "You must transfer this exact amount, or the donation will not be matched.",

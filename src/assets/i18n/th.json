@@ -468,6 +468,8 @@
     "amountPlaceholder": "เช่น 100",
     "providerLabel": "ช่องทางชำระเงิน",
     "createBtn": "สร้าง QR PromptPay",
+    "bmcHint": "หรือโดเนตผ่าน Buy Me a Coffee (บัตร/ต่างประเทศ) — กรุณาพิมพ์ Steam ID ของคุณในข้อความตอนโดเนต ระบบจะเติม Meowcoins ให้อัตโนมัติ",
+    "bmcBtn": "Buy Me a Coffee",
     "payTitle": "สแกนเพื่อชำระเงิน",
     "exactAmountLabel": "โอนยอดนี้ให้ตรงเป๊ะ",
     "exactWarn": "ต้องโอนยอดนี้ให้ตรงเป๊ะ มิฉะนั้นระบบจะจับคู่รายการโดเนตไม่ได้",
