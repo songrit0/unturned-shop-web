@@ -206,6 +206,7 @@ export class TopupService {
             : [],
           monthly_cap_baht: Number(r?.monthly_cap_baht) > 0 ? Number(r!.monthly_cap_baht) : TOPUP_CONFIG_FALLBACK.monthly_cap_baht,
           monthly_goal_baht: Number(r?.monthly_goal_baht) > 0 ? Number(r!.monthly_goal_baht) : TOPUP_CONFIG_FALLBACK.monthly_goal_baht,
+          bmc_page_url: typeof r?.bmc_page_url === 'string' && r.bmc_page_url.trim() ? r.bmc_page_url : null,
         } as TopupConfig)),
         catchError(() => of(TOPUP_CONFIG_FALLBACK)),
         shareReplay({ bufferSize: 1, refCount: false }),
