@@ -167,65 +167,6 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
               <span class="mi sm">qr_code_2</span>
               {{ (creating ? 'common.saving' : 'topup.createBtn') | translate }}
             </button>
-
-            <!-- BuyMeACoffee: plain external link, not a create-intent flow like the providers
-                 above. The donor must put their steamID64 in the BMC supporter message
-                 themselves — the API's webhook matches on that and credits the account. -->
-            <div *ngIf="bmcPageUrl" style="margin-top:20px">
-              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">
-                <span class="mi sm">public</span> {{ 'topup.groupForeign' | translate }}
-              </div>
-              <div class="card tactical" style="padding:12px">
-                <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcHint' | translate }}</p>
-
-              <ol class="muted" style="font-size:12px;margin:0 0 10px 0;padding-left:18px;line-height:1.6">
-                <li>{{ 'topup.bmcStep1' | translate }}</li>
-                <li>{{ 'topup.bmcStep2' | translate }}</li>
-                <li>{{ 'topup.bmcStep3' | translate }}</li>
-              </ol>
-
-              <button type="button" class="btn secondary" style="width:100%;margin-bottom:8px" (click)="copyBmcSteamId()">
-                <span class="mi sm">{{ bmcSteamIdCopied ? 'check' : 'content_copy' }}</span>
-                {{ (bmcSteamIdCopied ? 'topup.bmcCopied' : 'topup.bmcCopySteamId') | translate }}
-              </button>
-
-              <a [href]="bmcPageUrl" target="_blank" rel="noopener" class="btn primary" style="width:100%;display:flex;justify-content:center">
-                <span class="mi sm">favorite</span>&nbsp;{{ 'topup.bmcBtn' | translate }}
-              </a>
-
-              <!-- Manual fallback: donated but not credited automatically -> submit proof for admin review. -->
-              <button type="button" class="btn" style="width:100%;margin-top:10px;font-size:12px"
-                      (click)="bmcClaimFormOpen = !bmcClaimFormOpen">
-                <span class="mi sm">help</span> {{ 'topup.bmcClaim.toggle' | translate }}
-              </button>
-
-              <div *ngIf="bmcClaimFormOpen" style="margin-top:10px">
-                <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcClaim.hint' | translate }}</p>
-                <input #bmcScreenshotInput type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="onBmcScreenshotSelected($event)">
-                <button type="button" class="btn secondary" style="width:100%" (click)="bmcScreenshotInput.click()">
-                  <span class="mi sm">upload_file</span> {{ (bmcClaimFileName ? 'topup.thunder.changeSlip' : 'topup.thunder.chooseSlip') | translate }}
-                </button>
-                <div *ngIf="bmcClaimFileName" class="slip-name mono">
-                  <span class="mi sm">image</span> {{ bmcClaimFileName }}
-                </div>
-                <input class="input" style="margin-top:8px" [(ngModel)]="bmcClaimNote" [placeholder]="'topup.bmcClaim.notePlaceholder' | translate" maxlength="255">
-                <p *ngIf="bmcClaimError" style="color:var(--rose);font-size:12px;margin:8px 0 0 0">{{ bmcClaimError | translate }}</p>
-                <button class="btn primary" style="width:100%;margin-top:8px" [disabled]="!bmcClaimScreenshot || bmcClaimSubmitting" (click)="submitBmcClaim()">
-                  {{ (bmcClaimSubmitting ? 'common.saving' : 'topup.bmcClaim.submit') | translate }}
-                </button>
-              </div>
-
-              <!-- Claim history: lets the donor see if an admin has reviewed their proof yet. -->
-              <div *ngIf="bmcClaims.length > 0" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px">
-                <div *ngFor="let c of bmcClaims" class="row between" style="font-size:12px;padding:4px 0">
-                  <span class="muted">{{ c.created_at | date:'short' }}{{ c.note ? ' — ' + c.note : '' }}</span>
-                  <span class="badge" [class.emerald]="c.status === 'approved'" [class.rose]="c.status === 'rejected'">
-                    {{ ('topup.bmcClaim.status.' + c.status) | translate }}
-                  </span>
-                </div>
-              </div>
-              </div>
-            </div>
           </ng-container>
 
           <!-- Phase: pay — PlernPay (QR + exact amount + countdown + polling) -->
@@ -346,6 +287,61 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
             </div>
             <button class="btn primary" style="width:100%;margin-top:8px" (click)="reset()">{{ 'topup.tryAgain' | translate }}</button>
           </ng-container>
+        </div>
+
+        <!-- ==== BuyMeACoffee: separate card, own create-intent-less flow ====
+             The donor must put their steamID64 in the BMC supporter message themselves —
+             the API's webhook matches on that and credits the account. -->
+        <div *ngIf="phase === 'form' && bmcPageUrl" class="card tactical">
+          <div class="card-title"><span class="mi">public</span>{{ 'topup.groupForeign' | translate }}</div>
+          <p class="muted" style="font-size:12px;margin:8px 0">{{ 'topup.bmcHint' | translate }}</p>
+
+          <ol class="muted" style="font-size:12px;margin:0 0 10px 0;padding-left:18px;line-height:1.6">
+            <li>{{ 'topup.bmcStep1' | translate }}</li>
+            <li>{{ 'topup.bmcStep2' | translate }}</li>
+            <li>{{ 'topup.bmcStep3' | translate }}</li>
+          </ol>
+
+          <button type="button" class="btn secondary" style="width:100%;margin-bottom:10px" (click)="copyBmcSteamId()">
+            <span class="mi sm">{{ bmcSteamIdCopied ? 'check' : 'content_copy' }}</span>
+            {{ (bmcSteamIdCopied ? 'topup.bmcCopied' : 'topup.bmcCopySteamId') | translate }}
+          </button>
+
+          <a [href]="bmcPageUrl" target="_blank" rel="noopener" style="display:flex;justify-content:center">
+            <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=songrit0&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff" alt="Buy Me a Coffee">
+          </a>
+
+          <!-- Manual fallback: donated but not credited automatically -> submit proof for admin review. -->
+          <button type="button" class="btn" style="width:100%;margin-top:10px;font-size:12px"
+                  (click)="bmcClaimFormOpen = !bmcClaimFormOpen">
+            <span class="mi sm">help</span> {{ 'topup.bmcClaim.toggle' | translate }}
+          </button>
+
+          <div *ngIf="bmcClaimFormOpen" style="margin-top:10px">
+            <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcClaim.hint' | translate }}</p>
+            <input #bmcScreenshotInput type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="onBmcScreenshotSelected($event)">
+            <button type="button" class="btn secondary" style="width:100%" (click)="bmcScreenshotInput.click()">
+              <span class="mi sm">upload_file</span> {{ (bmcClaimFileName ? 'topup.thunder.changeSlip' : 'topup.thunder.chooseSlip') | translate }}
+            </button>
+            <div *ngIf="bmcClaimFileName" class="slip-name mono">
+              <span class="mi sm">image</span> {{ bmcClaimFileName }}
+            </div>
+            <input class="input" style="margin-top:8px" [(ngModel)]="bmcClaimNote" [placeholder]="'topup.bmcClaim.notePlaceholder' | translate" maxlength="255">
+            <p *ngIf="bmcClaimError" style="color:var(--rose);font-size:12px;margin:8px 0 0 0">{{ bmcClaimError | translate }}</p>
+            <button class="btn primary" style="width:100%;margin-top:8px" [disabled]="!bmcClaimScreenshot || bmcClaimSubmitting" (click)="submitBmcClaim()">
+              {{ (bmcClaimSubmitting ? 'common.saving' : 'topup.bmcClaim.submit') | translate }}
+            </button>
+          </div>
+
+          <!-- Claim history: lets the donor see if an admin has reviewed their proof yet. -->
+          <div *ngIf="bmcClaims.length > 0" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px">
+            <div *ngFor="let c of bmcClaims" class="row between" style="font-size:12px;padding:4px 0">
+              <span class="muted">{{ c.created_at | date:'short' }}{{ c.note ? ' — ' + c.note : '' }}</span>
+              <span class="badge" [class.emerald]="c.status === 'approved'" [class.rose]="c.status === 'rejected'">
+                {{ ('topup.bmcClaim.status.' + c.status) | translate }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- ==== Right: history ==== -->
