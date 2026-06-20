@@ -468,6 +468,8 @@
     "amountPlaceholder": "e.g. 100",
     "providerLabel": "Payment method",
     "createBtn": "Generate PromptPay QR",
+    "groupThai": "For Thai players — PromptPay",
+    "groupForeign": "For international / card payments — Buy Me a Coffee",
     "bmcHint": "Or donate via Buy Me a Coffee (card / international) — follow these 3 steps so Meowcoins are credited automatically.",
     "bmcBtn": "Go to Buy Me a Coffee",
     "bmcCopySteamId": "1. Copy my Steam ID",

@@ -73,9 +73,9 @@ type StatusFilter = 'all' | AdminTopupStatus;
 
         <div *ngIf="!bmcClaimsLoading" style="display:grid;gap:12px">
           <div *ngFor="let c of bmcClaims" class="card flush" style="padding:12px;display:grid;grid-template-columns:120px 1fr auto;gap:12px;align-items:start">
-            <a [href]="c.screenshot" target="_blank" rel="noopener">
+            <button type="button" style="border:0;background:none;padding:0;cursor:pointer" (click)="previewImage = c.screenshot">
               <img [src]="c.screenshot" style="width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
-            </a>
+            </button>
             <div>
               <div style="font-weight:600">{{ c.discord_name || '—' }} <span class="mono muted" style="font-size:11px">{{ c.steam_id }}</span></div>
               <div class="muted" style="font-size:12px">{{ c.created_at | date:'short' }}{{ c.note ? ' — ' + c.note : '' }}</div>
@@ -96,6 +96,11 @@ type StatusFilter = 'all' | AdminTopupStatus;
           </div>
           <p *ngIf="bmcClaims.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminMeowcoins.bmcClaims.none' | translate }}</p>
         </div>
+      </div>
+
+      <!-- Screenshot preview overlay (data: URLs are too long for a browser tab — show inline instead). -->
+      <div *ngIf="previewImage" class="img-overlay" (click)="previewImage = null">
+        <img [src]="previewImage" (click)="$event.stopPropagation()">
       </div>
 
       <!-- ===== A. Top-ups ===== -->
@@ -274,6 +279,8 @@ type StatusFilter = 'all' | AdminTopupStatus;
     .badge.st-pending, .badge.st-confirmed { background:var(--amber); color:#1a1a1a; }
     .badge.st-failed, .badge.st-cancelled { background:var(--rose); color:#fff; }
     .badge.st-expired { background:var(--surface-3, var(--surface-2)); color:var(--muted); }
+    .img-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:1000; cursor:zoom-out; }
+    .img-overlay img { max-width:90vw; max-height:90vh; border-radius:8px; }
   `],
 })
 export class AdminMeowcoinsComponent implements OnInit {
@@ -309,6 +316,7 @@ export class AdminMeowcoinsComponent implements OnInit {
   bmcClaimFilter: 'pending' | 'approved' | 'rejected' | '' = 'pending';
   bmcCreditInputs: Record<number, number | null> = {};
   bmcResolving: number | null = null;
+  previewImage: string | null = null;
 
   constructor(private svc: AdminMeowcoinsService, private t: TranslateService) {}
 

@@ -468,6 +468,8 @@
     "amountPlaceholder": "เช่น 100",
     "providerLabel": "ช่องทางชำระเงิน",
     "createBtn": "สร้าง QR PromptPay",
+    "groupThai": "สำหรับคนไทย — PromptPay",
+    "groupForeign": "สำหรับต่างประเทศ / บัตรเครดิต — Buy Me a Coffee",
     "bmcHint": "หรือโดเนตผ่าน Buy Me a Coffee (บัตร/ต่างประเทศ) — ทำตาม 3 ขั้นตอนนี้เพื่อให้ระบบเติม Meowcoins ให้อัตโนมัติ",
     "bmcBtn": "ไปหน้า Buy Me a Coffee",
     "bmcCopySteamId": "1. คัดลอก Steam ID ของฉัน",

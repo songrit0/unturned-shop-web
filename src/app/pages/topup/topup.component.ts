@@ -128,6 +128,10 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
           <ng-container *ngIf="phase === 'form'">
             <div class="card-title"><span class="mi">payments</span>{{ 'topup.formTitle' | translate }}</div>
 
+            <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-top:8px">
+              <span class="mi sm">flag</span> {{ 'topup.groupThai' | translate }}
+            </div>
+
             <!-- Provider picker: only shown when more than one provider is enabled. -->
             <div *ngIf="providers.length > 1" style="margin-top:12px">
               <span class="muted" style="font-size:12px">{{ 'topup.providerLabel' | translate }}</span>
@@ -167,8 +171,12 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
             <!-- BuyMeACoffee: plain external link, not a create-intent flow like the providers
                  above. The donor must put their steamID64 in the BMC supporter message
                  themselves — the API's webhook matches on that and credits the account. -->
-            <div *ngIf="bmcPageUrl" class="card tactical" style="margin-top:16px;padding:12px">
-              <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcHint' | translate }}</p>
+            <div *ngIf="bmcPageUrl" style="margin-top:20px">
+              <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">
+                <span class="mi sm">public</span> {{ 'topup.groupForeign' | translate }}
+              </div>
+              <div class="card tactical" style="padding:12px">
+                <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcHint' | translate }}</p>
 
               <ol class="muted" style="font-size:12px;margin:0 0 10px 0;padding-left:18px;line-height:1.6">
                 <li>{{ 'topup.bmcStep1' | translate }}</li>
@@ -215,6 +223,7 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
                     {{ ('topup.bmcClaim.status.' + c.status) | translate }}
                   </span>
                 </div>
+              </div>
               </div>
             </div>
           </ng-container>
