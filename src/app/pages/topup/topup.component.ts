@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import {
+  BmcClaim,
   DonateProgress,
   DonateTier,
   ThunderVerifyReason,
@@ -168,9 +169,53 @@ const ALLOWED_SLIP_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'
                  themselves — the API's webhook matches on that and credits the account. -->
             <div *ngIf="bmcPageUrl" class="card tactical" style="margin-top:16px;padding:12px">
               <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcHint' | translate }}</p>
-              <a [href]="bmcPageUrl" target="_blank" rel="noopener" class="btn" style="width:100%;display:flex;justify-content:center">
+
+              <ol class="muted" style="font-size:12px;margin:0 0 10px 0;padding-left:18px;line-height:1.6">
+                <li>{{ 'topup.bmcStep1' | translate }}</li>
+                <li>{{ 'topup.bmcStep2' | translate }}</li>
+                <li>{{ 'topup.bmcStep3' | translate }}</li>
+              </ol>
+
+              <button type="button" class="btn secondary" style="width:100%;margin-bottom:8px" (click)="copyBmcSteamId()">
+                <span class="mi sm">{{ bmcSteamIdCopied ? 'check' : 'content_copy' }}</span>
+                {{ (bmcSteamIdCopied ? 'topup.bmcCopied' : 'topup.bmcCopySteamId') | translate }}
+              </button>
+
+              <a [href]="bmcPageUrl" target="_blank" rel="noopener" class="btn primary" style="width:100%;display:flex;justify-content:center">
                 <span class="mi sm">favorite</span>&nbsp;{{ 'topup.bmcBtn' | translate }}
               </a>
+
+              <!-- Manual fallback: donated but not credited automatically -> submit proof for admin review. -->
+              <button type="button" class="btn" style="width:100%;margin-top:10px;font-size:12px"
+                      (click)="bmcClaimFormOpen = !bmcClaimFormOpen">
+                <span class="mi sm">help</span> {{ 'topup.bmcClaim.toggle' | translate }}
+              </button>
+
+              <div *ngIf="bmcClaimFormOpen" style="margin-top:10px">
+                <p class="muted" style="font-size:12px;margin:0 0 8px 0">{{ 'topup.bmcClaim.hint' | translate }}</p>
+                <input #bmcScreenshotInput type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="onBmcScreenshotSelected($event)">
+                <button type="button" class="btn secondary" style="width:100%" (click)="bmcScreenshotInput.click()">
+                  <span class="mi sm">upload_file</span> {{ (bmcClaimFileName ? 'topup.thunder.changeSlip' : 'topup.thunder.chooseSlip') | translate }}
+                </button>
+                <div *ngIf="bmcClaimFileName" class="slip-name mono">
+                  <span class="mi sm">image</span> {{ bmcClaimFileName }}
+                </div>
+                <input class="input" style="margin-top:8px" [(ngModel)]="bmcClaimNote" [placeholder]="'topup.bmcClaim.notePlaceholder' | translate" maxlength="255">
+                <p *ngIf="bmcClaimError" style="color:var(--rose);font-size:12px;margin:8px 0 0 0">{{ bmcClaimError | translate }}</p>
+                <button class="btn primary" style="width:100%;margin-top:8px" [disabled]="!bmcClaimScreenshot || bmcClaimSubmitting" (click)="submitBmcClaim()">
+                  {{ (bmcClaimSubmitting ? 'common.saving' : 'topup.bmcClaim.submit') | translate }}
+                </button>
+              </div>
+
+              <!-- Claim history: lets the donor see if an admin has reviewed their proof yet. -->
+              <div *ngIf="bmcClaims.length > 0" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px">
+                <div *ngFor="let c of bmcClaims" class="row between" style="font-size:12px;padding:4px 0">
+                  <span class="muted">{{ c.created_at | date:'short' }}{{ c.note ? ' — ' + c.note : '' }}</span>
+                  <span class="badge" [class.emerald]="c.status === 'approved'" [class.rose]="c.status === 'rejected'">
+                    {{ ('topup.bmcClaim.status.' + c.status) | translate }}
+                  </span>
+                </div>
+              </div>
             </div>
           </ng-container>
 
@@ -456,6 +501,16 @@ export class TopupComponent implements OnInit, OnDestroy {
   // BuyMeACoffee donate link (null hides the section). Not a create-intent provider — just an
   // external link; the donor puts their steamID64 in the BMC supporter message themselves.
   bmcPageUrl: string | null = null;
+  bmcSteamIdCopied = false;
+
+  // BMC manual-claim fallback (donation paid but the webhook couldn't auto-attribute it).
+  bmcClaims: BmcClaim[] = [];
+  bmcClaimNote = '';
+  bmcClaimScreenshot: string | null = null;
+  bmcClaimFileName: string | null = null;
+  bmcClaimError: string | null = null;
+  bmcClaimSubmitting = false;
+  bmcClaimFormOpen = false;
 
   // Thunder slip-upload state.
   slipName: string | null = null;
@@ -493,6 +548,7 @@ export class TopupComponent implements OnInit, OnDestroy {
           this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
           this.loadProgress();
           this.loadHistory();
+          this.loadBmcClaims();
         } else {
           this.historyLoading = false;
         }
@@ -617,6 +673,65 @@ export class TopupComponent implements OnInit, OnDestroy {
         // Map the API reason to a friendly i18n key; keep the QR so the user can re-upload.
         const reason = e?.error?.reason as ThunderVerifyReason | undefined;
         this.slipError = reason ? `topup.thunder.errors.${reason}` : 'topup.thunder.errors.generic';
+      },
+    });
+  }
+
+  // ---- BuyMeACoffee: copy Steam ID + manual claim fallback ----
+  copyBmcSteamId() {
+    const id = this.auth.current?.steam_id;
+    if (!id) return;
+    navigator.clipboard.writeText(id).then(() => {
+      this.bmcSteamIdCopied = true;
+      setTimeout(() => { this.bmcSteamIdCopied = false; }, 2000);
+    });
+  }
+
+  loadBmcClaims() {
+    this.topup.myBmcClaims().subscribe({ next: r => { this.bmcClaims = r; }, error: () => {} });
+  }
+
+  onBmcScreenshotSelected(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    this.bmcClaimError = null;
+    this.bmcClaimFileName = null;
+    this.bmcClaimScreenshot = null;
+    if (!ALLOWED_SLIP_TYPES.includes(file.type)) {
+      this.bmcClaimError = 'topup.thunder.errors.badType';
+      return;
+    }
+    if (file.size > MAX_SLIP_BYTES) {
+      this.bmcClaimError = 'topup.thunder.errors.tooLarge';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.bmcClaimScreenshot = String(reader.result);
+      this.bmcClaimFileName = file.name;
+    };
+    reader.onerror = () => { this.bmcClaimError = 'topup.thunder.errors.readFail'; };
+    reader.readAsDataURL(file);
+  }
+
+  submitBmcClaim() {
+    if (!this.bmcClaimScreenshot || this.bmcClaimSubmitting) return;
+    this.bmcClaimSubmitting = true;
+    this.bmcClaimError = null;
+    this.topup.reportBmcClaim(this.bmcClaimScreenshot, this.bmcClaimNote.trim() || undefined).subscribe({
+      next: () => {
+        this.bmcClaimSubmitting = false;
+        this.bmcClaimFormOpen = false;
+        this.bmcClaimNote = '';
+        this.bmcClaimScreenshot = null;
+        this.bmcClaimFileName = null;
+        this.loadBmcClaims();
+      },
+      error: () => {
+        this.bmcClaimSubmitting = false;
+        this.bmcClaimError = 'topup.bmcClaim.errors.generic';
       },
     });
   }

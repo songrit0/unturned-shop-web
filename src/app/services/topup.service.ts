@@ -108,6 +108,19 @@ export interface TopupConfig {
   bmc_page_url: string | null;
 }
 
+export type BmcClaimStatus = 'pending' | 'approved' | 'rejected';
+
+/** GET /topup/bmc/claims item — the donor's own view of a manual-claim ticket. */
+export interface BmcClaim {
+  id: number;
+  status: BmcClaimStatus;
+  note: string | null;
+  credited_meowcoins: number | null;
+  admin_note: string | null;
+  created_at: string;
+  resolved_at: string | null;
+}
+
 // ---- Donate / Battlepass (GET /donate/progress) ----
 // One reward bundled inside a tier (item or vehicle), resolved with display name + image.
 export interface DonateReward {
@@ -237,5 +250,17 @@ export class TopupService {
   /** Claim an unlocked tier's reward — mints (or returns the existing) redeem code. Idempotent. */
   claimTier(tierId: number): Observable<DonateClaimResult> {
     return this.http.post<DonateClaimResult>(`${this.apiUrl.get()}/donate/claim`, { tier_id: tierId });
+  }
+
+  // ---- BuyMeACoffee manual claim (fallback when the webhook couldn't auto-attribute) ----
+  /** screenshot_base64 is a data URL from FileReader, same convention as Thunder's slip upload. */
+  reportBmcClaim(screenshot_base64: string, note?: string): Observable<BmcClaim> {
+    return this.http.post<BmcClaim>(`${this.apiUrl.get()}/topup/bmc/claim`, { screenshot_base64, note });
+  }
+
+  /** The current user's own BMC claims, newest first (no screenshot payload in this list). */
+  myBmcClaims(): Observable<BmcClaim[]> {
+    return this.http.get<BmcClaim[]>(`${this.apiUrl.get()}/topup/bmc/claims`)
+      .pipe(map(r => Array.isArray(r) ? r : []));
   }
 }

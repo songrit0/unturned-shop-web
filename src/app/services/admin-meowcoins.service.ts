@@ -63,6 +63,24 @@ export interface AdminProviderRow {
   sort: number;
 }
 
+export type BmcClaimStatus = 'pending' | 'approved' | 'rejected';
+
+// GET /admin/meowcoins/bmc-claims?status=  -> AdminBmcClaim[]  (donor-submitted proof for a
+// BuyMeACoffee donation the webhook couldn't auto-attribute to a steamID64)
+// POST /admin/meowcoins/bmc-claims/:id/resolve { approve, credit_meowcoins?, admin_note? }
+export interface AdminBmcClaim {
+  id: number;
+  steam_id: string;
+  discord_name: string | null;
+  note: string | null;
+  screenshot: string;            // base64 image (no data: prefix)
+  status: BmcClaimStatus;
+  credited_meowcoins: number | null;
+  admin_note: string | null;
+  created_at: string;
+  resolved_at: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminMeowcoinsService {
   constructor(private http: HttpClient, private apiUrl: ApiUrlService) {}
@@ -102,5 +120,25 @@ export class AdminMeowcoinsService {
   /** Enable/disable a provider. Disabling hides it from the players' top-up page. */
   setProvider(key: string, enabled: boolean): Observable<unknown> {
     return this.http.post(`${this.apiUrl.get()}/admin/meowcoins/providers`, { key, enabled });
+  }
+
+  // ---- BuyMeACoffee manual claims ----
+  /** `status` of '' returns all (pending + approved + rejected). */
+  listBmcClaims(status: BmcClaimStatus | '' = 'pending'): Observable<AdminBmcClaim[]> {
+    const params: { [k: string]: string } = status ? { status } : {};
+    return this.http.get<AdminBmcClaim[]>(`${this.apiUrl.get()}/admin/meowcoins/bmc-claims`, { params })
+      .pipe(map(r => Array.isArray(r) ? r : []));
+  }
+
+  approveBmcClaim(id: number, creditMeowcoins: number, adminNote?: string): Observable<AdminBmcClaim> {
+    return this.http.post<AdminBmcClaim>(`${this.apiUrl.get()}/admin/meowcoins/bmc-claims/${id}/resolve`, {
+      approve: true, credit_meowcoins: creditMeowcoins, admin_note: adminNote,
+    });
+  }
+
+  rejectBmcClaim(id: number, adminNote?: string): Observable<AdminBmcClaim> {
+    return this.http.post<AdminBmcClaim>(`${this.apiUrl.get()}/admin/meowcoins/bmc-claims/${id}/resolve`, {
+      approve: false, admin_note: adminNote,
+    });
   }
 }

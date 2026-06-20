@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
   AdjustResult,
+  AdminBmcClaim,
   AdminProviderRow,
   AdminTopupRow,
   AdminTopupStatus,
@@ -53,6 +54,48 @@ type StatusFilter = 'all' | AdminTopupStatus;
           </div>
           <p *ngIf="providers.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminMeowcoins.provider.none' | translate }}</p>
         </ng-container>
+      </div>
+
+      <!-- ===== BuyMeACoffee manual claims ===== -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0 0 4px 0;font-size:16px;font-weight:700"><span class="mi sm">help</span> {{ 'adminMeowcoins.bmcClaims.title' | translate }}</h3>
+          <select class="select" [(ngModel)]="bmcClaimFilter" (ngModelChange)="loadBmcClaims()">
+            <option value="pending">{{ 'adminMeowcoins.bmcClaims.filter.pending' | translate }}</option>
+            <option value="approved">{{ 'adminMeowcoins.bmcClaims.filter.approved' | translate }}</option>
+            <option value="rejected">{{ 'adminMeowcoins.bmcClaims.filter.rejected' | translate }}</option>
+            <option value="">{{ 'adminMeowcoins.bmcClaims.filter.all' | translate }}</option>
+          </select>
+        </div>
+        <p class="muted" style="font-size:12px;margin:4px 0 12px 0">{{ 'adminMeowcoins.bmcClaims.hint' | translate }}</p>
+
+        <div *ngIf="bmcClaimsLoading" style="text-align:center;padding:24px 0"><div class="spinner"></div></div>
+
+        <div *ngIf="!bmcClaimsLoading" style="display:grid;gap:12px">
+          <div *ngFor="let c of bmcClaims" class="card flush" style="padding:12px;display:grid;grid-template-columns:120px 1fr auto;gap:12px;align-items:start">
+            <a [href]="c.screenshot" target="_blank" rel="noopener">
+              <img [src]="c.screenshot" style="width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+            </a>
+            <div>
+              <div style="font-weight:600">{{ c.discord_name || '—' }} <span class="mono muted" style="font-size:11px">{{ c.steam_id }}</span></div>
+              <div class="muted" style="font-size:12px">{{ c.created_at | date:'short' }}{{ c.note ? ' — ' + c.note : '' }}</div>
+              <div *ngIf="c.status !== 'pending'" class="muted" style="font-size:12px;margin-top:4px">
+                {{ ('adminMeowcoins.bmcClaims.status.' + c.status) | translate }}
+                <ng-container *ngIf="c.credited_meowcoins">— {{ c.credited_meowcoins | number }} {{ 'adminMeowcoins.meowcoins' | translate }}</ng-container>
+              </div>
+            </div>
+            <div *ngIf="c.status === 'pending'" style="display:flex;flex-direction:column;gap:6px;min-width:160px">
+              <input type="number" class="input mono" [(ngModel)]="bmcCreditInputs[c.id]" placeholder="Meowcoins" style="width:140px">
+              <button class="btn primary sm" [disabled]="bmcResolving === c.id || !bmcCreditInputs[c.id]" (click)="approveBmcClaim(c)">
+                <span class="mi sm">check</span> {{ 'adminMeowcoins.bmcClaims.approve' | translate }}
+              </button>
+              <button class="btn danger sm" [disabled]="bmcResolving === c.id" (click)="rejectBmcClaim(c)">
+                <span class="mi sm">close</span> {{ 'adminMeowcoins.bmcClaims.reject' | translate }}
+              </button>
+            </div>
+          </div>
+          <p *ngIf="bmcClaims.length === 0" class="muted" style="font-size:13px;margin:8px 0 0 0">{{ 'adminMeowcoins.bmcClaims.none' | translate }}</p>
+        </div>
       </div>
 
       <!-- ===== A. Top-ups ===== -->
@@ -260,9 +303,16 @@ export class AdminMeowcoinsComponent implements OnInit {
   setReason = '';
   saving = false;
 
+  // ---- BuyMeACoffee manual claims ----
+  bmcClaims: AdminBmcClaim[] = [];
+  bmcClaimsLoading = true;
+  bmcClaimFilter: 'pending' | 'approved' | 'rejected' | '' = 'pending';
+  bmcCreditInputs: Record<number, number | null> = {};
+  bmcResolving: number | null = null;
+
   constructor(private svc: AdminMeowcoinsService, private t: TranslateService) {}
 
-  ngOnInit() { this.load(1, 20); this.loadProviders(); }
+  ngOnInit() { this.load(1, 20); this.loadProviders(); this.loadBmcClaims(); }
 
   /** Coerce string/number DECIMAL/BIGINT fields to a number for display/math. */
   num(v: string | number | null | undefined): number {
@@ -363,5 +413,32 @@ export class AdminMeowcoinsComponent implements OnInit {
     if (this.wallet) this.wallet.balance = r.balance;
     this.walletError = null;
     this.loadWallet();
+  }
+
+  // ---- BuyMeACoffee manual claims ----
+  loadBmcClaims() {
+    this.bmcClaimsLoading = true;
+    this.svc.listBmcClaims(this.bmcClaimFilter).subscribe({
+      next: list => { this.bmcClaims = list; this.bmcClaimsLoading = false; },
+      error: () => { this.bmcClaimsLoading = false; },
+    });
+  }
+
+  approveBmcClaim(c: AdminBmcClaim) {
+    const credit = Number(this.bmcCreditInputs[c.id]);
+    if (!Number.isFinite(credit) || credit <= 0) return;
+    this.bmcResolving = c.id;
+    this.svc.approveBmcClaim(c.id, credit).subscribe({
+      next: () => { this.bmcResolving = null; delete this.bmcCreditInputs[c.id]; this.loadBmcClaims(); },
+      error: () => { this.bmcResolving = null; },
+    });
+  }
+
+  rejectBmcClaim(c: AdminBmcClaim) {
+    this.bmcResolving = c.id;
+    this.svc.rejectBmcClaim(c.id).subscribe({
+      next: () => { this.bmcResolving = null; this.loadBmcClaims(); },
+      error: () => { this.bmcResolving = null; },
+    });
   }
 }

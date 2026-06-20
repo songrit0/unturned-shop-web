@@ -468,8 +468,27 @@
     "amountPlaceholder": "e.g. 100",
     "providerLabel": "Payment method",
     "createBtn": "Generate PromptPay QR",
-    "bmcHint": "Or donate via Buy Me a Coffee (card / international) — please put your Steam ID in the message. Meowcoins are credited automatically.",
-    "bmcBtn": "Buy Me a Coffee",
+    "bmcHint": "Or donate via Buy Me a Coffee (card / international) — follow these 3 steps so Meowcoins are credited automatically.",
+    "bmcBtn": "Go to Buy Me a Coffee",
+    "bmcCopySteamId": "1. Copy my Steam ID",
+    "bmcCopied": "Copied!",
+    "bmcStep1": "Click \"Copy my Steam ID\" below",
+    "bmcStep2": "Click \"Go to Buy Me a Coffee\" and paste your Steam ID into the message/note field while donating",
+    "bmcStep3": "Complete the donation — Meowcoins are credited automatically within a few minutes",
+    "bmcClaim": {
+      "toggle": "Donated but no Meowcoins yet? Click here",
+      "hint": "If you donated but Meowcoins weren't credited (e.g. forgot to include your Steam ID, or typed it wrong), submit a screenshot of your donation as proof and an admin will review and credit it manually.",
+      "notePlaceholder": "Note (optional), e.g. amount donated",
+      "submit": "Submit proof",
+      "status": {
+        "pending": "Pending review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "errors": {
+        "generic": "Failed to submit proof. Please try again."
+      }
+    },
     "payTitle": "Scan to pay",
     "exactAmountLabel": "Transfer this EXACT amount",
     "exactWarn": "You must transfer this exact amount, or the donation will not be matched.",
@@ -896,6 +915,23 @@
       "enable": "Enable",
       "disable": "Disable",
       "none": "No payment providers configured."
+    },
+    "bmcClaims": {
+      "title": "Buy Me a Coffee claims",
+      "hint": "Players who donated but didn't get Meowcoins (forgot/typo'd their Steam ID) submit a screenshot here. Review it and enter how many Meowcoins to credit.",
+      "filter": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "all": "All"
+      },
+      "status": {
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "approve": "Approve",
+      "reject": "Reject",
+      "none": "No claims."
     },
     "topupsTitle": "Top-ups",
     "searchTopups": "Search steam_id / discord...",
