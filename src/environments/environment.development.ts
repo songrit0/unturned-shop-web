@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrlFallback: 'https://meowpow.ngrok.dev',
+  apiUrlFallback: 'https://api.meowpow.shop',
   firebase: {
     apiKey: '',
     authDomain: '',
