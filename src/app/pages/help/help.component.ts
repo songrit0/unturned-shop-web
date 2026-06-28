@@ -194,6 +194,14 @@ export class HelpComponent {
     { cmd: '/tpa <player>', descKey: 'commandRef.desc.tpa' },
     { cmd: '/tpa a / d / c', descKey: 'help.cmdTpaReplyDesc' },
     { cmd: '/decay', descKey: 'commandRef.desc.decay' },
+    { cmd: '/backpack', descKey: 'commandRef.desc.backpack' },
+    { cmd: '/backpackupgrade', descKey: 'commandRef.desc.backpackupgrade' },
+    { cmd: '/koth', descKey: 'commandRef.desc.koth' },
+    { cmd: '/jkoth [loadout]', descKey: 'commandRef.desc.jkoth' },
+    { cmd: '/kothtop', descKey: 'commandRef.desc.kothtop' },
+    { cmd: '/menu', descKey: 'commandRef.desc.menu' },
+    { cmd: '/votetime <day|night>', descKey: 'commandRef.desc.votetime' },
+    { cmd: '/raidstatus', descKey: 'commandRef.desc.raidstatus' },
   ];
   // Systems overview — one short blurb per server system so a new player gets the whole picture.
   systems = [
@@ -209,6 +217,11 @@ export class HelpComponent {
     { icon: '🧹', key: 'help.sys.cleanup' },
     { icon: '💬', key: 'help.sys.discord' },
     { icon: '🔑', key: 'help.sys.weblogin' },
+    { icon: '🎒', key: 'help.sys.vaultbackpack' },
+    { icon: '⚔️', key: 'help.sys.kothbox' },
+    { icon: '🎮', key: 'help.sys.gamemenu' },
+    { icon: '🔴', key: 'help.sys.raidprotection' },
+    { icon: '📦', key: 'help.sys.deadbox' },
   ];
   faqs = [
     { q: 'help.faq1Q', a: 'help.faq1A' },

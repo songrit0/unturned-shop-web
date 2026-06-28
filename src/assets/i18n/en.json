@@ -198,7 +198,11 @@
       "morehomes": "MoreHomes",
       "kits": "Kits",
       "vault": "Vault",
-      "tpa": "Teleport"
+      "tpa": "Teleport",
+      "vaultbackpack": "VaultBackpack",
+      "kothbox": "KothBox (PvP)",
+      "gamemenu": "GameMenu",
+      "raidprotection": "Raid Protection"
     },
     "desc": {
       "garage": "List all vehicles in your garage",
@@ -223,12 +227,41 @@
       "tpa": "Request to teleport to a player",
       "tpaAccept": "Accept a request",
       "tpaDeny": "Deny a request",
-      "tpaCancel": "Cancel your request"
+      "tpaCancel": "Cancel your request",
+      "backpack": "Open your personal persistent backpack",
+      "backpackupgrade": "Upgrade your backpack size (+1 row)",
+      "koth": "Open the PvP deathmatch lobby",
+      "jkoth": "Join the current PvP match",
+      "leavekoth": "Leave the PvP match and return to your spawn",
+      "claimkoth": "Claim pending PvP match rewards",
+      "kothtop": "Show PvP kill leaderboard",
+      "savekit": "Save your current inventory as your personal PvP loadout",
+      "menu": "Open the in-game menu (Kits · P2P Shop)",
+      "votetime": "Start a vote to change to day or night",
+      "vote": "Vote on the active time vote (no = vote against)",
+      "raidstatus": "Show raid allowed/blocked status and countdown"
     },
     "note": {
       "morehomes": "Place a bed to set a home (max 2) · 10s warm-up before teleport (cancels if you move) · 20s cooldown",
       "kits": "Some kits have a cooldown or price",
-      "tpa": "/tpa autoaccept = toggle auto-accept"
+      "tpa": "/tpa autoaccept = toggle auto-accept",
+      "vaultbackpack": "Your backpack persists across restarts and death — items stay until you withdraw them",
+      "kothbox": "Entry fee may apply · Rewards paid in Coin after the match · /savekit to set your own loadout"
+    }
+  },
+  "deadbox": {
+    "title": "Death Loot Box",
+    "points": {
+      "drops": "When you die your items drop into a public loot box at your location",
+      "public": "Any nearby player can loot the box",
+      "vanish": "Box disappears automatically when emptied"
+    }
+  },
+  "deathMenu": {
+    "title": "Death Screen Menu",
+    "points": {
+      "menu": "A menu appears on screen when you die",
+      "respawn": "Provides quick respawn and other post-death options"
     }
   },
   "autoCleanup": {
@@ -750,7 +783,12 @@
       "decay": "Decay protection — a generator/Tool Cupboard keeps your base from decaying; check coverage with /decay.",
       "cleanup": "Auto-cleanup — dropped items vanish over time (player drops after 10 min, zombie loot after 2 min).",
       "discord": "Discord — link your account for web login and notifications; get the invite in-game with /discord.",
-      "weblogin": "Web shop login — sign in with Discord, or with your Steam ID + a PIN you set in-game via /shoppin."
+      "weblogin": "Web shop login — sign in with Discord, or with your Steam ID + a PIN you set in-game via /shoppin.",
+      "vaultbackpack": "Vault Backpack — a personal persistent backpack that survives restarts and death (/bp to open, /bpu to upgrade).",
+      "kothbox": "KothBox (PvP) — deathmatch events with entry fees and Coin rewards; /koth to open the lobby.",
+      "gamemenu": "GameMenu — in-game UI menu for Kits and the P2P Shop; open with /menu or the Plugin Key.",
+      "raidprotection": "Raid Protection — buildings are protected outside raid hours; /raidstatus shows the current window.",
+      "deadbox": "Deadbox — when you die your items drop in a public loot box that any nearby player can loot."
     },
     "faqTitle": "FAQ",
     "faq1Q": "Forgot a purchased code, what now?",

@@ -500,12 +500,52 @@ export class LoginComponent implements OnInit, OnDestroy {
       ],
       noteKey: 'tpa',
     },
+    {
+      icon: '🎒',
+      titleKey: 'vaultbackpack',
+      commands: [
+        { name: '/backpack', alias: '/bp', descKey: 'backpack' },
+        { name: '/backpackupgrade', alias: '/bpu', descKey: 'backpackupgrade' },
+      ],
+      noteKey: 'vaultbackpack',
+    },
+    {
+      icon: '⚔️',
+      titleKey: 'kothbox',
+      commands: [
+        { name: '/koth', descKey: 'koth' },
+        { name: '/jkoth', args: '[loadout]', alias: '/joinkoth', descKey: 'jkoth' },
+        { name: '/leavekoth', alias: '/lkoth', descKey: 'leavekoth' },
+        { name: '/claimkoth', descKey: 'claimkoth' },
+        { name: '/kothtop', args: '[limit]', descKey: 'kothtop' },
+        { name: '/savekit', descKey: 'savekit' },
+      ],
+      noteKey: 'kothbox',
+    },
+    {
+      icon: '🎮',
+      titleKey: 'gamemenu',
+      commands: [
+        { name: '/menu', alias: '/gamemenu', descKey: 'menu' },
+        { name: '/votetime', args: '<day|night>', alias: '/vt', descKey: 'votetime' },
+        { name: '/vote', args: '[no]', descKey: 'vote' },
+      ],
+    },
+    {
+      icon: '🔴',
+      titleKey: 'raidprotection',
+      commands: [
+        { name: '/raidstatus', alias: '/raidtime', descKey: 'raidstatus' },
+      ],
+    },
   ];
 
   /** Server-behavior notices (no player command), rendered as INFO cards below the command grid. */
   infoCards: InfoCard[] = [
     { icon: '🧹', bulletIcon: 'schedule', ns: 'autoCleanup', points: ['playerItems', 'zombieLoot', 'interval', 'mapLoot'] },
     { icon: '🩹', bulletIcon: 'healing', ns: 'knockdown', points: ['downed', 'bleedout', 'immunity', 'revive', 'revived'] },
+    { icon: '📦', bulletIcon: 'inventory_2', ns: 'deadbox', points: ['drops', 'public', 'vanish'] },
+    { icon: '💀', bulletIcon: 'open_with', ns: 'deathMenu', points: ['menu', 'respawn'] },
   ];
 
   /** Static, editable server details (see SERVER_INFO at top of file). */
