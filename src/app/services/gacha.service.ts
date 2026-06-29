@@ -96,8 +96,8 @@ export class GachaService {
   state(): Observable<GachaState> {
     return this.http.get<GachaState>(`${this.base()}/state`);
   }
-  spin(): Observable<GachaSpinResult> {
-    return this.http.post<GachaSpinResult>(`${this.base()}/spin`, {});
+  spin(count = 1): Observable<{ results: GachaSpinResult[] }> {
+    return this.http.post<{ results: GachaSpinResult[] }>(`${this.base()}/spin`, { count });
   }
   buy(count: number, currency: 'coins' | 'meowcoins'): Observable<{ paidSpins: number; charged: number; currency: string }> {
     return this.http.post<{ paidSpins: number; charged: number; currency: string }>(`${this.base()}/buy`, { count, currency });

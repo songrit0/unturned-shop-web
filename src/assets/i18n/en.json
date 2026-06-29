@@ -168,7 +168,10 @@
       "insufficient_meowcoin": "Not enough meowcoins.",
       "buy_currency_disabled": "This payment option is disabled.",
       "not_linked": "Link your Steam account first."
-    }
+    },
+    "spinAll": "Spin All ({{n}}×)",
+    "summaryTitle": "Spin Results",
+    "spinCount": "spins"
   },
   "pinLogin": {
     "title": "Enter your PIN",

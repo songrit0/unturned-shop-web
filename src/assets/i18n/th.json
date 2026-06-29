@@ -168,7 +168,10 @@
       "insufficient_meowcoin": "Meowcoins ไม่พอ",
       "buy_currency_disabled": "ช่องทางจ่ายนี้ปิดอยู่",
       "not_linked": "ผูกบัญชี Steam ก่อน"
-    }
+    },
+    "spinAll": "หมุนทั้งหมด ({{n}}×)",
+    "summaryTitle": "ผลการหมุน",
+    "spinCount": "ครั้ง"
   },
   "pinLogin": {
     "title": "ใส่ PIN ของคุณ",

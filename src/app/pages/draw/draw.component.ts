@@ -53,11 +53,29 @@ import { TopupService } from '../../services/topup.service';
               </div>
             </div>
 
-            <button class="btn primary lg draw-spin-btn" (click)="spin()" [disabled]="spinning || state.totalRemaining <= 0">
-              <span *ngIf="spinning" class="spinner sm"></span>
-              <span *ngIf="!spinning" class="mi">casino</span>
-              {{ (state.totalRemaining > 0 ? 'draw.spin' : 'draw.noSpins') | translate }}
-            </button>
+            <div class="draw-spin-row">
+              <button class="btn primary lg draw-spin-btn" (click)="spin()" [disabled]="spinning || state.totalRemaining <= 0">
+                <span *ngIf="spinning" class="spinner sm"></span>
+                <span *ngIf="!spinning" class="mi">casino</span>
+                {{ (state.totalRemaining > 0 ? 'draw.spin' : 'draw.noSpins') | translate }}
+              </button>
+              <button class="btn secondary draw-spinall-btn" *ngIf="state.totalRemaining > 1" (click)="spinAll()" [disabled]="spinning">
+                <span class="mi sm">fast_forward</span>
+                {{ 'draw.spinAll' | translate:{ n: state.totalRemaining } }}
+              </button>
+            </div>
+
+            <!-- Spin history chips (multi-spin) -->
+            <div class="spin-history" *ngIf="spinHistory.length > 0">
+              <div class="spin-chip" *ngFor="let r of spinHistory; let i = index" [class]="'rar-' + (r.prize.rarity || 'common')">
+                <div class="chip-thumb">
+                  <img *ngIf="r.prize.imageUrl; else ci" [src]="r.prize.imageUrl" alt="">
+                  <ng-template #ci><span class="mi sm">{{ typeIcon(r.prize.type) }}</span></ng-template>
+                </div>
+                <span class="chip-label">{{ r.prize.label }}</span>
+                <span class="chip-idx muted text-xs">#{{ i + 1 }}</span>
+              </div>
+            </div>
 
             <!-- Buy spins -->
             <div class="draw-buy" *ngIf="state.priceCoins || state.priceMeowcoins">
@@ -92,6 +110,26 @@ import { TopupService } from '../../services/topup.service';
           </section>
         </ng-container>
       </ng-container>
+
+      <!-- Summary modal (multi-spin) -->
+      <div class="modal-backdrop" *ngIf="showSummary" (click)="closeSummary()">
+        <div class="modal draw-summary" (click)="$event.stopPropagation()">
+          <h2 style="margin:0 0 4px">{{ 'draw.summaryTitle' | translate }}</h2>
+          <p class="muted text-sm" style="margin:0 0 14px">{{ spinHistory.length }} {{ 'draw.spinCount' | translate }}</p>
+          <div class="summary-list">
+            <div class="spin-chip" *ngFor="let r of spinHistory; let i = index" [class]="'rar-' + (r.prize.rarity || 'common')">
+              <div class="chip-thumb">
+                <img *ngIf="r.prize.imageUrl; else si" [src]="r.prize.imageUrl" alt="">
+                <ng-template #si><span class="mi sm">{{ typeIcon(r.prize.type) }}</span></ng-template>
+              </div>
+              <span class="chip-label">{{ r.prize.label }}</span>
+              <code *ngIf="r.prize.code" class="mono chip-code">{{ r.prize.code }}</code>
+              <span class="chip-idx muted text-xs">#{{ i + 1 }}</span>
+            </div>
+          </div>
+          <button class="btn primary full" style="margin-top:16px" (click)="closeSummary()">{{ 'draw.ok' | translate }}</button>
+        </div>
+      </div>
 
       <!-- Result modal -->
       <div class="modal-backdrop" *ngIf="result" (click)="closeResult()">
@@ -146,7 +184,22 @@ import { TopupService } from '../../services/topup.service';
     .draw-counts { display:flex; flex-direction:column; align-items:center; }
     .draw-big { font-size:44px; font-weight:800; line-height:1; }
     .draw-breakdown { margin-top:6px; }
+    .draw-spin-row { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
     .draw-spin-btn { min-width:220px; }
+    .draw-spinall-btn { min-width:180px; }
+    .spin-history { width:100%; max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; padding-top:12px; border-top:1px solid var(--border); }
+    .spin-chip { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:8px; background:var(--surface-2); border-left:3px solid var(--border); animation:slideIn .25s ease; font-size:13px; }
+    .spin-chip.rar-common { border-left-color:#9ca3af; } .spin-chip.rar-rare { border-left-color:#3b82f6; }
+    .spin-chip.rar-epic { border-left-color:#a855f7; } .spin-chip.rar-legendary { border-left-color:#f5c518; }
+    @keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+    .chip-thumb { flex:0 0 28px; width:28px; height:28px; border-radius:6px; background:var(--surface); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .chip-thumb img { width:100%; height:100%; object-fit:contain; }
+    .chip-thumb .mi { font-size:18px; color:var(--text-faint); }
+    .chip-label { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chip-code { font-size:11px; color:var(--muted); letter-spacing:.04em; }
+    .chip-idx { white-space:nowrap; }
+    .draw-summary { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px; max-width:420px; width:100%; text-align:center; }
+    .summary-list { max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; text-align:left; }
     .draw-buy { width:100%; border-top:1px solid var(--border); padding-top:14px; margin-top:4px; }
     .coin-img { width:16px; height:16px; vertical-align:middle; margin-right:4px; }
 
@@ -191,6 +244,9 @@ export class DrawComponent implements OnInit, OnDestroy {
   buyError: string | null = null;
   result: GachaSpinResult | null = null;
   copied = false;
+  spinQueue: GachaSpinResult[] = [];
+  spinHistory: GachaSpinResult[] = [];
+  showSummary = false;
   resetCountdown = '';
   private resetTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -247,13 +303,21 @@ export class DrawComponent implements OnInit, OnDestroy {
     });
   }
 
-  spin() {
-    if (!this.state || this.spinning || this.state.totalRemaining <= 0) return;
+  spin() { this.startSpins(1); }
+  spinAll() { this.startSpins(this.state?.totalRemaining ?? 0); }
+
+  private startSpins(count: number) {
+    if (!this.state || this.spinning || count <= 0) return;
     this.spinning = true;
     this.buyError = null;
-    // API decides the prize; the reel is purely cosmetic and lands on whatever the API returned.
-    this.gacha.spin().subscribe({
-      next: res => this.runReel(res),
+    this.spinHistory = [];
+    this.showSummary = false;
+    this.result = null;
+    this.gacha.spin(count).subscribe({
+      next: r => {
+        this.spinQueue = r.results.slice(1);
+        this.runReel(r.results[0], r.results.length > 1);
+      },
       error: e => {
         this.spinning = false;
         this.buyError = e?.error?.message || this.t.instant('draw.spinError');
@@ -273,7 +337,7 @@ export class DrawComponent implements OnInit, OnDestroy {
   }
 
   /** Animate the reel to land on the API's actual result, then reveal it. */
-  private runReel(res: GachaSpinResult) {
+  private runReel(res: GachaSpinResult, isMulti = false) {
     const won: PoolPrize = {
       type: res.prize.type, label: res.prize.label, amount: res.prize.amount,
       imageUrl: res.prize.imageUrl, rarity: res.prize.rarity,
@@ -291,11 +355,23 @@ export class DrawComponent implements OnInit, OnDestroy {
       this.reelTransform = `translateX(${tx}px)`;
     }, 50);
     setTimeout(() => {
-      this.spinning = false;
-      this.result = res;
       if (this.state) this.state.totalRemaining = res.remaining;
-      this.refresh();
-      this.loadToday();
+      if (this.spinQueue.length > 0) {
+        this.spinHistory = [...this.spinHistory, res];
+        const next = this.spinQueue.shift()!;
+        setTimeout(() => this.runReel(next, true), 500);
+      } else if (isMulti) {
+        this.spinning = false;
+        this.spinHistory = [...this.spinHistory, res];
+        this.showSummary = true;
+        this.refresh();
+        this.loadToday();
+      } else {
+        this.spinning = false;
+        this.result = res;
+        this.refresh();
+        this.loadToday();
+      }
     }, 3400);
   }
 
@@ -322,6 +398,7 @@ export class DrawComponent implements OnInit, OnDestroy {
   }
 
   closeResult() { this.result = null; this.copied = false; }
+  closeSummary() { this.showSummary = false; this.spinHistory = []; }
 
   copyCode(code: string) {
     navigator.clipboard.writeText(code).then(() => {
