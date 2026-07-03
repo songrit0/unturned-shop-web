@@ -399,6 +399,10 @@ import { P2pListing } from '../../models/vault';
     .rank.gold   { color: #f5c518; }
     .rank.silver { color: #aaa; }
     .rank.bronze { color: #cd7f32; }
+    /* ธีมสว่าง: ทอง/เงินสว่างเกินอ่านไม่ออกบนพื้นขาว - ใช้โทนเข้มลง */
+    :host-context(.theme-light) .rank.gold   { color: #b45309; }
+    :host-context(.theme-light) .rank.silver { color: #6b7280; }
+    :host-context(.theme-light) .rank.bronze { color: #92400e; }
     .player-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .kd-good { color: var(--emerald); }
     .p2p-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }

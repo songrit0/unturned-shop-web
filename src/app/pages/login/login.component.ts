@@ -358,6 +358,10 @@ interface InfoCard {
     .top-list li:hover { background: var(--surface-2); }
     .top-rank { font-weight: 700; text-align: center; }
     .top-rank.gold { color: #f5c518; } .top-rank.silver { color: #aaa; } .top-rank.bronze { color: #cd7f32; }
+    /* ธีมสว่าง: ทอง/เงินสว่างเกินอ่านไม่ออกบนพื้นขาว - ใช้โทนเข้มลง */
+    :host-context(.theme-light) .top-rank.gold { color: #b45309; }
+    :host-context(.theme-light) .top-rank.silver { color: #6b7280; }
+    :host-context(.theme-light) .top-rank.bronze { color: #92400e; }
     .top-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .top-kd { color: var(--muted); } .top-kd.good { color: var(--emerald); }
 

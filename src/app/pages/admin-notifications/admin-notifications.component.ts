@@ -10,27 +10,27 @@ import { AdminNotificationsService, NotifRow } from '../../services/admin-notifi
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="max-w-3xl mx-auto p-4 sm:p-6 text-gray-100">
+    <div class="max-w-3xl mx-auto p-4 sm:p-6 text-gray-900 dark:text-gray-100">
       <h1 class="text-2xl font-bold mb-1">In-game Notifications</h1>
-      <p class="text-sm text-gray-400 mb-6">
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Posts a notification to every online player (top-right toast + phone lock screen).
       </p>
 
       <!-- compose -->
-      <div class="bg-gray-800/70 border border-gray-700 rounded-xl p-4 sm:p-5 mb-8">
-        <label class="block text-xs font-semibold tracking-wide text-gray-400 mb-1">TITLE</label>
+      <div class="bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-700 rounded-xl p-4 sm:p-5 mb-8">
+        <label class="block text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 mb-1">TITLE</label>
         <input [(ngModel)]="title" maxlength="64" placeholder="e.g. Server event"
-               class="w-full mb-4 px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 focus:border-yellow-500 outline-none" />
+               class="w-full mb-4 px-3 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:border-yellow-500 outline-none" />
 
-        <label class="block text-xs font-semibold tracking-wide text-gray-400 mb-1">MESSAGE</label>
+        <label class="block text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 mb-1">MESSAGE</label>
         <textarea [(ngModel)]="body" maxlength="255" rows="2" placeholder="e.g. Double coins for the next hour!"
-                  class="w-full mb-4 px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 focus:border-yellow-500 outline-none"></textarea>
+                  class="w-full mb-4 px-3 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:border-yellow-500 outline-none"></textarea>
 
-        <label class="block text-xs font-semibold tracking-wide text-gray-400 mb-1">ACCENT</label>
+        <label class="block text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 mb-1">ACCENT</label>
         <div class="flex gap-2 mb-5">
           <button *ngFor="let a of accents" (click)="accent = a"
                   [class]="'px-3 py-1.5 rounded-lg text-sm font-semibold border ' +
-                           (accent === a ? dot(a) + ' border-current' : 'text-gray-400 border-gray-700')">
+                           (accent === a ? dot(a) + ' border-current' : 'text-gray-500 dark:text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700')">
             {{ a }}
           </button>
         </div>
@@ -40,22 +40,22 @@ import { AdminNotificationsService, NotifRow } from '../../services/admin-notifi
                   class="px-5 py-2 rounded-lg font-semibold bg-yellow-500 text-gray-900 disabled:opacity-50">
             {{ sending ? 'Sending…' : 'Send notification' }}
           </button>
-          <span *ngIf="msg" class="text-sm" [class.text-green-400]="!err" [class.text-red-400]="err">{{ msg }}</span>
+          <span *ngIf="msg" class="text-sm" [class.text-green-500]="!err" [class.text-red-500]="err">{{ msg }}</span>
         </div>
       </div>
 
       <!-- recent -->
-      <h2 class="text-sm font-semibold tracking-wide text-gray-400 mb-3">RECENT</h2>
+      <h2 class="text-sm font-semibold tracking-wide text-gray-500 dark:text-gray-400 mb-3">RECENT</h2>
       <div class="space-y-2">
         <div *ngFor="let n of items"
-             class="flex items-start gap-3 bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+             class="flex items-start gap-3 bg-white/60 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-lg p-3">
           <span class="mt-1 w-2.5 h-2.5 rounded-full flex-none" [class]="dotBg(n.accent)"></span>
           <div class="flex-1 min-w-0">
             <div class="font-semibold">{{ n.title }}</div>
-            <div class="text-sm text-gray-400">{{ n.body }}</div>
-            <div class="text-xs text-gray-600 mt-0.5">{{ n.created_at }}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">{{ n.body }}</div>
+            <div class="text-xs text-gray-400 dark:text-gray-600 mt-0.5">{{ n.created_at }}</div>
           </div>
-          <button (click)="remove(n)" class="text-red-400 text-sm hover:underline flex-none">Delete</button>
+          <button (click)="remove(n)" class="text-red-500 dark:text-red-400 text-sm hover:underline flex-none">Delete</button>
         </div>
         <div *ngIf="!items.length" class="text-sm text-gray-500">No notifications yet.</div>
       </div>
