@@ -66,6 +66,9 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/vip" routerLinkActive="active" class="nav-item">
           <span class="mi">workspace_premium</span>VIP
         </a>
+        <a routerLink="/map" routerLinkActive="active" class="nav-item">
+          <span class="mi">map</span>แผนที่ Kill
+        </a>
       </ng-container>
 
       <!-- SHOP — demoted below P2P + Account; still public (visible logged-out) -->

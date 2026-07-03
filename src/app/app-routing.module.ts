@@ -16,6 +16,7 @@ import { AdminNotificationsComponent } from './pages/admin-notifications/admin-n
 import { AdminHelpComponent } from './pages/admin-help/admin-help.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
 import { VipComponent } from './pages/vip/vip.component';
+import { KillMapComponent } from './pages/kill-map/kill-map.component';
 import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
 import { AdminItemTypesComponent } from './pages/admin-item-types/admin-item-types.component';
 import { AdminItemsComponent } from './pages/admin-items/admin-items.component';
@@ -61,6 +62,7 @@ const routes: Routes = [
   { path: 'codes', component: CodesComponent, canActivate: [authGuard] },
   { path: 'topup', component: TopupComponent, canActivate: [authGuard, topupGuard] },
   { path: 'vip', component: VipComponent, canActivate: [authGuard] },
+  { path: 'map', component: KillMapComponent, canActivate: [authGuard] },
   { path: 'help', component: HelpComponent },
   { path: 'quests', component: QuestsComponent, canActivate: [authGuard] },
   { path: 'draw', component: DrawComponent, canActivate: [authGuard] },
