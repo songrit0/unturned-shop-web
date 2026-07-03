@@ -39,6 +39,8 @@
 }
 
 .theme-light {
+  /* native controls (date picker, scrollbar, select) follow the theme */
+  color-scheme: light;
   --bg: #f6f5ef;
   --bg-grid: rgb(15 23 42 / 0.04);
   --surface: #ffffff;
@@ -55,6 +57,7 @@
 }
 
 .theme-dark {
+  color-scheme: dark;
   --bg: #070b14;
   --bg-grid: rgb(245 158 11 / 0.04);
   --surface: #0f1626;

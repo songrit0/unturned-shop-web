@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CandlestickSeries, createChart, HistogramSeries, IChartApi, ISeriesApi, Time } from 'lightweight-charts';
 import { MarketItem, MarketService } from '../../services/market.service';
 import { Candle, CandleInterval, Forecast, MarketHistoryService, MarketTxn } from '../../services/market-history.service';
 import { BasketService } from '../../services/basket.service';
+import { ThemeService } from '../../services/theme.service';
 import { formatBangkokUnix } from '../../services/thai-time';
 
 const INTERVALS: CandleInterval[] = ['1m', '5m', '15m', '1h', '4h', '1d'];
@@ -168,17 +170,20 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private candleSeries: ISeriesApi<'Candlestick'> | null = null;
   private volumeSeries: ISeriesApi<'Histogram'> | null = null;
   private resizeObs?: ResizeObserver;
+  private themeSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private market: MarketService,
     private hist: MarketHistoryService,
     private basket: BasketService,
+    private theme: ThemeService,
   ) {}
 
   addToCart() { if (this.item) this.basket.add(this.item.item_id).subscribe(() => this.basket.setOpen(true)); }
 
   ngOnInit() {
+    this.themeSub = this.theme.theme$.subscribe(t => this.applyChartTheme(t === 'dark'));
     this.itemId = Number(this.route.snapshot.paramMap.get('id'));
     this.market.get(this.itemId).subscribe({
       next: it => {
@@ -196,9 +201,21 @@ export class MarketDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() { setTimeout(() => this.tryInitChart(), 0); }
 
   ngOnDestroy() {
+    this.themeSub?.unsubscribe();
     this.resizeObs?.disconnect();
     this.chart?.remove();
     this.chart = null;
+  }
+
+  /** สีแกน/เส้น grid ของกราฟตามธีม - เรียกซ้ำเมื่อผู้ใช้สลับธีมโดยไม่ต้องสร้างกราฟใหม่ */
+  private applyChartTheme(dark: boolean) {
+    this.chart?.applyOptions({
+      layout: { textColor: dark ? '#94a3b8' : '#6b7280' },
+      grid: {
+        vertLines: { color: dark ? '#1f2c47' : '#e6e2d4', style: 1 },
+        horzLines: { color: dark ? '#1f2c47' : '#e6e2d4', style: 1 },
+      },
+    });
   }
 
   private tryInitChart() {

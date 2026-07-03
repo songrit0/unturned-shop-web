@@ -72,14 +72,14 @@ import { KillRow, KillsService } from '../../services/kills.service';
         <div style="flex:0 1 400px;min-width:300px;display:flex;flex-direction:column;gap:12px">
           <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
             <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">จากวันที่
-              <input type="date" [(ngModel)]="from" class="mono" style="background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;color:inherit">
+              <input type="date" [(ngModel)]="from" class="mono" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
             </label>
             <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">ถึงวันที่
-              <input type="date" [(ngModel)]="to" class="mono" style="background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;color:inherit">
+              <input type="date" [(ngModel)]="to" class="mono" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
             </label>
             <label *ngIf="(auth.me$ | async)?.is_admin" class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">Steam ID (เว้นว่าง = ทุกคน)
               <input type="text" [(ngModel)]="steamFilter" placeholder="7656119..." maxlength="17" class="mono"
-                     style="background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;color:inherit;width:170px">
+                     style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit;width:170px">
             </label>
             <button class="btn emerald" (click)="load(1)" [disabled]="loading">
               <span class="mi sm">search</span>ค้นหา
@@ -95,7 +95,7 @@ import { KillRow, KillsService } from '../../services/kills.service';
 
               <div *ngFor="let k of kills" (click)="select(k)"
                    [style.outline]="selected?.id === k.id ? '2px solid var(--accent-hi)' : 'none'"
-                   style="display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);cursor:pointer">
+                   style="display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);cursor:pointer">
                 <img *ngIf="k.weapon_image" [src]="k.weapon_image" alt="" style="width:38px;height:38px;object-fit:contain;flex:none">
                 <span *ngIf="!k.weapon_image" class="mi lg" style="flex:none;opacity:.7">{{ k.is_pvp ? 'skull' : 'coronavirus' }}</span>
                 <div style="flex:1;min-width:0">
