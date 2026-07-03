@@ -196,6 +196,10 @@ export class KillMapComponent implements OnInit, AfterViewInit {
   }
 
   select(k: KillRow) {
+    if (this.selected?.id === k.id) { // คลิกซ้ำ = ยกเลิกการเลือก
+      this.selected = null;
+      return;
+    }
     this.selected = k;
     this.centerOn(k.victim_x, k.victim_z);
   }
@@ -244,6 +248,8 @@ export class KillMapComponent implements OnInit, AfterViewInit {
   }
 
   onPointerDown(e: PointerEvent) {
+    // อย่าเริ่มลากถ้ากดบนปุ่ม - setPointerCapture จะดัก pointerup ทำให้ปุ่มไม่ได้รับ click
+    if ((e.target as HTMLElement).closest('button')) return;
     this.dragging = true;
     this.lastX = e.clientX; this.lastY = e.clientY;
     this.viewport.nativeElement.setPointerCapture(e.pointerId);
