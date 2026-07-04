@@ -67,7 +67,7 @@ import { TopupService } from '../../services/topup.service';
           <span class="mi">workspace_premium</span>VIP
         </a>
         <a routerLink="/map" routerLinkActive="active" class="nav-item">
-          <span class="mi">map</span>แผนที่ Kill
+          <span class="mi">map</span>{{ 'nav.killMap' | translate }}
         </a>
       </ng-container>
 

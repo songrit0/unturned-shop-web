@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { KillRow, KillsService } from '../../services/kills.service';
 
@@ -14,17 +15,17 @@ import { KillRow, KillsService } from '../../services/kills.service';
     <div class="page">
       <div class="page-header">
         <div class="h-icon amber"><span class="mi lg">map</span></div>
-        <h1>แผนที่ Kill</h1>
+        <h1>{{ 'killMap.title' | translate }}</h1>
       </div>
 
       <div *ngIf="!(auth.me$ | async)?.is_admin" class="welcome-alert" style="margin-bottom:12px">
         <span class="alert-icon mi">schedule</span>
-        <div>แสดงเฉพาะ kill ที่คุณเป็นคนยิงหรือคนโดน และดีเลย์ 30 นาที (กันส่องตำแหน่งสด)</div>
+        <div>{{ 'killMap.delayNotice' | translate }}</div>
       </div>
 
       <div *ngIf="notLinked" class="welcome-alert" style="margin-bottom:12px">
         <span class="alert-icon mi">link_off</span>
-        <div>ยังไม่ได้เชื่อมบัญชี Steam ↔ Discord — ใช้คำสั่ง /link ใน Discord ก่อนถึงจะดู kill ของตัวเองได้</div>
+        <div>{{ 'killMap.notLinked' | translate }}</div>
       </div>
 
       <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
@@ -57,32 +58,32 @@ import { KillRow, KillsService } from '../../services/kills.service';
           </div>
 
           <div style="position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px">
-            <button class="btn secondary" style="padding:6px 8px" (click)="zoomBy(1.4)" title="ซูมเข้า"><span class="mi sm">add</span></button>
-            <button class="btn secondary" style="padding:6px 8px" (click)="zoomBy(1 / 1.4)" title="ซูมออก"><span class="mi sm">remove</span></button>
-            <button class="btn secondary" style="padding:6px 8px" (click)="fit()" title="ดูทั้งแผนที่"><span class="mi sm">fit_screen</span></button>
+            <button class="btn secondary" style="padding:6px 8px" (click)="zoomBy(1.4)" [title]="'killMap.zoomIn' | translate"><span class="mi sm">add</span></button>
+            <button class="btn secondary" style="padding:6px 8px" (click)="zoomBy(1 / 1.4)" [title]="'killMap.zoomOut' | translate"><span class="mi sm">remove</span></button>
+            <button class="btn secondary" style="padding:6px 8px" (click)="fit()" [title]="'killMap.fitMap' | translate"><span class="mi sm">fit_screen</span></button>
           </div>
 
           <div class="card" style="position:absolute;left:10px;bottom:10px;padding:6px 10px;font-size:12px;display:flex;gap:12px;align-items:center">
-            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e"></span>คนยิง</span>
-            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444"></span>คนโดน</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e"></span>{{ 'killMap.killer' | translate }}</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444"></span>{{ 'killMap.victim' | translate }}</span>
           </div>
         </div>
 
         <!-- ===== feed panel ===== -->
         <div style="flex:0 1 400px;min-width:300px;display:flex;flex-direction:column;gap:12px">
           <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
-            <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">จากวันที่
+            <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.fromDate' | translate }}
               <input type="date" [(ngModel)]="from" class="mono" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
             </label>
-            <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">ถึงวันที่
+            <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.toDate' | translate }}
               <input type="date" [(ngModel)]="to" class="mono" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
             </label>
-            <label *ngIf="(auth.me$ | async)?.is_admin" class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">Steam ID (เว้นว่าง = ทุกคน)
+            <label *ngIf="(auth.me$ | async)?.is_admin" class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.steamFilter' | translate }}
               <input type="text" [(ngModel)]="steamFilter" placeholder="7656119..." maxlength="17" class="mono"
                      style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit;width:170px">
             </label>
             <button class="btn emerald" (click)="load(1)" [disabled]="loading">
-              <span class="mi sm">search</span>ค้นหา
+              <span class="mi sm">search</span>{{ 'killMap.search' | translate }}
             </button>
           </div>
 
@@ -90,7 +91,7 @@ import { KillRow, KillsService } from '../../services/kills.service';
             <ng-container *ngIf="!loading; else loadingTpl">
               <div *ngIf="kills.length === 0" class="empty" style="padding:24px 0">
                 <span class="mi xxl">location_off</span>
-                <div class="empty-title">ไม่พบ kill ในช่วงที่เลือก</div>
+                <div class="empty-title">{{ 'killMap.empty' | translate }}</div>
               </div>
 
               <div *ngFor="let k of kills" (click)="select(k)"
@@ -119,7 +120,7 @@ import { KillRow, KillsService } from '../../services/kills.service';
 
           <div *ngIf="pages > 1" class="card" style="display:flex;gap:8px;align-items:center;justify-content:center;padding:8px">
             <button class="btn secondary" style="padding:4px 10px" [disabled]="page <= 1 || loading" (click)="load(page - 1)"><span class="mi sm">chevron_left</span></button>
-            <span class="mono muted" style="font-size:13px">{{ page }} / {{ pages }} ({{ total | number }} รายการ)</span>
+            <span class="mono muted" style="font-size:13px">{{ page }} / {{ pages }} ({{ total | number }} {{ 'killMap.items' | translate }})</span>
             <button class="btn secondary" style="padding:4px 10px" [disabled]="page >= pages || loading" (click)="load(page + 1)"><span class="mi sm">chevron_right</span></button>
           </div>
 
@@ -157,7 +158,7 @@ export class KillMapComponent implements OnInit, AfterViewInit {
   notLinked = false;
   error: string | null = null;
 
-  constructor(public auth: AuthService, private killsApi: KillsService) {}
+  constructor(public auth: AuthService, private killsApi: KillsService, private t: TranslateService) {}
 
   ngOnInit() {
     const today = new Date();
@@ -190,7 +191,7 @@ export class KillMapComponent implements OnInit, AfterViewInit {
         this.loading = false;
         this.kills = [];
         if (e?.status === 403) this.notLinked = true;
-        else this.error = e?.error?.message || 'โหลดข้อมูลไม่สำเร็จ';
+        else this.error = e?.error?.message || this.t.instant('killMap.loadError');
       },
     });
   }

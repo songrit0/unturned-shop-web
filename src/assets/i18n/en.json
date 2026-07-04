@@ -3,6 +3,7 @@
     "title": "meowpow Shop"
   },
   "nav": {
+    "killMap": "Kill Map",
     "home": "Home",
     "dashboard": "Dashboard",
     "shop": "Shop",
@@ -1036,6 +1037,23 @@
   },
   "pager": {
     "perPage": "{{n}}/page"
+  },
+  "killMap": {
+    "title": "Kill Map",
+    "delayNotice": "Only kills where you are the killer or the victim are shown, delayed by 30 minutes (to prevent live position tracking)",
+    "notLinked": "Steam ↔ Discord not linked yet — use the /link command in Discord first to view your own kills",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fitMap": "Fit whole map",
+    "killer": "Killer",
+    "victim": "Victim",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "steamFilter": "Steam ID (blank = everyone)",
+    "search": "Search",
+    "empty": "No kills found in the selected range",
+    "items": "entries",
+    "loadError": "Failed to load data"
   },
   "common": {
     "save": "Save",

@@ -3,6 +3,7 @@
     "title": "meowpow Shop"
   },
   "nav": {
+    "killMap": "แผนที่ Kill",
     "home": "หน้าแรก",
     "dashboard": "แดชบอร์ด",
     "shop": "ร้านค้า",
@@ -1061,6 +1062,23 @@
   },
   "pager": {
     "perPage": "{{n}}/หน้า"
+  },
+  "killMap": {
+    "title": "แผนที่ Kill",
+    "delayNotice": "แสดงเฉพาะ kill ที่คุณเป็นคนยิงหรือคนโดน และดีเลย์ 30 นาที (กันส่องตำแหน่งสด)",
+    "notLinked": "ยังไม่ได้เชื่อมบัญชี Steam ↔ Discord — ใช้คำสั่ง /link ใน Discord ก่อนถึงจะดู kill ของตัวเองได้",
+    "zoomIn": "ซูมเข้า",
+    "zoomOut": "ซูมออก",
+    "fitMap": "ดูทั้งแผนที่",
+    "killer": "คนยิง",
+    "victim": "คนโดน",
+    "fromDate": "จากวันที่",
+    "toDate": "ถึงวันที่",
+    "steamFilter": "Steam ID (เว้นว่าง = ทุกคน)",
+    "search": "ค้นหา",
+    "empty": "ไม่พบ kill ในช่วงที่เลือก",
+    "items": "รายการ",
+    "loadError": "โหลดข้อมูลไม่สำเร็จ"
   },
   "common": {
     "save": "บันทึก",
