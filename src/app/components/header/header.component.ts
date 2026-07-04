@@ -8,6 +8,7 @@ import { ThemeService } from '../../services/theme.service';
 import { LangService } from '../../services/lang.service';
 import { BasketService } from '../../services/basket.service';
 import { NotificationsService, ShopNotification } from '../../services/notifications.service';
+import { OnlinePlayerEntry, PublicService } from '../../services/public.service';
 import { daysUntil } from '../../services/expiry';
 
 @Component({
@@ -25,6 +26,33 @@ import { daysUntil } from '../../services/expiry';
       </div> -->
 
       <div class="header-actions">
+        <!-- Online players widget: green dot + count; click to see who + total hours -->
+        <div class="notif-wrap" (click)="$event.stopPropagation()">
+          <button class="icon-btn" style="width:auto;padding:0 10px;gap:6px;display:inline-flex;align-items:center"
+                  (click)="toggleOnline()" [title]="'header.onlinePlayers' | translate">
+            <span style="width:8px;height:8px;border-radius:50%;flex:none"
+                  [style.background]="onlineCount > 0 ? 'var(--emerald)' : 'var(--muted)'"></span>
+            <span class="mono" style="font-size:12px;font-weight:700">{{ onlineCount }}</span>
+          </button>
+
+          <div *ngIf="onlineOpen" class="notif-dropdown">
+            <div class="notif-head">
+              <span class="fw-7">{{ 'header.onlinePlayers' | translate }} ({{ onlineCount }})</span>
+            </div>
+            <div *ngIf="onlineLoading" class="notif-empty"><div class="spinner sm"></div></div>
+            <ng-container *ngIf="!onlineLoading">
+              <div *ngIf="onlinePlayers.length === 0" class="notif-empty muted">{{ 'header.noOnline' | translate }}</div>
+              <div *ngFor="let p of onlinePlayers" class="notif-item" style="cursor:default">
+                <div class="notif-body">
+                  <div class="notif-title">{{ p.name }}</div>
+                  <div class="notif-text muted mono">{{ 'header.playedHours' | translate:{ h: p.hours } }}</div>
+                </div>
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);flex:none"></span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
         <ng-container *ngIf="auth.me$ | async as me; else loginBtn">
           <button class="coin-pill" (click)="goCoins()" title="Coins">
             <img class="coin-img" src="assets/coins/coin.png" alt="">
@@ -195,6 +223,10 @@ export class HeaderComponent implements OnInit {
   q = '';
 
   inboxOpen = false;
+  onlineOpen = false;
+  onlineLoading = false;
+  onlineCount = 0;
+  onlinePlayers: OnlinePlayerEntry[] = [];
   notifLoading = false;
   notifications: ShopNotification[] = [];
   codeFor: ShopNotification | null = null;
@@ -210,6 +242,7 @@ export class HeaderComponent implements OnInit {
     public lang: LangService,
     public basket: BasketService,
     public notifs: NotificationsService,
+    private pub: PublicService,
     private t: TranslateService,
     private router: Router,
   ) { }
@@ -220,6 +253,9 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadOnline();
+    // ponytail: refresh the count once a minute; the list itself refreshes on every open
+    setInterval(() => { if (!this.onlineOpen) this.loadOnline(); }, 60_000);
     this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => {} });
     this.auth.me$.subscribe(me => {
       if (me) {
@@ -249,7 +285,25 @@ export class HeaderComponent implements OnInit {
 
   /** Close the dropdown when clicking anywhere outside it (wrapper stops propagation). */
   @HostListener('document:click')
-  onDocClick() { if (this.inboxOpen) this.inboxOpen = false; }
+  onDocClick() {
+    if (this.inboxOpen) this.inboxOpen = false;
+    if (this.onlineOpen) this.onlineOpen = false;
+  }
+
+  // ---- Online players widget ----
+
+  toggleOnline() {
+    this.onlineOpen = !this.onlineOpen;
+    if (this.onlineOpen) { this.inboxOpen = false; this.loadOnline(); }
+  }
+
+  private loadOnline() {
+    this.onlineLoading = true;
+    this.pub.onlinePlayers().subscribe({
+      next: r => { this.onlineCount = r.count; this.onlinePlayers = r.players; this.onlineLoading = false; },
+      error: () => { this.onlineLoading = false; },
+    });
+  }
 
   toggleInbox() {
     this.inboxOpen = !this.inboxOpen;

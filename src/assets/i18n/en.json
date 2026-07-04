@@ -50,7 +50,10 @@
     "adminDonate": "Manage Donate"
   },
   "header": {
-    "search": "Search items..."
+    "search": "Search items...",
+    "onlinePlayers": "Online players",
+    "noOnline": "No one is online right now",
+    "playedHours": "played {{h}} hrs total"
   },
   "login": {
     "title": "meowpow Shop",

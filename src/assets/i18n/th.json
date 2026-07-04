@@ -50,7 +50,10 @@
     "adminDonate": "จัดการโดเนต"
   },
   "header": {
-    "search": "ค้นหาไอเทม..."
+    "search": "ค้นหาไอเทม...",
+    "onlinePlayers": "ผู้เล่นออนไลน์",
+    "noOnline": "ตอนนี้ไม่มีใครออนไลน์",
+    "playedHours": "เล่นไปรวม {{h}} ชม."
   },
   "login": {
     "title": "meowpow Shop",

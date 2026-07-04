@@ -25,6 +25,18 @@ export interface P2pLatestEntry {
   createdAt: string;
 }
 
+/** One online player for the header widget. `hours` = lifetime playtime in hours. */
+export interface OnlinePlayerEntry {
+  steamId: string;
+  name: string;
+  hours: number;
+}
+
+export interface OnlinePlayersResult {
+  count: number;
+  players: OnlinePlayerEntry[];
+}
+
 export interface DonateTotal {
   communityTotal: number;
   communityGoal: number;
@@ -46,6 +58,10 @@ export class PublicService {
     return this.http.get<LandingData>(
       `${this.apiUrl.get()}/public/landing?p2pLimit=${p2pLimit}&topLimit=${topLimit}`,
     );
+  }
+
+  onlinePlayers(): Observable<OnlinePlayersResult> {
+    return this.http.get<OnlinePlayersResult>(`${this.apiUrl.get()}/public/online-players`);
   }
 
   serverStatus(): Observable<ServerStatus> {
