@@ -68,6 +68,15 @@ export type P2pListingStatus = 'active' | 'sold' | 'cancelled' | 'expired';
 // Matches api `P2PListingView`.
 // `seller_discord_name` / `buyer_discord_name` are Discord snowflake IDs (numeric string) joined from sv_links,
 // not usernames. Use `formatActorLabel()` to render them with a `Discord #...` / `Steam #...` prefix.
+/** One item inside a bundle listing/purchase (names/images joined server-side). */
+export interface P2pBundleItem {
+  item_id: number;
+  amount: number;
+  quality: number;
+  item_name?: string | null;
+  image_url?: string | null;
+}
+
 export interface P2pListing {
   id: number;
   seller_steam: string;
@@ -96,6 +105,9 @@ export interface P2pListing {
   code_expires_at?: string | null;
   // Decoded gun attachments/ammo; null when the listed item isn't a gun.
   gun?: GunInfo | null;
+  // Bundle listing: item_id=0 sentinel, real items in bundleItems (amount = child count).
+  is_bundle?: number | boolean;
+  bundleItems?: P2pBundleItem[];
 }
 
 export interface P2pCreatePayload {

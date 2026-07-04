@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Paginated } from '../../models/paginated';
@@ -64,18 +65,19 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
         <div class="grid-cards">
           <div *ngFor="let l of items" class="listing-card" (click)="select(l)">
             <div class="thumb">
-              <img *ngIf="l.image_url; else noImg" [src]="l.image_url">
-              <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+              <img *ngIf="thumbOf(l); else noImg" [src]="thumbOf(l)">
+              <ng-template #noImg><span class="mi xl">{{ l.is_bundle ? 'package_2' : 'inventory_2' }}</span></ng-template>
             </div>
             <div class="meta">
               <div class="name" style="display:flex;align-items:center;gap:6px">
-                <span>{{ l.item_name || ('#' + l.item_id) }}</span>
-                <span *ngIf="!l.item_name" class="verify-icon" [title]="'verifyStatus.unverified' | translate">
+                <span>{{ nameOf(l) }}</span>
+                <span *ngIf="!l.item_name && !l.is_bundle" class="verify-icon" [title]="'verifyStatus.unverified' | translate">
                   <span class="mi sm">info</span>
                 </span>
               </div>
-              <app-quality-bar [value]="l.quality" [showPercent]="true"></app-quality-bar>
-              <div *ngIf="l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
+              <app-quality-bar *ngIf="!l.is_bundle" [value]="l.quality" [showPercent]="true"></app-quality-bar>
+              <div *ngIf="l.is_bundle" class="muted" style="font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ bundleSummary(l) }}</div>
+              <div *ngIf="!l.is_bundle && l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
               <app-gun-chips *ngIf="l.gun" [gun]="l.gun"></app-gun-chips>
               <div class="price mono">{{ l.price | number }} <span class="muted" style="font-weight:400">coins</span></div>
             </div>
@@ -99,19 +101,34 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
       <!-- Buy modal -->
       <div *ngIf="selected" class="modal-backdrop" (click)="selected = null">
         <div class="modal-card tactical" style="max-width:480px" (click)="$event.stopPropagation()">
-          <h3 style="margin:0 0 12px 0;font-size:18px;font-weight:700">{{ selected.item_name || ('#' + selected.item_id) }}</h3>
+          <h3 style="margin:0 0 12px 0;font-size:18px;font-weight:700">{{ nameOf(selected) }}</h3>
           <div class="row gap-3" style="align-items:center;margin-bottom:12px">
             <div style="width:96px;height:96px;background:var(--surface-2);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden">
-              <img *ngIf="selected.image_url" [src]="selected.image_url" style="width:100%;height:100%;object-fit:contain;padding:6px">
+              <img *ngIf="thumbOf(selected)" [src]="thumbOf(selected)" style="width:100%;height:100%;object-fit:contain;padding:6px">
             </div>
             <div style="flex:1">
               <div class="muted" style="font-size:12px">{{ 'p2p.seller' | translate }}</div>
               <div class="mono" style="font-weight:600;font-size:13px" [class.deleted-actor]="isSellerDeleted(selected)">{{ sellerLabel(selected) }}</div>
-              <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.quality' | translate }}</div>
-              <app-quality-bar [value]="selected.quality" [showPercent]="true"></app-quality-bar>
-              <div *ngIf="selected.amount > 1" class="muted mono" style="font-size:11px">×{{ selected.amount }}</div>
+              <ng-container *ngIf="!selected.is_bundle">
+                <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.quality' | translate }}</div>
+                <app-quality-bar [value]="selected.quality" [showPercent]="true"></app-quality-bar>
+                <div *ngIf="selected.amount > 1" class="muted mono" style="font-size:11px">×{{ selected.amount }}</div>
+              </ng-container>
               <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.price' | translate }}</div>
               <div class="mono" style="font-weight:700;font-size:18px">{{ selected.price | number }} coins</div>
+            </div>
+          </div>
+          <div *ngIf="selected.is_bundle && selected.bundleItems?.length" style="margin-bottom:12px">
+            <div class="muted" style="font-size:12px;margin-bottom:4px">{{ 'p2p.bundleContents' | translate }}</div>
+            <div style="max-height:180px;overflow-y:auto">
+              <div *ngFor="let b of selected.bundleItems" class="row gap-2" style="align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+                <div style="width:28px;height:28px;background:var(--surface-2);border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+                  <img *ngIf="b.image_url; else noBImg" [src]="b.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
+                  <ng-template #noBImg><span class="mi sm faint">inventory_2</span></ng-template>
+                </div>
+                <span style="flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.item_name || ('#' + b.item_id) }}</span>
+                <span class="muted mono" style="font-size:11px">×{{ b.amount }} · Q{{ b.quality }}%</span>
+              </div>
             </div>
           </div>
           <div *ngIf="selected.gun" style="margin-bottom:12px">
@@ -242,7 +259,26 @@ export class P2pMarketComponent implements OnInit, OnDestroy {
     private typesSvc: ItemTypesService,
     private vaultsSvc: VaultsService,
     public auth: AuthService,
+    private t: TranslateService,
   ) {}
+
+  /** Display name — bundles get a translated "Bundle (N items)" label instead of "#0". */
+  nameOf(l: P2pListing): string {
+    if (l.is_bundle) return this.t.instant('p2p.bundle', { n: l.bundleItems?.length || l.amount });
+    return l.item_name || '#' + l.item_id;
+  }
+
+  /** Card/modal thumbnail — bundles fall back to the first child item's image. */
+  thumbOf(l: P2pListing): string | null {
+    return l.image_url || l.bundleItems?.find(b => b.image_url)?.image_url || null;
+  }
+
+  /** One-line contents preview for the grid card, e.g. "Magazine ×3, Fuel Can ×1". */
+  bundleSummary(l: P2pListing): string {
+    return (l.bundleItems ?? [])
+      .map(b => `${b.item_name || '#' + b.item_id} ×${b.amount}`)
+      .join(', ');
+  }
 
   ngOnInit() {
     this.sub = this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {

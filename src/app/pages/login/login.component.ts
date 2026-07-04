@@ -204,9 +204,9 @@ interface InfoCard {
                 <div class="market-mini" *ngFor="let l of p2pLatest">
                   <div class="market-thumb">
                     <img *ngIf="l.imageUrl; else noImg" [src]="l.imageUrl" alt="">
-                    <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+                    <ng-template #noImg><span class="mi xl">{{ l.isBundle ? 'package_2' : 'inventory_2' }}</span></ng-template>
                   </div>
-                  <div class="market-name">{{ l.itemName || ('#' + l.itemId) }}</div>
+                  <div class="market-name">{{ l.isBundle ? ('p2p.bundle' | translate:{ n: l.amount }) : (l.itemName || ('#' + l.itemId)) }}</div>
                   <div class="market-price mono">{{ l.price | number }} <span class="muted">coins</span></div>
                 </div>
               </div>

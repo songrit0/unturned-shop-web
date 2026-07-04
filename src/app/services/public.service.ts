@@ -21,6 +21,7 @@ export interface P2pLatestEntry {
   imageUrl: string | null;
   price: number;
   amount: number;
+  isBundle?: boolean;
   createdAt: string;
 }
 

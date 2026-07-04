@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ClaimAllResult, PurchaseFilter, PurchaseView } from '../../models/purchase';
 import { PurchasesService } from '../../services/purchases.service';
 import { mapVaultP2pErrorKey } from '../../services/vault-errors';
@@ -49,9 +50,12 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
                       <ng-template #noImg><span class="mi faint">inventory_2</span></ng-template>
                     </div>
                   </td>
-                  <td><div style="font-weight:600">{{ p.item_name || ('#' + p.item_id) }}</div></td>
+                  <td>
+                    <div style="font-weight:600">{{ nameOf(p) }}</div>
+                    <div *ngIf="p.is_bundle" class="muted" style="font-size:11px">{{ bundleSummary(p) }}</div>
+                  </td>
                   <td class="mono">×{{ p.amount }}</td>
-                  <td><app-quality-bar [value]="p.quality" [showPercent]="true"></app-quality-bar></td>
+                  <td><app-quality-bar *ngIf="!p.is_bundle" [value]="p.quality" [showPercent]="true"></app-quality-bar></td>
                   <td>
                     <span class="badge" [class.amber]="!p.claimed_at" [class.emerald]="!!p.claimed_at">
                       {{ (p.claimed_at ? 'inventory.status.claimed' : 'inventory.status.unclaimed') | translate }}
@@ -94,8 +98,8 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
 
           <!-- Single purchase summary -->
           <p *ngIf="codeFor" class="muted" style="font-size:13px;margin:0 0 12px 0">
-            {{ codeFor.item_name || ('#' + codeFor.item_id) }}
-            <ng-container *ngIf="codeFor.amount > 1"> · ×{{ codeFor.amount }}</ng-container>
+            {{ nameOf(codeFor) }}
+            <ng-container *ngIf="!codeFor.is_bundle && codeFor.amount > 1"> · ×{{ codeFor.amount }}</ng-container>
           </p>
 
           <!-- Bulk summary: one code covering N items -->
@@ -170,9 +174,22 @@ export class InventoryComponent implements OnInit {
   claimError: string | null = null;
   copied = false;
 
-  constructor(private svc: PurchasesService) {}
+  constructor(private svc: PurchasesService, private t: TranslateService) {}
 
   ngOnInit() { this.reload(); }
+
+  /** Display name — bundle purchases get a translated "Bundle (N items)" label instead of "#0". */
+  nameOf(p: PurchaseView): string {
+    if (p.is_bundle) return this.t.instant('p2p.bundle', { n: p.bundleItems?.length || p.amount });
+    return p.item_name || '#' + p.item_id;
+  }
+
+  /** One-line contents preview, e.g. "Magazine ×3, Fuel Can ×1". */
+  bundleSummary(p: PurchaseView): string {
+    return (p.bundleItems ?? [])
+      .map(b => `${b.item_name || '#' + b.item_id} ×${b.amount}`)
+      .join(', ');
+  }
 
   hasUnclaimed(): boolean { return this.items.some(i => !i.claimed_at); }
 

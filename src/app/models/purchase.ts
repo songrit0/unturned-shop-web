@@ -15,6 +15,9 @@ export interface PurchaseView {
   image_url: string | null;
   type_id: number | null;
   type_name: string | null;
+  // Bundle purchase: item_id=0 sentinel, real items in bundleItems (amount = child count).
+  is_bundle?: number | boolean;
+  bundleItems?: { item_id: number; amount: number; quality: number; item_name?: string | null; image_url?: string | null }[];
 }
 
 export type PurchaseFilter = 'unclaimed' | 'claimed' | 'all';

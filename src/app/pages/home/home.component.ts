@@ -325,10 +325,10 @@ import { P2pListing } from '../../models/vault';
         <div class="p2p-strip">
           <a routerLink="/p2p-market" class="p2p-mini" *ngFor="let l of p2pListings">
             <div class="p2p-thumb">
-              <img *ngIf="l.image_url; else noImg" [src]="l.image_url">
-              <ng-template #noImg><span class="mi xl">inventory_2</span></ng-template>
+              <img *ngIf="bundleThumb(l); else noImg" [src]="bundleThumb(l)">
+              <ng-template #noImg><span class="mi xl">{{ l.is_bundle ? 'package_2' : 'inventory_2' }}</span></ng-template>
             </div>
-            <div class="p2p-name">{{ l.item_name || ('#' + l.item_id) }}</div>
+            <div class="p2p-name">{{ l.is_bundle ? ('p2p.bundle' | translate:{ n: l.bundleItems?.length || l.amount }) : (l.item_name || ('#' + l.item_id)) }}</div>
             <div class="p2p-price mono">{{ l.price | number }} <span class="muted">coins</span></div>
           </a>
         </div>
@@ -423,6 +423,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   copied = false;
   recentGain = 0;
   p2pListings: P2pListing[] = [];
+  // Bundle listings have no own image (item_id=0) — fall back to the first child item's.
+  bundleThumb = (l: P2pListing) => l.image_url || l.bundleItems?.find(b => b.image_url)?.image_url || null;
   leaderboard: PlayerStatEntry[] = [];
   statsLoading = true;
   myStats: PlayerStatEntry | null = null;

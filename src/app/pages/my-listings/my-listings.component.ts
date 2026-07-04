@@ -47,10 +47,13 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
                       <img *ngIf="l.image_url" [src]="l.image_url" style="width:100%;height:100%;object-fit:contain;padding:2px">
                     </div>
                   </td>
-                  <td><div style="font-weight:600">{{ l.item_name }}</div></td>
                   <td>
-                    <app-quality-bar [value]="l.quality" [showPercent]="true"></app-quality-bar>
-                    <div *ngIf="l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
+                    <div style="font-weight:600">{{ nameOf(l) }}</div>
+                    <div *ngIf="l.is_bundle" class="muted" style="font-size:11px">{{ bundleSummary(l) }}</div>
+                  </td>
+                  <td>
+                    <app-quality-bar *ngIf="!l.is_bundle" [value]="l.quality" [showPercent]="true"></app-quality-bar>
+                    <div *ngIf="!l.is_bundle && l.amount > 1" class="muted mono" style="font-size:11px;margin-top:2px">×{{ l.amount }}</div>
                   </td>
                   <td class="mono">{{ l.price | number }}</td>
                   <td *ngIf="tab === 'sold'" class="muted mono" style="font-size:12px" [class.deleted-actor]="isBuyerDeleted(l)">{{ buyerLabel(l) }}</td>
@@ -90,7 +93,7 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
             <span class="mi">warning</span>{{ 'myListings.cancelConfirm.title' | translate }}
           </h3>
           <p style="font-size:13px;margin:0 0 10px 0">
-            {{ cancelFor.item_name || ('#' + cancelFor.item_id) }}
+            {{ nameOf(cancelFor) }}
             <span class="mono muted">· {{ cancelFor.price | number }} coins</span>
           </p>
           <div class="warn">
@@ -114,7 +117,7 @@ type Tab = 'active' | 'sold' | 'expired' | 'cancelled';
             <span class="mi">qr_code_2</span>{{ 'notifications.code.title' | translate }}
           </h3>
           <p class="muted" style="font-size:13px;margin:0 0 12px 0">
-            {{ codeFor.item_name || ('#' + codeFor.item_id) }}
+            {{ nameOf(codeFor) }}
             <ng-container *ngIf="codeFor.amount > 1"> · ×{{ codeFor.amount }}</ng-container>
           </p>
           <div class="code-box mono">{{ codeFor.redeem_code }}</div>
@@ -189,6 +192,19 @@ export class MyListingsComponent implements OnInit {
 
   get items(): P2pListing[] {
     return this.all.filter(l => l.status === this.tab);
+  }
+
+  /** Display name — bundles get a translated "Bundle (N items)" label instead of "#0". */
+  nameOf(l: P2pListing): string {
+    if (l.is_bundle) return this.t.instant('p2p.bundle', { n: l.bundleItems?.length || l.amount });
+    return l.item_name || '#' + l.item_id;
+  }
+
+  /** One-line contents preview, e.g. "Magazine ×3, Fuel Can ×1". */
+  bundleSummary(l: P2pListing): string {
+    return (l.bundleItems ?? [])
+      .map(b => `${b.item_name || '#' + b.item_id} ×${b.amount}`)
+      .join(', ');
   }
 
   select(t: Tab) {
