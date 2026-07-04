@@ -15,6 +15,7 @@ import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
 import { AdminNotificationsComponent } from './pages/admin-notifications/admin-notifications.component';
 import { AdminHelpComponent } from './pages/admin-help/admin-help.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
+import { AdminBackpackComponent } from './pages/admin-backpack/admin-backpack.component';
 import { VipComponent } from './pages/vip/vip.component';
 import { KillMapComponent } from './pages/kill-map/kill-map.component';
 import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
@@ -73,6 +74,7 @@ const routes: Routes = [
   { path: 'admin/help', component: AdminHelpComponent, canActivate: [adminGuard] },
   { path: 'admin/meowcoins', component: AdminMeowcoinsComponent, canActivate: [adminGuard] },
   { path: 'admin/vip', component: AdminVipComponent, canActivate: [adminGuard] },
+  { path: 'admin/backpack', component: AdminBackpackComponent, canActivate: [adminGuard] },
   { path: 'admin/quests', component: AdminQuestsComponent, canActivate: [adminGuard] },
   { path: 'admin/item-types', component: AdminItemTypesComponent, canActivate: [adminGuard] },
   { path: 'admin/items', component: AdminItemsComponent, canActivate: [adminGuard] },

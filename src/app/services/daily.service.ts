@@ -32,6 +32,16 @@ export interface DailyStatus {
   };
 }
 
+export interface DailyTierPreview {
+  enabled: boolean;
+  reward: { coins: number; items: DailyReward[]; vehicles: DailyReward[] };
+}
+
+export interface DailyTiersPreview {
+  normal: DailyTierPreview;
+  vip: DailyTierPreview;
+}
+
 export interface DailyClaimResult {
   ok: true;
   tier: DailyTier;
@@ -107,6 +117,11 @@ export class DailyService {
   // ---- player ----
   status(): Observable<DailyStatus> {
     return this.http.get<DailyStatus>(`${this.base()}/status`);
+  }
+
+  /** Per-tier preview (normal vs the combined bundle a VIP gets) — VIP-benefits UI. */
+  preview(): Observable<DailyTiersPreview> {
+    return this.http.get<DailyTiersPreview>(`${this.base()}/preview`);
   }
 
   claim(): Observable<DailyClaimResult> {

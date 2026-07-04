@@ -8,7 +8,10 @@ import { BasketService } from '../../services/basket.service';
 import { P2pService } from '../../services/p2p.service';
 import { PlayerStatsService, PlayerStatEntry } from '../../services/player-stats.service';
 import { GachaService, GachaState, RankRewards } from '../../services/gacha.service';
-import { DailyService, DailyStatus, DailyReward } from '../../services/daily.service';
+import { DailyService, DailyStatus, DailyReward, DailyTiersPreview, DailyTierPreview } from '../../services/daily.service';
+import { BackpackService, BackpackMe, BackpackPayMethod } from '../../services/backpack.service';
+import { VipService } from '../../services/vip.service';
+import { TopupService } from '../../services/topup.service';
 import { P2pListing } from '../../models/vault';
 
 @Component({
@@ -126,6 +129,119 @@ import { P2pListing } from '../../models/vault';
           {{ (dailyStatus?.canClaim ? 'daily.claimBtn' : 'daily.claimedShort') | translate }}
         </span>
       </a>
+
+      <!-- VIP benefits: daily reward compare + vault sizes + backpack upgrade -->
+      <section class="card vip-card">
+        <div class="vb-head">
+          <span class="row gap-2">
+            <span class="mi fill" style="color:var(--amber)">workspace_premium</span>
+            <span class="fw-7">{{ 'vipBenefits.title' | translate }}</span>
+            <span *ngIf="isVip" class="badge amber">VIP</span>
+          </span>
+          <a routerLink="/vip" class="btn ghost sm">
+            {{ (isVip ? 'vipBenefits.extend' : 'vipBenefits.getVip') | translate }} <span class="mi sm">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="vb-grid">
+          <!-- 1) Daily reward: normal vs VIP (from DB) -->
+          <div class="vb-block" *ngIf="dailyPreview as dp">
+            <div class="vb-title"><span class="mi sm">redeem</span>{{ 'vipBenefits.daily' | translate }}</div>
+            <div class="vb-compare">
+              <div class="vb-col">
+                <div class="vb-tag">{{ 'vipBenefits.normal' | translate }}</div>
+                <div class="vb-goods">
+                  <span class="daily-coins" *ngIf="dp.normal.reward.coins > 0">
+                    <img class="coin-img" src="assets/coins/coin.png" alt=""><b>{{ dp.normal.reward.coins | number }}</b>
+                  </span>
+                  <span class="daily-thumb" *ngFor="let r of previewGoods(dp.normal)" [title]="r.label">
+                    <img *ngIf="r.imageUrl; else pn" [src]="r.imageUrl" [alt]="r.label">
+                    <ng-template #pn><span class="mi sm">{{ r.kind === 1 ? 'directions_car' : 'inventory_2' }}</span></ng-template>
+                    <span *ngIf="r.amount > 1" class="daily-qty">×{{ r.amount }}</span>
+                  </span>
+                  <span *ngIf="dp.normal.reward.coins <= 0 && previewGoods(dp.normal).length === 0" class="muted text-xs">—</span>
+                </div>
+              </div>
+              <span class="mi vb-arrow">arrow_forward</span>
+              <div class="vb-col vip">
+                <div class="vb-tag vip">VIP</div>
+                <div class="vb-goods">
+                  <span class="daily-coins" *ngIf="dp.vip.reward.coins > 0">
+                    <img class="coin-img" src="assets/coins/coin.png" alt=""><b>{{ dp.vip.reward.coins | number }}</b>
+                  </span>
+                  <span class="daily-thumb" *ngFor="let r of previewGoods(dp.vip)" [title]="r.label">
+                    <img *ngIf="r.imageUrl; else pv" [src]="r.imageUrl" [alt]="r.label">
+                    <ng-template #pv><span class="mi sm">{{ r.kind === 1 ? 'directions_car' : 'inventory_2' }}</span></ng-template>
+                    <span *ngIf="r.amount > 1" class="daily-qty">×{{ r.amount }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2) Vault sizes -->
+          <div class="vb-block">
+            <div class="vb-title"><span class="mi sm">inventory</span>{{ 'vipBenefits.vaults' | translate }}</div>
+            <div class="vb-compare">
+              <div class="vb-col">
+                <div class="vb-tag">{{ 'vipBenefits.normal' | translate }}</div>
+                <div class="vb-size mono">6×3</div>
+              </div>
+              <span class="mi vb-arrow">arrow_forward</span>
+              <div class="vb-col vip">
+                <div class="vb-tag vip">VIP</div>
+                <div class="vb-size mono">6×8</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3) Backpack upgrade (coins / meowcoins / mixed) -->
+          <div class="vb-block wide" *ngIf="bp?.enabled">
+            <div class="vb-title">
+              <span class="mi sm">backpack</span>{{ 'vipBenefits.backpack' | translate }}
+              <span class="badge amber" *ngIf="bp!.vip_only">VIP</span>
+            </div>
+            <div class="bp-row">
+              <div class="bp-stat">
+                <span class="bp-label">{{ 'vipBenefits.bpLevel' | translate }}</span>
+                <span class="bp-value mono">{{ bp!.level }}<span class="muted">/{{ bp!.max_level }}</span></span>
+              </div>
+              <div class="bp-stat">
+                <span class="bp-label">{{ 'vipBenefits.bpSize' | translate }}</span>
+                <span class="bp-value mono">{{ bp!.width }}×{{ bp!.height }}</span>
+              </div>
+              <span *ngIf="bp!.at_max" class="badge emerald">MAX</span>
+            </div>
+
+            <ng-container *ngIf="!bp!.at_max && bp!.next as nx">
+              <div class="bp-btns" *ngIf="bp!.can_upgrade; else bpLocked">
+                <button class="btn primary sm" [disabled]="bpBusy" (click)="upgradeBp('coins')">
+                  <span class="spinner sm" *ngIf="bpBusy"></span>
+                  {{ 'vipBenefits.upgrade' | translate }} {{ nx.coins | number }}
+                  <img class="coin-img" src="assets/coins/coin.png" alt="">
+                </button>
+                <button class="btn secondary sm" *ngIf="nx.meowcoins != null" [disabled]="bpBusy" (click)="upgradeBp('meowcoins')">
+                  {{ 'vipBenefits.upgrade' | translate }} {{ nx.meowcoins | number }}
+                  <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                </button>
+                <button class="btn emerald sm" *ngIf="nx.mixed" [disabled]="bpBusy" (click)="upgradeBp('mixed')">
+                  <span class="mi sm">percent</span>
+                  {{ nx.mixed.coins | number }} <img class="coin-img" src="assets/coins/coin.png" alt="">
+                  + {{ nx.mixed.meowcoins | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                </button>
+              </div>
+              <ng-template #bpLocked>
+                <div class="bp-locked muted text-sm">
+                  <span class="mi sm">lock</span>{{ 'vipBenefits.bpVipOnly' | translate }}
+                </div>
+              </ng-template>
+            </ng-container>
+
+            <p *ngIf="bpMsg" class="text-sm mt-2" style="color:var(--emerald)">{{ bpMsg }}</p>
+            <p *ngIf="bpErr" class="text-rose text-sm mt-2">{{ bpErr }}</p>
+          </div>
+        </div>
+      </section>
 
       <!-- Free spins by rank -->
       <section *ngIf="rankRewards?.enabled && rankRewards!.entries.length" class="card rank-reward-card">
@@ -360,6 +476,29 @@ import { P2pListing } from '../../models/vault';
     .daily-qty { position:absolute; right:1px; bottom:1px; font-size:9px; font-weight:700; line-height:1;
       padding:1px 3px; border-radius:4px; background:rgb(0 0 0 / .65); color:#fff; }
     .daily-upsell { color:var(--amber,#f5c518); }
+    /* VIP benefits card */
+    .vip-card { margin:16px 0; padding:16px 18px; border-color:color-mix(in srgb, var(--amber,#f5c518) 35%, var(--border)); }
+    .vb-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .vb-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; }
+    .vb-block { background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+    .vb-block.wide { grid-column:1 / -1; }
+    .vb-title { display:flex; align-items:center; gap:6px; font-weight:700; font-size:13px; margin-bottom:10px; }
+    .vb-compare { display:flex; align-items:stretch; gap:10px; }
+    .vb-arrow { align-self:center; color:var(--text-faint); }
+    .vb-col { flex:1; border:1px solid var(--border); border-radius:10px; padding:8px 10px; background:var(--surface); }
+    .vb-col.vip { border-color:color-mix(in srgb, var(--amber,#f5c518) 55%, var(--border)); }
+    .vb-tag { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+    .vb-tag.vip { color:var(--amber,#f5c518); }
+    .vb-goods { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .vb-size { font-size:20px; font-weight:800; }
+    .bp-row { display:flex; align-items:center; gap:18px; margin-bottom:10px; flex-wrap:wrap; }
+    .bp-stat { display:flex; flex-direction:column; gap:2px; }
+    .bp-label { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+    .bp-value { font-size:18px; font-weight:800; }
+    .bp-btns { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .bp-btns .coin-img { width:14px; height:14px; }
+    .bp-locked { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:8px;
+      background:var(--surface); border:1px dashed var(--border); }
     .rank-reward-card { margin:16px 0; padding:16px 18px; }
     .rr-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
     .rr-reset { display:inline-flex; align-items:center; gap:4px; }
@@ -435,6 +574,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   rankResetCountdown = '';
   dailyStatus: DailyStatus | null = null;
   dailyCountdown = '';
+  dailyPreview: DailyTiersPreview | null = null;
+  bp: BackpackMe | null = null;
+  isVip = false;
+  bpBusy = false;
+  bpMsg: string | null = null;
+  bpErr: string | null = null;
   private rankTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -446,6 +591,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     private playerStats: PlayerStatsService,
     private gacha: GachaService,
     private daily: DailyService,
+    private backpack: BackpackService,
+    private vip: VipService,
+    private topup: TopupService,
     private t: TranslateService,
   ) { }
 
@@ -462,6 +610,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.daily.status().subscribe({
       next: s => { this.dailyStatus = s; this.tickDailyReset(); },
       error: () => { this.dailyStatus = null; },
+    });
+    // VIP benefits card: daily compare + backpack level + own VIP status.
+    this.daily.preview().subscribe({
+      next: p => { this.dailyPreview = p; },
+      error: () => { this.dailyPreview = null; },
+    });
+    this.backpack.me().subscribe({
+      next: b => { this.bp = b; },
+      error: () => { this.bp = null; },
+    });
+    this.vip.mine().subscribe({
+      next: m => { this.isVip = (m.grants || []).length > 0; },
+      error: () => { this.isVip = false; },
     });
     this.rankTimer = setInterval(() => { this.tickRankReset(); this.tickDailyReset(); }, 1000);
     this.p2p.listActive({ page: 1, limit: 6 }).subscribe({
@@ -513,6 +674,36 @@ export class HomeComponent implements OnInit, OnDestroy {
   /** Flat list of all claimable items (kind 0) + vehicles (kind 1) for the banner thumbnails. */
   dailyRewards(s: DailyStatus): DailyReward[] {
     return [...(s.reward.items || []), ...(s.reward.vehicles || [])];
+  }
+
+  previewGoods(t: DailyTierPreview): DailyReward[] {
+    return [...(t.reward.items || []), ...(t.reward.vehicles || [])];
+  }
+
+  upgradeBp(method: BackpackPayMethod) {
+    if (!this.bp?.next || this.bpBusy) return;
+    if (!confirm(this.t.instant('vipBenefits.confirmUpgrade'))) return;
+    this.bpBusy = true; this.bpMsg = null; this.bpErr = null;
+    this.backpack.upgrade(method).subscribe({
+      next: r => {
+        this.bpBusy = false;
+        this.bp = r;
+        this.bpMsg = this.t.instant('vipBenefits.upgraded', { level: r.level, size: `${r.width}×${r.height}` });
+        this.coins.refreshMe().subscribe({ error: () => {} });
+        if (r.paid.meowcoins > 0) this.topup.meowcoinsMe().subscribe({ error: () => {} });
+      },
+      error: e => {
+        this.bpBusy = false;
+        const code = e?.error?.message;
+        const known: Record<string, string> = {
+          insufficient_coins: 'vipBenefits.errCoins',
+          insufficient_meowcoin: 'vipBenefits.errMeow',
+          vip_required: 'vipBenefits.bpVipOnly',
+          max_level: 'vipBenefits.errMax',
+        };
+        this.bpErr = known[code] ? this.t.instant(known[code]) : (code || 'Error');
+      },
+    });
   }
 
   formatPlaytime(seconds: number): string {

@@ -37,6 +37,7 @@
     "daily": "รางวัลรายวัน",
     "adminGacha": "สุ่มรายวัน",
     "adminDaily": "จัดการรางวัลรายวัน",
+    "adminBackpack": "จัดการ Backpack",
     "basket": "ตะกร้า",
     "section": {
       "main": "MAIN",
@@ -76,6 +77,24 @@
     "latestMarket": "ของล่าสุดในตลาด P2P",
     "noData": "ยังไม่มีข้อมูล",
     "noListings": "ยังไม่มีรายการขาย"
+  },
+  "vipBenefits": {
+    "title": "สิทธิพิเศษ VIP",
+    "getVip": "สมัคร VIP",
+    "extend": "ต่ออายุ VIP",
+    "daily": "รางวัลรายวัน",
+    "normal": "ทั่วไป",
+    "vaults": "ขนาดคลัง (Vault)",
+    "backpack": "อัพเกรด Backpack",
+    "bpLevel": "เลเวล",
+    "bpSize": "ขนาด",
+    "upgrade": "อัพเกรด",
+    "bpVipOnly": "เฉพาะ VIP — สมัคร VIP เพื่ออัพเกรด Backpack ผ่านเว็บ",
+    "confirmUpgrade": "ยืนยันอัพเกรด Backpack?",
+    "upgraded": "อัพเกรดสำเร็จ! เลเวล {{level}} ({{size}}) — ปิด/เปิดกระเป๋าในเกมเพื่อเห็นขนาดใหม่",
+    "errCoins": "Coins ไม่พอ",
+    "errMeow": "Meowcoins ไม่พอ",
+    "errMax": "ถึงระดับสูงสุดแล้ว"
   },
   "adminDaily": {
     "title": "รางวัลรายวัน",

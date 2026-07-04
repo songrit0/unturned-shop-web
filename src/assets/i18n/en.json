@@ -37,6 +37,7 @@
     "daily": "Daily Reward",
     "adminGacha": "Daily Draw",
     "adminDaily": "Manage Daily Reward",
+    "adminBackpack": "Manage Backpack",
     "basket": "Basket",
     "section": {
       "main": "MAIN",
@@ -76,6 +77,24 @@
     "latestMarket": "Latest in the P2P market",
     "noData": "No data yet",
     "noListings": "No active listings"
+  },
+  "vipBenefits": {
+    "title": "VIP Benefits",
+    "getVip": "Get VIP",
+    "extend": "Extend VIP",
+    "daily": "Daily Reward",
+    "normal": "Normal",
+    "vaults": "Vault size",
+    "backpack": "Backpack upgrade",
+    "bpLevel": "Level",
+    "bpSize": "Size",
+    "upgrade": "Upgrade",
+    "bpVipOnly": "VIP only — get VIP to upgrade your backpack on the web",
+    "confirmUpgrade": "Confirm backpack upgrade?",
+    "upgraded": "Upgraded! Level {{level}} ({{size}}) — reopen your backpack in-game to see the new size",
+    "errCoins": "Not enough Coins",
+    "errMeow": "Not enough Meowcoins",
+    "errMax": "Already at max level"
   },
   "adminDaily": {
     "title": "Daily Reward",

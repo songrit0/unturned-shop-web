@@ -131,6 +131,9 @@ import { TopupService } from '../../services/topup.service';
         <a routerLink="/admin/vip" routerLinkActive="active" class="nav-item admin">
           <span class="mi">workspace_premium</span>VIP
         </a>
+        <a routerLink="/admin/backpack" routerLinkActive="active" class="nav-item admin">
+          <span class="mi">backpack</span>{{ 'nav.adminBackpack' | translate }}
+        </a>
         <a routerLink="/admin/gacha" routerLinkActive="active" class="nav-item admin">
           <span class="mi">casino</span>{{ 'nav.adminGacha' | translate }}
         </a>

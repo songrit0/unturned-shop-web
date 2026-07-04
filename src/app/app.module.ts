@@ -21,6 +21,7 @@ import { AdminMarketComponent } from './pages/admin-market/admin-market.componen
 import { SellPricesComponent } from './pages/sell-prices/sell-prices.component';
 import { AdminCoinsComponent } from './pages/admin-coins/admin-coins.component';
 import { AdminVipComponent } from './pages/admin-vip/admin-vip.component';
+import { AdminBackpackComponent } from './pages/admin-backpack/admin-backpack.component';
 import { VipComponent } from './pages/vip/vip.component';
 import { KillMapComponent } from './pages/kill-map/kill-map.component';
 import { AdminQuestsComponent } from './pages/admin-quests/admin-quests.component';
@@ -98,6 +99,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminMarketComponent,
     AdminCoinsComponent,
     AdminVipComponent,
+    AdminBackpackComponent,
     AdminQuestsComponent,
     AdminItemTypesComponent,
     AdminItemsComponent,
