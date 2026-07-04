@@ -30,7 +30,7 @@ import {
               <input type="checkbox" [(ngModel)]="cfg.vip_only"> เฉพาะ VIP เท่านั้น
             </label>
             <label class="cfg-field chk">
-              <input type="checkbox" [(ngModel)]="cfg.mixed_enabled"> เปิดจ่ายผสม (ครึ่ง Coins + ครึ่ง Meowcoins)
+              <input type="checkbox" [(ngModel)]="cfg.mixed_enabled"> เปิดจ่ายผสม (ผู้เล่นเลือกจำนวน Meowcoins เป็นส่วนลดเอง)
             </label>
             <label class="cfg-field">
               <span>Coins ต่อระดับ <img class="coin-img" src="assets/coins/coin.png" alt=""></span>
@@ -51,7 +51,8 @@ import {
           </div>
           <p class="muted text-xs mt-2">
             ราคาอัพเกรดจากระดับ N = base × N — เช่น base 500: เลเวล 1→2 = 500, 2→3 = 1000 |
-            จ่ายผสม = เพดานครึ่งหนึ่งของแต่ละฝั่ง
+            จ่ายผสม: ผู้เล่นกรอกจำนวน Meowcoins เอง แล้วราคา Coins ลดตามสัดส่วน
+            (Coins ที่จ่าย = เพดาน(Coins × (Meow เต็ม − Meow ที่ใช้) ÷ Meow เต็ม))
           </p>
           <div class="row gap-2 mt-3">
             <button class="btn primary" [disabled]="saving" (click)="saveConfig()">

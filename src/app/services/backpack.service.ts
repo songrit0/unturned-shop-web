@@ -11,8 +11,7 @@ export type BackpackPayMethod = 'coins' | 'meowcoins' | 'mixed';
 
 export interface BackpackNextCost {
   coins: number;
-  meowcoins: number | null;                            // null = meow payment disabled
-  mixed: { coins: number; meowcoins: number } | null;  // null = mixed disabled
+  meowcoins: number | null;   // full price in Meowcoins; null = meow payment disabled
 }
 
 export interface BackpackMe {
@@ -20,6 +19,7 @@ export interface BackpackMe {
   vip_only: boolean;
   is_vip: boolean;
   can_upgrade: boolean;
+  mixed_allowed: boolean;     // player may spend Meowcoins as a pro-rata discount
   width: number;
   height: number;
   level: number;
@@ -65,8 +65,9 @@ export class BackpackService {
     return this.http.get<BackpackMe>(`${this.base()}/me`);
   }
 
-  upgrade(method: BackpackPayMethod): Observable<BackpackUpgradeResult> {
-    return this.http.post<BackpackUpgradeResult>(`${this.base()}/upgrade`, { method });
+  /** meowcoins = player-chosen Meowcoin spend for method 'mixed' (pro-rata coin discount). */
+  upgrade(method: BackpackPayMethod, meowcoins?: number): Observable<BackpackUpgradeResult> {
+    return this.http.post<BackpackUpgradeResult>(`${this.base()}/upgrade`, { method, meowcoins });
   }
 
   // ---- admin ----

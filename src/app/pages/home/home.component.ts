@@ -215,19 +215,14 @@ import { P2pListing } from '../../models/vault';
 
             <ng-container *ngIf="!bp!.at_max && bp!.next as nx">
               <div class="bp-btns" *ngIf="bp!.can_upgrade; else bpLocked">
-                <button class="btn primary sm" [disabled]="bpBusy" (click)="upgradeBp('coins')">
-                  <span class="spinner sm" *ngIf="bpBusy"></span>
-                  {{ 'vipBenefits.upgrade' | translate }} {{ nx.coins | number }}
+                <button class="btn primary sm" (click)="openBpModal()">
+                  <span class="mi sm">upgrade</span>
+                  {{ 'vipBenefits.upgrade' | translate }} — {{ nx.coins | number }}
                   <img class="coin-img" src="assets/coins/coin.png" alt="">
-                </button>
-                <button class="btn secondary sm" *ngIf="nx.meowcoins != null" [disabled]="bpBusy" (click)="upgradeBp('meowcoins')">
-                  {{ 'vipBenefits.upgrade' | translate }} {{ nx.meowcoins | number }}
-                  <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
-                </button>
-                <button class="btn emerald sm" *ngIf="nx.mixed" [disabled]="bpBusy" (click)="upgradeBp('mixed')">
-                  <span class="mi sm">percent</span>
-                  {{ nx.mixed.coins | number }} <img class="coin-img" src="assets/coins/coin.png" alt="">
-                  + {{ nx.mixed.meowcoins | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                  <ng-container *ngIf="nx.meowcoins != null">
+                    <span class="muted">/</span> {{ nx.meowcoins | number }}
+                    <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+                  </ng-container>
                 </button>
               </div>
               <ng-template #bpLocked>
@@ -238,10 +233,67 @@ import { P2pListing } from '../../models/vault';
             </ng-container>
 
             <p *ngIf="bpMsg" class="text-sm mt-2" style="color:var(--emerald)">{{ bpMsg }}</p>
-            <p *ngIf="bpErr" class="text-rose text-sm mt-2">{{ bpErr }}</p>
           </div>
         </div>
       </section>
+
+      <!-- Backpack upgrade modal -->
+      <div *ngIf="bpModal && bp?.next as nx" class="modal-backdrop" (click)="bpModal = false">
+        <div class="modal-card tactical" (click)="$event.stopPropagation()">
+          <h3 class="row gap-2 mb-3">
+            <span class="mi" style="color:var(--amber)">backpack</span>
+            {{ 'vipBenefits.bpModalTitle' | translate:{ level: bp!.level + 1 } }}
+          </h3>
+
+          <div class="bpm-balances muted text-xs mb-3">
+            <span>{{ 'vipBenefits.balance' | translate }}:</span>
+            <span class="mono">{{ (coins.balance$ | async) ?? '—' | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></span>
+            <span class="mono" *ngIf="nx.meowcoins != null">{{ (topup.balance$ | async) ?? '—' | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt=""></span>
+          </div>
+
+          <!-- Meow discount: player picks the amount (only when mixed is allowed) -->
+          <ng-container *ngIf="bp!.mixed_allowed && nx.meowcoins != null">
+            <label class="bpm-label">{{ 'vipBenefits.useMeow' | translate }} (0–{{ nx.meowcoins | number }})</label>
+            <div class="row gap-2" style="align-items:center;">
+              <input type="range" class="grow" min="0" [max]="nx.meowcoins" step="1" [(ngModel)]="meowUse">
+              <input class="input bpm-num" type="number" min="0" [max]="nx.meowcoins" [(ngModel)]="meowUse">
+              <img class="coin-img meow" src="assets/coins/meowcoin.png" alt="">
+            </div>
+          </ng-container>
+
+          <!-- No mixed: plain currency choice -->
+          <ng-container *ngIf="!bp!.mixed_allowed && nx.meowcoins != null">
+            <label class="bpm-label">{{ 'vipBenefits.payWith' | translate }}</label>
+            <div class="row gap-2">
+              <label class="bpm-radio"><input type="radio" name="bpcur" value="coins" [(ngModel)]="payCurrency">
+                {{ nx.coins | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></label>
+              <label class="bpm-radio"><input type="radio" name="bpcur" value="meowcoins" [(ngModel)]="payCurrency">
+                {{ nx.meowcoins | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt=""></label>
+            </div>
+          </ng-container>
+
+          <!-- Live total -->
+          <div class="bpm-total">
+            <span class="muted text-sm">{{ 'vipBenefits.youPay' | translate }}</span>
+            <span class="bpm-price mono">
+              <ng-container *ngIf="bpCoinsDue > 0">{{ bpCoinsDue | number }} <img class="coin-img" src="assets/coins/coin.png" alt=""></ng-container>
+              <ng-container *ngIf="bpCoinsDue > 0 && bpMeowDue > 0"> + </ng-container>
+              <ng-container *ngIf="bpMeowDue > 0">{{ bpMeowDue | number }} <img class="coin-img meow" src="assets/coins/meowcoin.png" alt=""></ng-container>
+              <ng-container *ngIf="bpCoinsDue <= 0 && bpMeowDue <= 0">—</ng-container>
+            </span>
+          </div>
+
+          <p *ngIf="bpErr" class="text-rose text-sm mt-2">{{ bpErr }}</p>
+
+          <div class="row gap-2 mt-3" style="justify-content:flex-end;">
+            <button class="btn ghost" [disabled]="bpBusy" (click)="bpModal = false">{{ 'vipBenefits.cancel' | translate }}</button>
+            <button class="btn primary" [disabled]="bpBusy" (click)="confirmBp()">
+              <span class="spinner sm" *ngIf="bpBusy"></span><span class="mi" *ngIf="!bpBusy">upgrade</span>
+              {{ 'vipBenefits.confirm' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Free spins by rank -->
       <section *ngIf="rankRewards?.enabled && rankRewards!.entries.length" class="card rank-reward-card">
@@ -499,6 +551,18 @@ import { P2pListing } from '../../models/vault';
     .bp-btns .coin-img { width:14px; height:14px; }
     .bp-locked { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:8px;
       background:var(--surface); border:1px dashed var(--border); }
+    .bpm-balances { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .bpm-balances .coin-img { width:13px; height:13px; }
+    .bpm-label { display:block; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+      color:var(--muted); margin-bottom:6px; }
+    .bpm-num { max-width:110px; }
+    .bpm-radio { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:10px;
+      border:1px solid var(--border); background:var(--surface-2); cursor:pointer; font-weight:600; font-size:13px; }
+    .bpm-radio .coin-img { width:14px; height:14px; }
+    .bpm-total { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:14px;
+      padding:10px 12px; border-radius:10px; background:var(--surface-2); border:1px solid var(--border); }
+    .bpm-price { font-size:17px; font-weight:800; display:inline-flex; align-items:center; gap:5px; }
+    .bpm-price .coin-img { width:15px; height:15px; }
     .rank-reward-card { margin:16px 0; padding:16px 18px; }
     .rr-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
     .rr-reset { display:inline-flex; align-items:center; gap:4px; }
@@ -580,6 +644,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   bpBusy = false;
   bpMsg: string | null = null;
   bpErr: string | null = null;
+  bpModal = false;
+  meowUse = 0;                                   // player-chosen Meowcoin discount
+  payCurrency: 'coins' | 'meowcoins' = 'coins';  // when mixed is not allowed
   private rankTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -593,7 +660,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private daily: DailyService,
     private backpack: BackpackService,
     private vip: VipService,
-    private topup: TopupService,
+    public topup: TopupService,
     private t: TranslateService,
   ) { }
 
@@ -680,13 +747,57 @@ export class HomeComponent implements OnInit, OnDestroy {
     return [...(t.reward.items || []), ...(t.reward.vehicles || [])];
   }
 
-  upgradeBp(method: BackpackPayMethod) {
-    if (!this.bp?.next || this.bpBusy) return;
-    if (!confirm(this.t.instant('vipBenefits.confirmUpgrade'))) return;
-    this.bpBusy = true; this.bpMsg = null; this.bpErr = null;
-    this.backpack.upgrade(method).subscribe({
+  openBpModal() {
+    this.meowUse = 0;
+    this.payCurrency = 'coins';
+    this.bpMsg = null; this.bpErr = null;
+    this.bpModal = true;
+    // fresh Meowcoin balance for the modal
+    this.topup.meowcoinsMe().subscribe({ error: () => {} });
+  }
+
+  private clampMeow(): number {
+    const max = this.bp?.next?.meowcoins ?? 0;
+    return Math.min(max, Math.max(0, Math.trunc(Number(this.meowUse) || 0)));
+  }
+
+  /** Coins due after the chosen Meowcoin discount (pro-rata, same formula as the API). */
+  get bpCoinsDue(): number {
+    const nx = this.bp?.next;
+    if (!nx) return 0;
+    if (!this.bp!.mixed_allowed || nx.meowcoins == null) {
+      return this.payCurrency === 'meowcoins' && nx.meowcoins != null ? 0 : nx.coins;
+    }
+    const m = this.clampMeow();
+    if (m <= 0) return nx.coins;
+    if (m >= nx.meowcoins) return 0;
+    return Math.ceil((nx.coins * (nx.meowcoins - m)) / nx.meowcoins);
+  }
+
+  get bpMeowDue(): number {
+    const nx = this.bp?.next;
+    if (!nx || nx.meowcoins == null) return 0;
+    if (!this.bp!.mixed_allowed) return this.payCurrency === 'meowcoins' ? nx.meowcoins : 0;
+    return this.clampMeow();
+  }
+
+  confirmBp() {
+    const nx = this.bp?.next;
+    if (!nx || this.bpBusy) return;
+    let method: BackpackPayMethod = 'coins';
+    let meow: number | undefined;
+    if (this.bp!.mixed_allowed && nx.meowcoins != null) {
+      const m = this.clampMeow();
+      if (m >= nx.meowcoins) method = 'meowcoins';
+      else if (m > 0) { method = 'mixed'; meow = m; }
+    } else if (nx.meowcoins != null && this.payCurrency === 'meowcoins') {
+      method = 'meowcoins';
+    }
+    this.bpBusy = true; this.bpErr = null;
+    this.backpack.upgrade(method, meow).subscribe({
       next: r => {
         this.bpBusy = false;
+        this.bpModal = false;
         this.bp = r;
         this.bpMsg = this.t.instant('vipBenefits.upgraded', { level: r.level, size: `${r.width}×${r.height}` });
         this.coins.refreshMe().subscribe({ error: () => {} });
