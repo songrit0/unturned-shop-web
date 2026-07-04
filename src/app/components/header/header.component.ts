@@ -33,6 +33,7 @@ import { daysUntil } from '../../services/expiry';
             <span style="width:8px;height:8px;border-radius:50%;flex:none"
                   [style.background]="onlineCount > 0 ? 'var(--emerald)' : 'var(--muted)'"></span>
             <span class="mono" style="font-size:12px;font-weight:700">{{ onlineCount }}</span>
+            <span class="mono" style="font-size:12px;font-weight:700">Online</span>
           </button>
 
           <div *ngIf="onlineOpen" class="notif-dropdown">
@@ -256,13 +257,13 @@ export class HeaderComponent implements OnInit {
     this.loadOnline();
     // ponytail: refresh the count once a minute; the list itself refreshes on every open
     setInterval(() => { if (!this.onlineOpen) this.loadOnline(); }, 60_000);
-    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => {} });
+    this.topup.getTopupConfig().subscribe({ next: c => this.topupAdminOnly = c.admin_only, error: () => { } });
     this.auth.me$.subscribe(me => {
       if (me) {
         this.coins.refreshMe().subscribe();
         // Only fetch the Meowcoin balance for users who can use top-up (admins, or once opened to all).
         if (me.is_admin || !this.topupAdminOnly) {
-          this.topup.meowcoinsMe().subscribe({ next: () => {}, error: () => {} });
+          this.topup.meowcoinsMe().subscribe({ next: () => { }, error: () => { } });
         }
         this.basket.view().subscribe();
         this.notifs.startPolling();
@@ -325,10 +326,10 @@ export class HeaderComponent implements OnInit {
    */
   private kindKey(kind: string): string | null {
     switch (kind) {
-      case 'p2p_expired':      return 'p2pExpired';
-      case 'p2p_cancelled':    return 'p2pCancelled';
+      case 'p2p_expired': return 'p2pExpired';
+      case 'p2p_cancelled': return 'p2pCancelled';
       case 'p2p_force_closed': return 'p2pForceClosed';
-      default:                 return null;
+      default: return null;
     }
   }
 
@@ -340,7 +341,7 @@ export class HeaderComponent implements OnInit {
   /** Open the relevant detail for a notification and mark it read. */
   openNotification(n: ShopNotification) {
     if (!n.read_at) {
-      this.notifs.markRead(n.id).subscribe({ next: () => { n.read_at = new Date().toISOString(); }, error: () => {} });
+      this.notifs.markRead(n.id).subscribe({ next: () => { n.read_at = new Date().toISOString(); }, error: () => { } });
     }
     if (this.isCodeKind(n)) {
       this.codeFor = n;
@@ -375,13 +376,13 @@ export class HeaderComponent implements OnInit {
     if (!code) return;
     const text = `/code ${code}`;
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).then(() => { this.copied = true; }, () => {});
+      navigator.clipboard.writeText(text).then(() => { this.copied = true; }, () => { });
     } else {
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); this.copied = true; } catch {}
+      try { document.execCommand('copy'); this.copied = true; } catch { }
       document.body.removeChild(ta);
     }
   }
