@@ -5,7 +5,7 @@ import { Item, ItemsService } from '../../services/items.service';
 import { Vehicle, VehiclesService } from '../../services/vehicles.service';
 import { ItemType, ItemTypesService } from '../../services/item-types.service';
 import { AdminCodesService, CreateCodePayload, CodeRewardPayload, AdminCode } from '../../services/admin-codes.service';
-import { bangkokInputToIso } from '../../services/thai-time';
+import { localInputToIso } from '../../services/thai-time';
 
 type Kind = 'item' | 'vehicle';
 
@@ -90,7 +90,7 @@ interface CatalogEntry {
               <label class="set-field"><span>Max uses (0 = unlimited)</span>
                 <input class="input" type="number" min="0" [(ngModel)]="form.max_uses">
               </label>
-              <label class="set-field"><span>Expires (optional, Thai time)</span>
+              <label class="set-field"><span>Expires (optional, your local time)</span>
                 <input class="input" type="datetime-local" [(ngModel)]="form.expires_at">
               </label>
               <label class="set-field row" style="align-items:center;gap:8px">
@@ -323,7 +323,7 @@ export class AdminCodeBuilderComponent implements OnInit, OnDestroy {
     const payload: CreateCodePayload = {
       max_uses: Math.max(0, Number(this.form.max_uses) || 0),
       enabled: this.form.enabled !== false,
-      expires_at: bangkokInputToIso(this.form.expires_at),
+      expires_at: localInputToIso(this.form.expires_at),
       rewards,
     };
     const code = this.form.code.trim();

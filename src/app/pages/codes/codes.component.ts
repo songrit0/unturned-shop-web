@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CodesService, MergeResult, MyCode, Paginated } from '../../services/codes.service';
 import { daysUntil } from '../../services/expiry';
-import { formatBangkok } from '../../services/thai-time';
+import { formatLocal } from '../../services/thai-time';
 
 @Component({
   selector: 'app-codes',
@@ -265,7 +265,7 @@ export class CodesComponent implements OnInit {
   expiryText(c: MyCode): string | null {
     if (!c.expires_at) return null;
     if (c.status === 'expired') {
-      return this.t.instant('codes.expiredOn', { date: formatBangkok(c.expires_at, 'date') });
+      return this.t.instant('codes.expiredOn', { date: formatLocal(c.expires_at, 'date') });
     }
     if (c.status !== 'available') return null;
     const d = this.days(c);

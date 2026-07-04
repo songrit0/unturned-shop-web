@@ -422,8 +422,7 @@ export class DrawComponent implements OnInit, OnDestroy {
     // ถ้าไม่มี ให้ถือว่าเป็น UTC เพื่อกัน JS ตีความเป็นเวลา local
     const hasTz = /[zZ]|[+-]\d{2}:?\d{2}$/.test(iso);
     const normalized = hasTz ? iso : iso.replace(' ', 'T') + 'Z';
-    return new Date(normalized).toLocaleTimeString('th-TH', {
-      timeZone: 'Asia/Bangkok',
+    return new Date(normalized).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,

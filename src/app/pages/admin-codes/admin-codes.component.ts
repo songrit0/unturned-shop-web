@@ -11,7 +11,7 @@ import {
   Paginated,
 } from '../../services/admin-codes.service';
 import { Item, ItemsService } from '../../services/items.service';
-import { bangkokInputToIso } from '../../services/thai-time';
+import { localInputToIso } from '../../services/thai-time';
 import { Vehicle, VehiclesService } from '../../services/vehicles.service';
 
 /** One editable reward row in the create modal. */
@@ -491,7 +491,7 @@ export class AdminCodesComponent implements OnInit, OnDestroy {
     const payload: CreateCodePayload = {
       max_uses: Math.max(0, Number(this.form.max_uses) || 0),
       enabled: this.form.enabled !== false,
-      expires_at: bangkokInputToIso(this.form.expires_at),
+      expires_at: localInputToIso(this.form.expires_at),
       rewards,
     };
     const code = this.form.code.trim();

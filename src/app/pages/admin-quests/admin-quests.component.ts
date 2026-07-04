@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminQuest, AdminQuestPayload, Paginated, QuestResetType, QuestsService } from '../../services/quests.service';
-import { bangkokInputToIso, isoToBangkokInput } from '../../services/thai-time';
+import { localInputToIso, isoToLocalInput } from '../../services/thai-time';
 
 interface ItemRow { item_id: number | null; qty_required: number; }
 
@@ -236,9 +236,9 @@ export class AdminQuestsComponent implements OnInit {
     this.error = null;
   }
 
-  // datetime-local round-trips in Thai time (Asia/Bangkok), the canonical zone.
+  // datetime-local round-trips in the viewer's local time.
   toLocalInput(iso: string | null): string {
-    return isoToBangkokInput(iso);
+    return isoToLocalInput(iso);
   }
 
   addItem() { this.items.push({ item_id: null, qty_required: 1 }); }
@@ -258,8 +258,8 @@ export class AdminQuestsComponent implements OnInit {
       reward_coins: Number(this.form.reward_coins) || 0,
       reset_type: this.form.reset_type,
       enabled: this.form.enabled,
-      start_at: bangkokInputToIso(this.form.start_at),
-      end_at: bangkokInputToIso(this.form.end_at),
+      start_at: localInputToIso(this.form.start_at),
+      end_at: localInputToIso(this.form.end_at),
       items: cleanItems,
     };
 
