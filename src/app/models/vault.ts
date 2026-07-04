@@ -81,6 +81,8 @@ export interface P2pListing {
   id: number;
   seller_steam: string;
   seller_discord_name: string | null;
+  // In-game player name joined from the PlayerStats plugin table; null if never seen in-game.
+  seller_player_name?: string | null;
   item_id: number;
   item_name: string | null;
   image_url: string | null;

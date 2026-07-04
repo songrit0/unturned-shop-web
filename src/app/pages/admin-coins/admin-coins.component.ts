@@ -37,6 +37,7 @@ const SOURCE_ICON: Record<string, string> = {
             <table class="tbl">
               <thead>
                 <tr>
+                  <th>{{ 'adminCoins.col.player' | translate }}</th>
                   <th>{{ 'adminCoins.col.steamId' | translate }}</th>
                   <th>{{ 'adminCoins.col.discordId' | translate }}</th>
                   <th>{{ 'adminCoins.col.linkedAt' | translate }}</th>
@@ -46,6 +47,7 @@ const SOURCE_ICON: Record<string, string> = {
               </thead>
               <tbody>
                 <tr *ngFor="let u of page?.items">
+                  <td style="font-weight:600;font-size:13px">{{ u.player_name || '—' }}</td>
                   <td class="mono" style="font-size:12px">{{ u.steam_id }}</td>
                   <td class="mono muted" style="font-size:12px">{{ u.discord_id || '—' }}</td>
                   <td class="mono muted" style="font-size:12px">{{ u.linked_at ? (u.linked_at | date:'short') : '—' }}</td>
@@ -59,7 +61,7 @@ const SOURCE_ICON: Record<string, string> = {
                   </td>
                 </tr>
                 <tr *ngIf="page && page.items.length === 0">
-                  <td colspan="5">
+                  <td colspan="6">
                     <div class="empty">
                       <span class="mi xxl">person_off</span>
                       <div class="empty-title">{{ 'adminCoins.noUser' | translate }}</div>
@@ -91,7 +93,7 @@ const SOURCE_ICON: Record<string, string> = {
             </span>
             {{ (sign > 0 ? 'adminCoins.grantTitle' : 'adminCoins.takeTitle') | translate }}
           </h3>
-          <p class="mono muted" style="font-size:11px;margin:0 0 12px 0">{{ adjusting.steam_id }}</p>
+          <p class="mono muted" style="font-size:11px;margin:0 0 12px 0"><span *ngIf="adjusting.player_name" style="font-weight:600">{{ adjusting.player_name }} · </span>{{ adjusting.steam_id }}</p>
           <div style="display:flex;flex-direction:column;align-items:center;padding:16px;background:var(--surface-2);border-radius:8px;margin-bottom:16px">
             <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em">{{ 'adminCoins.currentBalance' | translate }}</span>
             <div class="coin-amt lg" style="margin-top:4px"><img class="coin-img lg" src="assets/coins/coin.png" alt="">{{ adjusting.balance | number }}</div>

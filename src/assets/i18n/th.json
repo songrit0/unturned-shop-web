@@ -950,6 +950,7 @@
     "info": "การ + Grant และ − Take จะถูกบันทึกใน activity_log (kind=admin_grant/admin_take)",
     "search": "ค้นหา steam_id / discord_id...",
     "col": {
+      "player": "ชื่อผู้เล่น",
       "steamId": "Steam ID",
       "discordId": "Discord ID",
       "linkedAt": "ผูกเมื่อ",

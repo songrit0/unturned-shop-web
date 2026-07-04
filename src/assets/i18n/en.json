@@ -925,6 +925,7 @@
     "info": "+ Grant and − Take are recorded in activity_log (kind=admin_grant/admin_take)",
     "search": "Search steam_id / discord_id...",
     "col": {
+      "player": "Player",
       "steamId": "Steam ID",
       "discordId": "Discord ID",
       "linkedAt": "Linked at",

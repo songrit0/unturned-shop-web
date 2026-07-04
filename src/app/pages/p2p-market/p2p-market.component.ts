@@ -108,7 +108,8 @@ import { mapVaultP2pErrorKey } from '../../services/vault-errors';
             </div>
             <div style="flex:1">
               <div class="muted" style="font-size:12px">{{ 'p2p.seller' | translate }}</div>
-              <div class="mono" style="font-weight:600;font-size:13px" [class.deleted-actor]="isSellerDeleted(selected)">{{ sellerLabel(selected) }}</div>
+              <div *ngIf="selected.seller_player_name" style="font-weight:600;font-size:13px">{{ selected.seller_player_name }}</div>
+              <div class="mono" [style.font-weight]="selected.seller_player_name ? 400 : 600" [class.muted]="!!selected.seller_player_name" style="font-size:12px" [class.deleted-actor]="isSellerDeleted(selected)">{{ sellerLabel(selected) }}</div>
               <ng-container *ngIf="!selected.is_bundle">
                 <div class="muted" style="font-size:12px;margin-top:8px">{{ 'p2p.quality' | translate }}</div>
                 <app-quality-bar [value]="selected.quality" [showPercent]="true"></app-quality-bar>

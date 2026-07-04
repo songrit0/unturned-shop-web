@@ -15,6 +15,8 @@ export interface CoinUserRow {
   balance: number;
   discord_id: string | null;
   linked_at: string | null;
+  // In-game player name joined from the PlayerStats plugin table.
+  player_name?: string | null;
 }
 export type CoinUsersPage = Paginated<CoinUserRow>;
 export interface AdjustResult { steam_id: string; balance: number; }
