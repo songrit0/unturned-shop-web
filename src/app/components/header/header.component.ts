@@ -86,6 +86,14 @@ import { daysUntil } from '../../services/expiry';
             <span class="mi">{{ (theme.theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
           </button>
 
+          <!-- โหมดเทสสำหรับ admin: สลับให้ API มองเราเป็น user ธรรมดาทั้งระบบ
+               ตอนสลับอยู่ me.is_admin จะเป็น false — ปุ่มต้องเช็ค auth.actAsUser ด้วยไม่งั้นกลับไม่ได้ -->
+          <button *ngIf="me.is_admin || auth.actAsUser" class="icon-btn" (click)="auth.toggleActAsUser()"
+                  [title]="(auth.actAsUser ? 'header.actAsAdmin' : 'header.actAsUser') | translate"
+                  [style.color]="auth.actAsUser ? '#f59e0b' : null">
+            <span class="mi">{{ auth.actAsUser ? 'person_off' : 'supervisor_account' }}</span>
+          </button>
+
           <!-- Notifications bell + inbox dropdown -->
           <div class="notif-wrap" (click)="$event.stopPropagation()">
             <button class="icon-btn" (click)="toggleInbox()" [title]="'notifications.title' | translate">

@@ -54,7 +54,9 @@
     "search": "Search items...",
     "onlinePlayers": "Online players",
     "noOnline": "No one is online right now",
-    "playedHours": "played {{h}} hrs total"
+    "playedHours": "played {{h}} hrs total",
+    "actAsUser": "Switch to user view (test)",
+    "actAsAdmin": "Viewing as user — click to switch back to admin"
   },
   "login": {
     "title": "meowpow Shop",
@@ -1079,6 +1081,8 @@
     "fromDate": "From date",
     "toDate": "To date",
     "steamFilter": "Steam ID (blank = everyone)",
+    "typeFilter": "Type",
+    "typeAll": "All",
     "search": "Search",
     "empty": "No kills found in the selected range",
     "items": "entries",

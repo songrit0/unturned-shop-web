@@ -14,6 +14,7 @@ export interface Me {
 }
 
 const TOKEN_KEY = 'shop_jwt';
+const ACT_AS_USER_KEY = 'act_as_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -24,7 +25,23 @@ export class AuthService {
 
   get token(): string | null { return localStorage.getItem(TOKEN_KEY); }
   setToken(t: string) { localStorage.setItem(TOKEN_KEY, t); }
-  clear() { localStorage.removeItem(TOKEN_KEY); this._me$.next(null); }
+  clear() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ACT_AS_USER_KEY);
+    this._me$.next(null);
+  }
+
+  /**
+   * โหมดเทสสำหรับ admin: interceptor จะส่ง X-Act-As-User: 1 ให้ API ลดสิทธิ์เป็น user ทั้งระบบ
+   * (API เช็ค is_admin จาก JWT ก่อน — user ธรรมดาส่ง header นี้ไปก็ไม่มีผล)
+   */
+  get actAsUser(): boolean { return localStorage.getItem(ACT_AS_USER_KEY) === '1'; }
+  toggleActAsUser() {
+    if (this.actAsUser) localStorage.removeItem(ACT_AS_USER_KEY);
+    else localStorage.setItem(ACT_AS_USER_KEY, '1');
+    // ponytail: reload ทั้งหน้า = ทุก service/เมนู refetch ใน role ใหม่พร้อมกัน ไม่ต้องไล่เคลียร์ state
+    location.reload();
+  }
 
   /** Send the user to the backend's Discord OAuth entry. */
   startLogin() {

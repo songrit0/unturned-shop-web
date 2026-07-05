@@ -35,6 +35,7 @@ export interface KillsQuery {
   from?: string;      // YYYY-MM-DD
   to?: string;        // YYYY-MM-DD
   steam_id?: string;  // admin เท่านั้น
+  is_pvp?: string;    // '1' = PvP, '0' = PvE, ไม่ส่ง = ทั้งหมด
   page?: number;
   limit?: number;
 }
@@ -49,6 +50,7 @@ export class KillsService {
       from: q.from,
       to: q.to,
       steam_id: q.steam_id,
+      is_pvp: q.is_pvp,
     });
     return this.http.get<unknown>(`${this.apiUrl.get()}/kills`, { params })
       .pipe(map(r => normalizePaginated<KillRow>(r, limit)));

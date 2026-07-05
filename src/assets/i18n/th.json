@@ -54,7 +54,9 @@
     "search": "ค้นหาไอเทม...",
     "onlinePlayers": "ผู้เล่นออนไลน์",
     "noOnline": "ตอนนี้ไม่มีใครออนไลน์",
-    "playedHours": "เล่นไปรวม {{h}} ชม."
+    "playedHours": "เล่นไปรวม {{h}} ชม.",
+    "actAsUser": "สลับเป็นมุมมอง user (เทส)",
+    "actAsAdmin": "กำลังดูแบบ user — คลิกเพื่อกลับเป็น admin"
   },
   "login": {
     "title": "meowpow Shop",
@@ -1104,6 +1106,8 @@
     "fromDate": "จากวันที่",
     "toDate": "ถึงวันที่",
     "steamFilter": "Steam ID (เว้นว่าง = ทุกคน)",
+    "typeFilter": "ประเภท",
+    "typeAll": "ทั้งหมด",
     "search": "ค้นหา",
     "empty": "ไม่พบ kill ในช่วงที่เลือก",
     "items": "รายการ",

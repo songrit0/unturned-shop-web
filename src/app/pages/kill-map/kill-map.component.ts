@@ -78,6 +78,14 @@ import { KillRow, KillsService } from '../../services/kills.service';
             <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.toDate' | translate }}
               <input type="date" [(ngModel)]="to" class="mono" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
             </label>
+            <label class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.typeFilter' | translate }}
+              <select [(ngModel)]="pvpFilter" (ngModelChange)="load(1)"
+                      style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit">
+                <option value="">{{ 'killMap.typeAll' | translate }}</option>
+                <option value="1">PvP</option>
+                <option value="0">PvE</option>
+              </select>
+            </label>
             <label *ngIf="(auth.me$ | async)?.is_admin" class="muted" style="font-size:12px;display:flex;flex-direction:column;gap:4px">{{ 'killMap.steamFilter' | translate }}
               <input type="text" [(ngModel)]="steamFilter" placeholder="7656119..." maxlength="17" class="mono"
                      style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:inherit;width:170px">
@@ -111,6 +119,7 @@ import { KillRow, KillsService } from '../../services/kills.service';
                   </div>
                 </div>
                 <span *ngIf="!k.is_pvp" class="badge amber" style="flex:none">PvE</span>
+                <span *ngIf="k.is_pvp" class="badge amber" style="flex:none;background-color: #ef4444; color: white;">PvP</span>
               </div>
             </ng-container>
             <ng-template #loadingTpl>
@@ -151,6 +160,7 @@ export class KillMapComponent implements OnInit, AfterViewInit {
   from = '';
   to = '';
   steamFilter = '';
+  pvpFilter = '';       // '' = ทั้งหมด, '1' = PvP, '0' = PvE
   kills: KillRow[] = [];
   selected: KillRow | null = null;
   page = 1; pages = 1; total = 0;
@@ -158,7 +168,7 @@ export class KillMapComponent implements OnInit, AfterViewInit {
   notLinked = false;
   error: string | null = null;
 
-  constructor(public auth: AuthService, private killsApi: KillsService, private t: TranslateService) {}
+  constructor(public auth: AuthService, private killsApi: KillsService, private t: TranslateService) { }
 
   ngOnInit() {
     const today = new Date();
@@ -180,6 +190,7 @@ export class KillMapComponent implements OnInit, AfterViewInit {
       from: this.from || undefined,
       to: this.to || undefined,
       steam_id: this.steamFilter.trim() || undefined,
+      is_pvp: this.pvpFilter || undefined,
       page,
       limit: 50,
     }).subscribe({

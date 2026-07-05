@@ -8,6 +8,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token && auth.actAsUser) headers['X-Act-As-User'] = '1';
 
   return next(req.clone({ setHeaders: headers }));
 };
