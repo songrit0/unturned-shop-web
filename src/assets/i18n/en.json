@@ -5,7 +5,17 @@
   "shutdown": {
     "title": "Service Termination Notice",
     "sub": "Donations close July 18 · Server shuts down July 20, 2026",
-    "body": "We regret to announce that the <b>Unturned server</b> will permanently cease operations on <b>July 20, 2026</b>.\n\nDue to the player population falling below expectations and the current number of active Thai players being too low to sustain the server, the administration team has made the difficult decision to discontinue the service.\n\nThe <b>donation system</b> will close on <b>July 18, 2026</b>, and the <b>item shop</b> will no longer be available once the server shuts down on <b>July 20, 2026</b>.\n\nWe sincerely thank everyone who has played on our server and supported us throughout the years. Your support has meant a great deal to us."
+    "body": "We regret to announce that the <b>Unturned server</b> will permanently cease operations on <b>July 20, 2026</b>.\n\nDue to the player population falling below expectations and the current number of active Thai players being too low to sustain the server, the administration team has made the difficult decision to discontinue the service.\n\nThe <b>donation system</b> will close on <b>July 18, 2026</b>, and the <b>item shop</b> will no longer be available once the server shuts down on <b>July 20, 2026</b>.\n\nWe sincerely thank everyone who has played on our server and supported us throughout the years. Your support has meant a great deal to us.",
+    "vote": {
+      "q": "Should the server really shut down? Cast your vote:",
+      "close": "Shut it down",
+      "keep": "Keep it running",
+      "login": "Sign in to vote",
+      "closed": "Voting has closed (ended July 19, 2026)",
+      "goalInfo": "If {{n}} players vote to keep it running, the server stays open — otherwise it closes as scheduled. Only players who have joined the server can vote.",
+      "reached": "Goal of {{n}} votes reached — the server will stay open!",
+      "need": "{{n}} more votes needed to keep the server open"
+    }
   },
   "nav": {
     "killMap": "Kill Map",
