@@ -27,10 +27,10 @@ import { VersionService } from './services/version.service';
           <div class="vote-q">{{ 'shutdown.vote.q' | translate }}</div>
           <div class="vote-goal">{{ 'shutdown.vote.goalInfo' | translate:{ n: votes.goal } }}</div>
           <div class="vote-row">
-            <button class="vote-btn close" [class.sel]="myVote === 'close'" [disabled]="!auth.token || voteClosed" (click)="castVote('close')">
+            <button class="vote-btn close" [class.sel]="myVote === 'close'" [disabled]="!auth.token || voteClosed || !!myVote" (click)="castVote('close')">
               {{ 'shutdown.vote.close' | translate }} <span class="vote-count">{{ votes.close }}</span>
             </button>
-            <button class="vote-btn keep" [class.sel]="myVote === 'keep'" [disabled]="!auth.token || voteClosed" (click)="castVote('keep')">
+            <button class="vote-btn keep" [class.sel]="myVote === 'keep'" [disabled]="!auth.token || voteClosed || !!myVote" (click)="castVote('keep')">
               {{ 'shutdown.vote.keep' | translate }} <span class="vote-count">{{ votes.keep }}/{{ votes.goal }}</span>
             </button>
           </div>
@@ -104,6 +104,7 @@ import { VersionService } from './services/version.service';
       background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
     }
     .vote-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .vote-btn.sel { opacity: 1; }
     .vote-btn.close.sel { border-color: #e2574f; background: color-mix(in srgb, #b3261e 22%, var(--surface-2)); }
     .vote-btn.keep.sel { border-color: #4caf7d; background: color-mix(in srgb, #2e7d52 22%, var(--surface-2)); }
     .vote-count { opacity: 0.75; font-weight: 800; margin-left: 4px; }
@@ -176,10 +177,9 @@ export class AppComponent implements OnInit {
   }
 
   castVote(vote: 'close' | 'keep') {
-    if (!this.auth.token || this.voteClosed || this.myVote === vote) return;
+    if (!this.auth.token || this.voteClosed || this.myVote) return; // one vote, final
     this.http.post(`${this.apiUrl.get()}/shutdown-vote`, { vote }).subscribe({
       next: () => {
-        if (this.myVote) this.votes[this.myVote]--;
         this.votes[vote]++;
         this.myVote = vote;
       },
