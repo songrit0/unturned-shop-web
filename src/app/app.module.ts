@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClient, HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -63,19 +63,8 @@ import { AdminDailyComponent } from './pages/admin-daily/admin-daily.component';
 import { AdminCodeBuilderComponent } from './pages/admin-code-builder/admin-code-builder.component';
 
 import { ApiErrorComponent } from './pages/api-error/api-error.component';
-import { ApiUrlService } from './services/api-url.service';
-import { VersionService } from './services/version.service';
 import { authInterceptor } from './services/auth.interceptor';
 import pkg from '../../package.json';
-
-// Resolve the API URL, then probe `/version` so connectivity is known before the first route
-// renders. AppComponent redirects to /api-error when the probe fails. probe() never throws.
-export function initApi(apiUrl: ApiUrlService, version: VersionService) {
-  return async () => {
-    await apiUrl.load();
-    await version.probe();
-  };
-}
 
 export function HttpLoaderFactory(http: HttpClient) {
   const v = (pkg as { version?: string }).version || '0';
@@ -156,7 +145,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
   ],
   providers: [
-    { provide: APP_INITIALIZER, useFactory: initApi, deps: [ApiUrlService, VersionService], multi: true },
     provideHttpClient(withInterceptors([authInterceptor])),
   ],
   bootstrap: [AppComponent],
